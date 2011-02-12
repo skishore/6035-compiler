@@ -1,4 +1,4 @@
-header {package decaf;}
+header {package edu.mit.compilers.lizfong.grammar;}
 
 options 
 {
