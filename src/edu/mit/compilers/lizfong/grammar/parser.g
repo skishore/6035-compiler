@@ -14,6 +14,13 @@ options
   buildAST=true;
 }
 
+// Primitives
+literal: INT | CHAR | BOOL;
+type: (TK_int | TK_boolean);
+assign_op: (ASSIGN | INC_ASSIGN | DEC_ASSIGN);
+location: (ID | ID LSQUARE expr RSQUARE);
+
+// Declarations
 program: TK_class ID LCURLY (field_decl)* (method_decl)* RCURLY EOF;
 field_decl:
   type (ID | ID LSQUARE INT RSQUARE)
@@ -22,9 +29,10 @@ method_decl:
   (type | TK_void) ID LPAREN (
     // Deliberately empty
     | type ID (COMMA type ID)*) RPAREN block;
-block: LCURLY (var_decl)* (statement)* RCURLY;
 var_decl: type ID (COMMA ID)* SEMICOLON;
-type: (TK_int | TK_boolean);
+
+// Control flows.
+block: LCURLY (var_decl)* (statement)* RCURLY;
 statement: (
   location assign_op expr SEMICOLON |
   method_call SEMICOLON |
@@ -37,28 +45,35 @@ statement: (
   TK_continue SEMICOLON |
   block
 );
-assign_op: (ASSIGN | INC_ASSIGN | DEC_ASSIGN);
+
+// Method calls.
+method_name: ID;
+callout_arg: expr | STRING;
 method_call: (
   method_name LPAREN ( // Deliberately empty
                        | expr (COMMA expr)*) RPAREN |
   TK_callout LPAREN STRING (COMMA callout_arg)* RPAREN
 );
-method_name: ID;
-location: (ID | ID LSQUARE expr RSQUARE);
 
+// Rewriting the grammar for expression evaluation to not cascade left,
+// and simultaneously ensuring order of operations is observed.
+// Tier -1: ||
 expr: term_zero expr_prime;
 expr_prime: (LOGICAL_OR term_zero expr_prime |
              // Deliberately empty
             );
+// Tier 0: &&
 term_zero: term_one term_zero_prime;
 term_zero_prime: (LOGICAL_AND term_one term_zero_prime |
                   // Deliberately empty
                  );
+// Tier 1: ==, !=
 term_one: term_two term_one_prime;
 term_one_prime: (EQUALS term_two term_one_prime |
                  NOT_EQUALS term_two term_one_prime |
                  // Deliberately empty
                 );
+// Tier 2: <, >, <=, >=
 term_two: term_three term_two_prime;
 term_two_prime: (LT term_three term_two_prime |
                  GT term_three term_two_prime |
@@ -66,25 +81,23 @@ term_two_prime: (LT term_three term_two_prime |
                  GE term_three term_two_prime |
                  // Deliberately empty
                 );
+// Tier 3: +, -
 term_three: term_four term_three_prime;
 term_three_prime: (PLUS term_four term_three_prime |
                    MINUS term_four term_three_prime|
                    // Deliberately empty
                   );
+// Tier 4: *, /, %
 term_four: term_five term_four_prime;
 term_four_prime: (TIMES term_five term_four_prime |
                   DIVIDE term_five term_four_prime |
                   MODULO term_five term_four_prime |
                   // Deliberately empty
                  );
+// Tier 5: !
 term_five: (NOT term_five | term_six);
+// Tier 6: urnary -
 term_six: (MINUS term_six | term_final);
+// Tier 7: base expressions and parenthesized subexpressions.
 term_final: (location | method_call | literal | LPAREN expr RPAREN);
 
-callout_arg: expr | STRING;
-bin_op: (arith_op | rel_op | eq_op | cond_op);
-arith_op: (PLUS | MINUS | TIMES | DIVIDE | MODULO);
-rel_op: (LT | GT | LE | GE);
-eq_op: (EQ | NOT_EQ);
-cond_op: (LOGICAL_AND | LOGICAL_OR);
-literal: INT | CHAR | BOOL;

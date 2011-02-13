@@ -1,0 +1,27 @@
+==Grammar==
+
+===Clarification/addition/assumptions===
+I believe my implementation returns a better result for char4 than the default
+testcase. Although the escape sequence is invalid, the char is otherwise
+syntactically correct so it makes little sense to me to return a spurious
+"unexpected newline" error in addition to flagging the invalid escape sequence.
+
+--- /tmp/fileq4X65m 2011-02-12 23:54:00.000000000 -0500
++++ /home/elizabeth/Desktop/6.035/fong-parser/tests/scanner/output/char4.out    2011-02-12 15:05:07.000000000 -0500
+@@ -1 +1,2 @@
+ char4 line 2:3: unexpected char: 'p'
++char4 line 2:5: unexpected char: 0xA
+
+==Overview of design, analysis of alternatives, and design decisions==
+
+
+==Implementation issues==
+The most frustrating experience I had with implementation was testcase char4.
+
+==Commented source code==
+See src/edu/mit/compilers/lizfong/grammar/{lexer,parser}.g
+I believe the code to be adequately commented, with no need for further
+copy-pasting of the file contents here.
+
+==Known problems==
+None current.
