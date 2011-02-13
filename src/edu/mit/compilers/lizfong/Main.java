@@ -19,6 +19,7 @@ import edu.mit.compilers.tools.CLI.Action;
 
 class Main {
   public static void main (String[] args) {
+    int retCode = 0;
     try {
       CLI.parse(args, new String[0]);
 
@@ -62,20 +63,26 @@ class Main {
             done = true;
           }
           catch (Exception e) {
-            // print the error:
+            // print the error and continue
             System.out.println(CLI.infile + " " + e);
             lexer.consume();
+            retCode = 1;
           }
         }
         break;
        case PARSE:
        case DEFAULT:
-        DecafScanner parse_lexer =
-          new DecafScanner(new DataInputStream(inputStream));
-        DecafParser parser = new DecafParser(parse_lexer);
-        parser.program();
+        try {
+          DecafScanner parse_lexer =
+            new DecafScanner(new DataInputStream(inputStream));
+          DecafParser parser = new DecafParser(parse_lexer);
+          parser.program();
+        } catch (Exception e) {
+          retCode = 2;
+        }
         break;
        default:
+        retCode = 255;
         throw new Exception("Action " + CLI.target + " not yet implemented.");
       }
     }
@@ -83,5 +90,6 @@ class Main {
       // print the error:
       System.out.println(CLI.infile + " " + e);
     }
+    System.exit(retCode);
   }
 }

@@ -75,7 +75,7 @@
     <antlr
       target="${src}/${base_package_dir}/grammar/parser.g"
       outputdirectory="${autogen}/${base_package_dir}/grammar"
-      trace="yes">
+      trace="no">
       <classpath>
         <pathelement location="${lib}/antlr.jar" />
       </classpath>
