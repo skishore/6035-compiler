@@ -63,7 +63,8 @@
   <target name="scanner" depends="init">
     <antlr
       target="${src}/${base_package_dir}/grammar/scanner.g"
-      outputdirectory="${autogen}/${base_package_dir}/grammar">
+      outputdirectory="${autogen}/${base_package_dir}/grammar"
+      trace="yes">
       <classpath>
         <pathelement location="${lib}/antlr.jar" />
       </classpath>
@@ -71,11 +72,10 @@
   </target>
 
   <target name="parser" depends="scanner">
-    <!-- set trace="yes" if you want to trace the parser actions -->
     <antlr
       target="${src}/${base_package_dir}/grammar/parser.g"
       outputdirectory="${autogen}/${base_package_dir}/grammar"
-      trace="no">
+      trace="yes">
       <classpath>
         <pathelement location="${lib}/antlr.jar" />
       </classpath>

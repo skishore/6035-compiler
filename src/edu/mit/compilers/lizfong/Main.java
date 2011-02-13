@@ -120,14 +120,18 @@ public class Main {
    */
   protected static boolean runScanner (InputStream inputStream) {
     boolean success = true;
-    DecafScanner lexer = new DecafScanner(new DataInputStream(inputStream));
+    DecafScanner scanner = new DecafScanner(new DataInputStream(inputStream));
+
+    // If debug mode is set, enable tracing in the scanner.
+    scanner.setTrace(CLI.debug);
+    
     Token token;
     boolean done = false;
     while (!done) {
       try {
-        for (token = lexer.nextToken();
+        for (token = scanner.nextToken();
              token.getType() != DecafParserTokenTypes.EOF;
-             token = lexer.nextToken()) {
+             token = scanner.nextToken()) {
           String type = "";
           String text = token.getText();
 
@@ -157,7 +161,7 @@ public class Main {
         // We hope that this gets us onto the right track again.
         reportError(e);
         try {
-          lexer.consume();
+          scanner.consume();
         } catch (CharStreamException cse) {
           reportError(cse);
         }
@@ -187,6 +191,8 @@ public class Main {
         parse_lexer.setFilename(CLI.infile);
         parser.setFilename(CLI.infile);
       }
+      // If debug mode is set, enable tracing in the parser.
+      parser.setTrace(CLI.debug);
 
       // Invoke the parser.
       parser.program();

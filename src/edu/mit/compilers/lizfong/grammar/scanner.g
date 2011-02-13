@@ -29,6 +29,28 @@ tokens
   "void";
 }
 
+// Selectively turns on debug mode.
+{
+  /** Whether to display debug information. */
+  private boolean trace = false;
+
+  public void setTrace(boolean shouldTrace) {
+    trace = shouldTrace;
+  }
+  @Override
+  public void traceIn(String rname) throws CharStreamException {
+    if (trace) {
+      super.traceIn(rname);
+    }
+  }
+  @Override
+  public void traceOut(String rname) throws CharStreamException {
+    if (trace) {
+      super.traceOut(rname);
+    }
+  }
+}
+
 // Symbols sadly cannot be listed as generic tokens.
 // Individually list each one along with a sane name.
 LCURLY options { paraphrase = "{"; } : "{";
