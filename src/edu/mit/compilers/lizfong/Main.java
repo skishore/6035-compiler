@@ -49,6 +49,13 @@ class Main {
                case DecafScannerTokenTypes.STRING:
                 type = " STRINGLITERAL";
                 break;
+               case DecafScannerTokenTypes.INT:
+                type = " INTLITERAL";
+                break;
+               case DecafScannerTokenTypes.TK_false:
+               case DecafScannerTokenTypes.TK_true:
+                type = " BOOLEANLITERAL";
+                break;
               }
               System.out.println(token.getLine() + type + " " + text);
             }
