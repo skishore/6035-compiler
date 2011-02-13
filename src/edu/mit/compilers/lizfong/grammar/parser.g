@@ -1,18 +1,19 @@
-header {package edu.mit.compilers.lizfong.grammar;}
+header { package edu.mit.compilers.lizfong.grammar; }
 
 options
 {
   mangleLiteralPrefix = "TK_";
-  language="Java";
+  language = "Java";
 }
 
 class DecafParser extends Parser;
 options
 {
-  importVocab=DecafScanner;
-  k=3;
-  buildAST=true;
+  importVocab = DecafScanner;
+  k =3 ;
+  buildAST = true;
 }
+
 // Do our own reporting of errors so the parser can return a non-zero status
 // if any errors are detected.
 // TODO(lizfong): don't use native error reporting, and instead collect the

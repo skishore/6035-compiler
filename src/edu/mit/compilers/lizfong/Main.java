@@ -19,12 +19,17 @@ import edu.mit.compilers.lizfong.grammar.DecafScannerTokenTypes;
 
 import edu.mit.compilers.tools.CLI;
 
+/**
+ * Main class used to invoke subcomponents of the compiler.
+ * @author Liz Fong <lizfong@mit.edu>
+ */
 public class Main {
+  /** Enumerates all valid return codes. */
   public enum ReturnCode {
     SUCCESS (0),
     SCAN_FAILED (1),
     PARSE_FAILED (2),
-    NO_SUCH_ACTION (255);
+    NO_SUCH_ACTION (127);
 
     private int numericCode;
     private ReturnCode (int code) {
@@ -35,48 +40,87 @@ public class Main {
     }
   };
 
+  public enum Optimization {
+    SAMPLE_OPT ("sample");
+    private String flagName;
+    private Optimization(String flag) {
+      flagName = flag;
+    }
+    public String flagName() {
+      return flagName;
+    }
+  }
+
+  /**
+   * Main entry point for compiler.
+   */
   public static void main (String[] args) {
+    // We should exit successfully unless something goes awry.
     ReturnCode retCode = ReturnCode.SUCCESS;
-    try {
-      CLI.parse(args, new String[0]);
+    // Default to reading from stdin unless we get a valid file input.
+    InputStream inputStream = System.in;
 
-      InputStream inputStream = (args.length == 0) ?
-        System.in : new FileInputStream(CLI.infile);
+    // Prepare the list of all optimization flags for the CLI utility. 
+    String[] optimizations = new String[Optimization.values().length];
+    int ii = 0;
+    for (Optimization opt : Optimization.values()) {
+      optimizations[ii] = opt.flagName();
+    }
 
-      switch (CLI.target) {
-       case SCAN:
-        if (!runScanner(inputStream)) {
-          retCode = ReturnCode.SCAN_FAILED;
-        }
-        break;
-       case PARSE:
-       case DEFAULT:
-        if (!runParser(inputStream)) {
-          retCode = ReturnCode.PARSE_FAILED;
-        }
-        break;
-       default:
-        retCode = ReturnCode.NO_SUCH_ACTION;
-        throw new NoSuchMethodException("Action " + CLI.target + " not yet implemented.");
+    CLI.parse(args, optimizations);
+
+    // If we have a valid file input, set up the input stream.
+    if (CLI.infile != null) {
+      try {
+        inputStream = new FileInputStream(CLI.infile);
+      } catch (IOException e) {
+        // print the error:
+        reportError(e);
       }
     }
-    catch (IOException e) {
-      // print the error:
-      reportError(e);
-    } catch (NoSuchMethodException nsme) {
-      reportError(nsme);
+
+    switch (CLI.target) {
+     case SCAN:
+      if (!runScanner(inputStream)) {
+        retCode = ReturnCode.SCAN_FAILED;
+      }
+      break;
+     case PARSE:
+     case DEFAULT:
+      if (!runParser(inputStream)) {
+        retCode = ReturnCode.PARSE_FAILED;
+      }
+      break;
+     default:
+      retCode = ReturnCode.NO_SUCH_ACTION;
+      reportError(new NoSuchMethodException(
+        "Action " + CLI.target + " not yet implemented."));
     }
     System.exit(retCode.numericCode());
   }
 
+  /**
+   * Utility method to pretty-print an exception along with the corresponding
+   * file name.
+   */
   protected static void reportError (Exception e) {
-    System.out.println(CLI.infile + " " + e);
+    String prefix = "<stdin> ";
+    if (CLI.infile != null) {
+      prefix = CLI.infile + " ";
+    }
+    System.out.println(prefix + e);
   }
 
+  /**
+   * Runs the scanner on an input and displays all tokens successfully
+   * parsed from the input, along with any error messages.
+   *
+   * @param inputStream The stream to read input from.
+   * @return true if scanner ran without errors, false if errors found.
+   */
   protected static boolean runScanner (InputStream inputStream) {
     boolean success = true;
-    DecafScanner lexer =
-      new DecafScanner(new DataInputStream(inputStream));
+    DecafScanner lexer = new DecafScanner(new DataInputStream(inputStream));
     Token token;
     boolean done = false;
     while (!done) {
@@ -109,7 +153,8 @@ public class Main {
         }
         done = true;
       } catch (ANTLRException e) {
-        // print the error and continue
+        // Print the error and continue by discarding the invalid token.
+        // We hope that this gets us onto the right track again.
         reportError(e);
         try {
           lexer.consume();
@@ -122,17 +167,31 @@ public class Main {
     return success;
   }
 
+  /**
+   * Runs the parser on an input and displays any error messages found while
+   * parsing.
+   *
+   * @param inputStream The stream to read input from.
+   * @return true if parser ran without errors, false if errors found.
+   */
   protected static boolean runParser (InputStream inputStream) {
     boolean success = true;
     try {
       DecafScanner parse_lexer =
         new DecafScanner(new DataInputStream(inputStream));
       DecafParser parser = new DecafParser(parse_lexer);
+
+      // The default instantiation is unaware of underlying filenames when
+      // pretty-printing exceptions. Set the values appropriately.
       if (inputStream instanceof FileInputStream) {
         parse_lexer.setFilename(CLI.infile);
         parser.setFilename(CLI.infile);
       }
+
+      // Invoke the parser.
       parser.program();
+
+      // If any errors were printed by the parser, note unsuccessful parse.
       if (parser.getError()) {
         success = false;
       }

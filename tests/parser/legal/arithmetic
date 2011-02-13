@@ -4,5 +4,16 @@ class Program {
   void main() {
     // Perform an order of operations test.
     a = foo() || bar() && baz == foo != false > 0 + 5 % !-(2 || 1);    
+
+    if (foo() > bar) {
+      // empty block
+    } else {
+      // nested if
+      if (2 < 'x') {
+        q = z;
+      }
+    }
+    q = (2 >= 1 * 5);
+    r = q <= 2 + 1;
   }
 }

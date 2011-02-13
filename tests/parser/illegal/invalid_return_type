@@ -1,0 +1,6 @@
+class Program {
+  // invalid return type
+  false main(int a) {
+    return int;
+  }
+}

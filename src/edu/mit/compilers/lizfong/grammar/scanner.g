@@ -1,9 +1,9 @@
-header {package edu.mit.compilers.lizfong.grammar;}
+header { package edu.mit.compilers.lizfong.grammar; }
 
 options 
 {
   mangleLiteralPrefix = "TK_";
-  language="Java";
+  language = "Java";
 }
 
 class DecafScanner extends Lexer;
@@ -71,15 +71,21 @@ SL_COMMENT : "//" (~'\n')* '\n' {_ttype = Token.SKIP; newline(); };
 // For characters and strings, manually construct the whitelist of valid
 // printing characters by removing the characters in ["'\].
 // Allow escape sequences, however.
-CHAR : '\'' (ESC|' '..'!'|'#'..'&'|'('..'['|']'..'~') '\'';
-STRING : '"' (ESC|' '..'!'|'#'..'&'|'('..'['|']'..'~')* '"';
+CHAR options { paraphrase = "a char"; } :
+  '\'' (ESC | ' '..'!' | '#'..'&' | '('..'[' | ']'..'~') '\'';
+STRING options { paraphrase = "a string"; }:
+  '"' (ESC | ' '..'!' | '#'..'&' | '('..'[' | ']'..'~')* '"';
 
 // Integers are straightforward - they are either in decimal or hex.
-INT options { paraphrase = "an integer"; } : (('0'..'9')+ | "0x" ('0'..'9' | 'a'..'f' | 'A'..'F')+);
+INT options { paraphrase = "an integer"; } :
+  ('0'..'9')+ | "0x" ('0'..'9' | 'a'..'f' | 'A'..'F')+;
 
 // Escape sequences consist of \n, \", \t, \\, and \'.
 // Also match anything else but return an explicit error.
 // Otherwise, the ESC rule fails to match causing CHAR/STRING to not match,
 // and the ID rule is used instead  to swallow the middle of the char/string.
+protected
 ESC :  '\\' ('n'|'"'|'t'|'\\'|'\''|
-             ~('n'|'"'|'t'|'\\'|'\'') {if (true) throw new NoViableAltForCharException((char)LA(0), getFilename(), getLine(), getColumn() - 1);});
+             ~('n'|'"'|'t'|'\\'|'\'')
+               {if (true) throw new NoViableAltForCharException(
+                 (char)LA(0), getFilename(), getLine(), getColumn() - 1);});

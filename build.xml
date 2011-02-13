@@ -62,7 +62,7 @@
 
   <target name="scanner" depends="init">
     <antlr
-      target="${src}/${base_package_dir}/grammar/lexer.g"
+      target="${src}/${base_package_dir}/grammar/scanner.g"
       outputdirectory="${autogen}/${base_package_dir}/grammar">
       <classpath>
         <pathelement location="${lib}/antlr.jar" />

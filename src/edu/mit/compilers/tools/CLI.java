@@ -11,7 +11,6 @@ import java.util.Vector;
  *
  * @author  6.035 Staff (<tt>6.035-staff@mit.edu</tt>)
  */
-
 public class CLI {
 
   /**
@@ -178,23 +177,23 @@ public class CLI {
 
     // create outfile name
     switch (target) {
-    case SCAN:
+     case SCAN:
       ext = ".scan";
       break;
-    case PARSE:
+     case PARSE:
       ext = ".parse";
       break;
-    case INTER:
+     case INTER:
       ext = ".ir";
       break;
-    case LOWIR:
+     case LOWIR:
       ext = ".lowir";
       break;
-    case ASSEMBLY:
+     case ASSEMBLY:
       ext = ".s";
       break;
-    case DEFAULT:
-    default:
+     case DEFAULT:
+     default:
       ext = ".out";
       break;
     }
@@ -203,7 +202,7 @@ public class CLI {
       int dot = infile.lastIndexOf('.');
       int slash = infile.lastIndexOf('/');
       // Last dot comes after last slash means that the file
-      // has an extention.  Note that the base case where dot
+      // has an extension.  Note that the base case where dot
       // or slash are -1 also work.
       if (dot <= slash)
         outfile = infile + ext;

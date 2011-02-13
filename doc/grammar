@@ -1,27 +1,81 @@
 ==Grammar==
 
 ===Clarification/addition/assumptions===
-I believe my implementation returns a better result for char4 than the default
-testcase. Although the escape sequence is invalid, the char is otherwise
-syntactically correct so it makes little sense to me to return a spurious
-"unexpected newline" error in addition to flagging the invalid escape sequence.
+I believe my implementation provides a more intuitive result for the provided
+char4 testcase than the expected output. Although the escape sequence is
+invalid, the char is otherwise syntactically correct so it makes little sense
+to me to return a spurious "unexpected newline" error in addition to flagging
+the invalid escape sequence.
 
---- /tmp/fileq4X65m 2011-02-12 23:54:00.000000000 -0500
-+++ /home/elizabeth/Desktop/6.035/fong-parser/tests/scanner/output/char4.out    2011-02-12 15:05:07.000000000 -0500
+I understand what the reference implementation is doing - it consumes the
+bad 'p' and causes the revised input to read as:
+'\'<newline>
+which then constructs a valid escape but causes the char to be unterminated.
+The unterminated char then results in a second spurious error message for the
+same original problem.
+
+Example discrepancy:
+--- /tmp/fileq4X65m
++++ /home/elizabeth/Desktop/6.035/fong-parser/tests/scanner/output/char4.out
 @@ -1 +1,2 @@
  char4 line 2:3: unexpected char: 'p'
 +char4 line 2:5: unexpected char: 0xA
 
 ==Overview of design, analysis of alternatives, and design decisions==
+I decided to split the grammar rules into the scanner and the parser by
+assigning only the minimum set of rules required to extract valid tokens to
+the scanner, and putting most of the meat in the parser.
 
+Thus, I opted to keep 'false' and 'true' as separate tokens in the lexer, and
+to only recognize them as booleans in the parser. The parser's only job is to
+find keywords, lex strings, chars, and integers, elide comments and whitespace,
+and mark identifiers from any remaining alphanumeric input.
+
+The parser constructs parse trees based on the grammar specified in the
+language reference; it is a relatively straightforward translation of the
+grammar with the exception of the transformation to avoid left-recursion.
+See the 'commented source code' section for commentary.
 
 ==Implementation issues==
+The majority of my effort on this assignment was spent setting up proper build
+and test infrastructure to ease future development; additionally, some effort
+was spent on reorganizing the directory tree and reformatting to comply with
+the style guide I'm most used to.
+
+test.sh in tests/parser and tests/scanner automatically compares the testcases
+with the expected outputs and exit statuses. It is invoked on every compile.
+The tests/src tree is used for unit testing the actual Java classes rather
+than the integration testing performed by test.sh.
+
 The most frustrating experience I had with implementation was testcase char4.
+I spent several hours trying to get the lexer to not attempt to parse the 'p'
+as an identifier once it gave up on making it match a known escape sequence.
+
+I realized halfway through implementation that the cause of my reduce/reduce
+conflicts typically was due to duplication of ((some clause)* |) - because *
+matches 0 or more times, the extra alternative of nothing was encapsulated in
+both cases and caused warnings.
+
+I predictably ran into infinite loops while implementing expr due to the
+expr := expr bin_op expr rule and solved the issue using the methods shown in
+class (see section below).
 
 ==Commented source code==
 See src/edu/mit/compilers/lizfong/grammar/{lexer,parser}.g
 I believe the code to be adequately commented, with no need for further
 copy-pasting of the file contents here.
 
+The most noteworthy bit of code that was not straight transcription of the
+grammar rules occurred in the parser for breaking 'expr' into multiple rules
+to avoid creating a left-recursive grammar. I opted to break
+tier := tier <op> tier
+ into
+tier := next_tier tier_prime  
+tier_prime := <op> tier_prime | // empty
+with the final layer consisting of raw literals, method calls, expressions,
+and of course parenthesized expressions to make grouping have the highest
+precedence. 
+
 ==Known problems==
-None current.
+None current, except for the intentional difference in the error messages
+shown for invalid escape sequences.
