@@ -13,18 +13,42 @@ options
   k=3;
   buildAST=true;
 }
+// Do our own reporting of errors so the parser can return a non-zero status
+// if any errors are detected.
+// TODO(lizfong): don't use native error reporting, and instead collect the
+// errors into an ArrayList so they can be pretty-printed along the lines of
+// the clang/llvm frontend or
+// http://www.milk.com/kodebase/antlr-tutorial/ErrorFormatter.java
+{
+  private boolean error;
+  public void reportError (RecognitionException ex) {
+    super.reportError(ex);
+    error = true;
+  }
+  public void reportError (String s) {
+    super.reportError(s);
+    error = true;
+  }
+  public boolean getError () {
+    return error;
+  }
+}
 
 // Primitives
-literal: INT | CHAR | BOOL;
-type: (TK_int | TK_boolean);
-assign_op: (ASSIGN | INC_ASSIGN | DEC_ASSIGN);
-location: (ID | ID LSQUARE expr RSQUARE);
+bool: TK_true | TK_false;
+literal: INT | CHAR | bool;
+type: TK_int | TK_boolean;
+assign_op: ASSIGN | INC_ASSIGN | DEC_ASSIGN;
+location: ID ( // Deliberately empty
+               | LSQUARE expr RSQUARE);
 
 // Declarations
 program: TK_class ID LCURLY (field_decl)* (method_decl)* RCURLY EOF;
 field_decl:
-  type (ID | ID LSQUARE INT RSQUARE)
-       (COMMA (ID | ID LSQUARE INT RSQUARE))* SEMICOLON;
+  type (ID ( // Deliberately empty
+             | LSQUARE INT RSQUARE))
+       (COMMA (ID ( // Deliberately empty
+                    | LSQUARE INT RSQUARE)))* SEMICOLON;
 method_decl:
   (type | TK_void) ID LPAREN (
     // Deliberately empty
@@ -33,7 +57,7 @@ var_decl: type ID (COMMA ID)* SEMICOLON;
 
 // Control flows.
 block: LCURLY (var_decl)* (statement)* RCURLY;
-statement: (
+statement:
   location assign_op expr SEMICOLON |
   method_call SEMICOLON |
   TK_if LPAREN expr RPAREN block ( // Deliberately empty
@@ -44,16 +68,16 @@ statement: (
   TK_break SEMICOLON |
   TK_continue SEMICOLON |
   block
-);
+;
 
 // Method calls.
 method_name: ID;
 callout_arg: expr | STRING;
-method_call: (
+method_call:
   method_name LPAREN ( // Deliberately empty
                        | expr (COMMA expr)*) RPAREN |
   TK_callout LPAREN STRING (COMMA callout_arg)* RPAREN
-);
+;
 
 // Rewriting the grammar for expression evaluation to not cascade left,
 // and simultaneously ensuring order of operations is observed.
@@ -95,9 +119,9 @@ term_four_prime: (TIMES term_five term_four_prime |
                   // Deliberately empty
                  );
 // Tier 5: !
-term_five: (NOT term_five | term_six);
+term_five: NOT term_five | term_six;
 // Tier 6: urnary -
-term_six: (MINUS term_six | term_final);
+term_six: MINUS term_six | term_final;
 // Tier 7: base expressions and parenthesized subexpressions.
-term_final: (location | method_call | literal | LPAREN expr RPAREN);
+term_final: location | method_call | literal | LPAREN expr RPAREN;
 

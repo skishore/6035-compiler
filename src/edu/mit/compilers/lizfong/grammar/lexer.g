@@ -75,7 +75,7 @@ CHAR : '\'' (ESC|' '..'!'|'#'..'&'|'('..'['|']'..'~') '\'';
 STRING : '"' (ESC|' '..'!'|'#'..'&'|'('..'['|']'..'~')* '"';
 
 // Integers are straightforward - they are either in decimal or hex.
-INT : (('0'..'9')+ | "0x" ('0'..'9' | 'a'..'f' | 'A'..'F')+);
+INT options { paraphrase = "an integer"; } : (('0'..'9')+ | "0x" ('0'..'9' | 'a'..'f' | 'A'..'F')+);
 
 // Escape sequences consist of \n, \", \t, \\, and \'.
 // Also match anything else but return an explicit error.

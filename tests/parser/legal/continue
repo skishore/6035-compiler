@@ -1,0 +1,18 @@
+class Program {
+  void bar(int a) {
+
+    for i = 0, a {
+      if (a == 4) {
+        continue;
+      }
+      callout("printf", "%d\n", i);
+      if (a == 9) {
+        break;
+      }
+    }
+  }
+
+  void main() {
+    bar(10);
+  }
+}
