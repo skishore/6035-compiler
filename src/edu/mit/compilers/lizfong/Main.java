@@ -40,8 +40,14 @@ class Main {
               String text = token.getText();
 
               switch (token.getType()) {
-              case DecafScannerTokenTypes.ID:
+               case DecafScannerTokenTypes.ID:
                 type = " IDENTIFIER";
+                break;
+               case DecafScannerTokenTypes.CHAR:
+                type = " CHARLITERAL";
+                break;
+               case DecafScannerTokenTypes.STRING:
+                type = " STRINGLITERAL";
                 break;
               }
               System.out.println(token.getLine() + type + " " + text);

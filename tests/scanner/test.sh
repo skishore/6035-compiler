@@ -1,7 +1,8 @@
 #!/bin/sh
 
 runscanner() {
-  java -jar `dirname $0`/../../dist/Compiler.jar -target scan $1
+  cd `dirname $1`;
+  java -jar `dirname $0`/../../dist/Compiler.jar -target scan `basename $1`
 }
 
 for file in `dirname $0`/input/*; do
