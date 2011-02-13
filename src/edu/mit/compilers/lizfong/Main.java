@@ -197,6 +197,11 @@ public class Main {
       // Invoke the parser.
       parser.program();
 
+      // If we are in debug mode, output the AST so it can be inspected.
+      if (CLI.debug) {
+        System.out.println(parser.getAST().toStringList());
+      }
+
       // If any errors were printed by the parser, note unsuccessful parse.
       if (parser.getError()) {
         success = false;
