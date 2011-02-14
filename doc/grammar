@@ -34,6 +34,9 @@ and mark identifiers from any remaining alphanumeric input.
 The parser constructs parse trees based on the grammar specified in the
 language reference; it is a relatively straightforward translation of the
 grammar with the exception of the transformation to avoid left-recursion.
+I removed unneeded tokens such as ;[]() from the parser output to eliminate
+verbosity, and where possible organized structures into subtrees.
+
 See the 'commented source code' section for commentary.
 
 ==Implementation issues==
@@ -60,22 +63,78 @@ I predictably ran into infinite loops while implementing expr due to the
 expr := expr bin_op expr rule and solved the issue using the methods shown in
 class (see section below).
 
+At the 11th hour, I realized that the generated parse tree was flat and I
+needed to not use antlr's default parse tree styles and instead create my own
+subtrees in order to get a recognizable AST with actual depth. This design
+change resulted in significant code churn due to needing to rewrite almost
+every rule to tag parts of input to place into the tree at varying subtree
+depths.
+
+I implemented a flag to allow graphical display of debug data in order to
+better analyze what was happening with the parse trees.
+
 ==Commented source code==
 See src/edu/mit/compilers/lizfong/grammar/{lexer,parser}.g
 I believe the code to be adequately commented, with no need for further
 copy-pasting of the file contents here.
 
-The most noteworthy bit of code that was not straight transcription of the
-grammar rules occurred in the parser for breaking 'expr' into multiple rules
-to avoid creating a left-recursive grammar. I opted to break
+I broke 'expr' into multiple rules to avoid creating a left-recursive grammar:
 tier := tier <op> tier
- into
-tier := next_tier tier_prime  
+ became
+tier := next_tier tier_prime
 tier_prime := <op> tier_prime | // empty
 with the final layer consisting of raw literals, method calls, expressions,
 and of course parenthesized expressions to make grouping have the highest
-precedence. 
+precedence.
+
+Breaking up comma-separated and other arbitrary-length sequences of tokens
+into organized lists was extremely difficult. I settled on the following
+approach:
+
+For declarations, my goal was to cause them to expand into a flat list by
+appending successive elements to the root node. I also played a trick to
+automatically expand compound field declarations such as "int i, j;"
+into a list automatically e.g. [ FieldDecl->(int, i), FieldDecl->(int, j) ]
+This required cloning the type rather than using it directly to avoid
+poisoning the tree structure.
+
+field_decl!:
+  t:type (n1:ID ( // Deliberately empty
+                 | LSQUARE! s1:int_literal RSQUARE!)
+                 {AST t_copy = astFactory.create(#t);
+                  astFactory.addASTChild(currentAST,
+                        #([FIELD_DECL,"FieldDecl"], t_copy, n1, s1));}
+                )
+       (COMMA (n2:ID ( // Deliberately empty
+                      | LSQUARE! s2:int_literal RSQUARE!)
+                      {AST t_copy = astFactory.create(#t);
+                      astFactory.addASTChild(currentAST,
+                        #([FIELD_DECL,"FieldDecl"], t_copy, n2, s2));})
+                     )* SEMICOLON!
+  { #field_decl = (AST)currentAST.root; };
+
+In the case of lists of fields/methods e.g. in the program class body, I used
+accumulator subtrees to store the lists of declarations/functions.
+
+program!:
+  {
+    AST f_accum = #([PROGRAM_FIELDS,"Fields"]);
+    AST m_accum = #([PROGRAM_METHODS,"Methods"]);
+  }
+  TK_class! n:ID LCURLY! (f:field_decl {f_accum.addChild(#f);})*
+                         (m:method_decl {m_accum.addChild(#m);})*
+                         RCURLY! EOF!
+  { #program = #([PROGRAM,"Prog"], n, f_accum, m_accum); };
+
+Here, f_accum and m_accum store the field and method subtrees and then glob
+them into the program neatly organized. Using this method, it might easily be
+possible to extend the language to permit field and method declarations in any
+order.
 
 ==Known problems==
-None current, except for the intentional difference in the error messages
-shown for invalid escape sequences.
+* Intentional difference in the error messages for invalid escape sequences.
+* Generated syntax trees are a little messy, mostly due to large amounts of
+  recursion depth triggered by simple primitives.
+* I am unsure as to the correctness of the syntax trees - it wasn't specified
+  how best to construct them so I took some wild guesses.
+* Concrete parse trees need to be pivoted to eliminate the prime terms.

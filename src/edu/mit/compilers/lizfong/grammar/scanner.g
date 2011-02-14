@@ -1,18 +1,18 @@
-header { package edu.mit.compilers.lizfong.grammar; }
+header {package edu.mit.compilers.lizfong.grammar;}
 
-options 
+options
 {
   mangleLiteralPrefix = "TK_";
   language = "Java";
 }
 
 class DecafScanner extends Lexer;
-options 
+options
 {
   k = 2;
 }
 
-tokens 
+tokens
 {
   "boolean";
   "break";
@@ -81,7 +81,7 @@ COMMA options { paraphrase = ","; } : ",";
 
 // Identifier is the catch-all bucket for any alphanumeric token.
 // Typically method or variable names.
-ID options { paraphrase = "an identifier"; } : 
+ID options { paraphrase = "an identifier"; } :
   ('a'..'z' | 'A'..'Z' | '_') ('a'..'z' | 'A'..'Z' | '0'..'9' | '_')*;
 
 // Elide whitespace - spaces, tabs, and newlines.
@@ -91,7 +91,7 @@ WS_ : (' ' | '\t' | '\n' {newline();}) {_ttype = Token.SKIP; };
 SL_COMMENT : "//" (~'\n')* '\n' {_ttype = Token.SKIP; newline(); };
 
 // For characters and strings, manually construct the whitelist of valid
-// printing characters by removing the characters in ["'\].
+// printing characters by removing the characters in ["'\] from ' '..'~'.
 // Allow escape sequences, however.
 CHAR options { paraphrase = "a char"; } :
   '\'' (ESC | ' '..'!' | '#'..'&' | '('..'[' | ']'..'~') '\'';

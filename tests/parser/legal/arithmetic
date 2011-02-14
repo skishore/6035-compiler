@@ -1,10 +1,15 @@
 class Program {
-  int a[10];
+  int a[10], b, c[5], d[1];
+  int f;
 
   void main() {
     // Perform an order of operations test.
-    a = foo() || bar() && baz == foo != false > 0 + 5 % !-(2 || 1);    
-
+    a = foo() || bar() && baz == foo != false > 0 + 5 % !-(2 || 1);
+    // Sub-block.
+    {
+      int temp;
+      temp = temp + 1;
+    }
     if (foo() > bar) {
       // empty block
     } else {

@@ -27,11 +27,11 @@
 
   <!-- Binaries for tools, etc. -->
   <property name="bin" location="bin" />
-  
-  <!-- Build up a path structure for a classpath 
-       that includes the binaries (jars) in bin/ and 
-       the existing classpath.  Not used now, 
-       because the jflex and cup task define their own cp, 
+
+  <!-- Build up a path structure for a classpath
+       that includes the binaries (jars) in bin/ and
+       the existing classpath.  Not used now,
+       because the jflex and cup task define their own cp,
        but could come in handly later. -->
   <path id="binaries">
     <pathelement location="${bin}" />
@@ -43,7 +43,7 @@
     <pathelement path="${classes}" />
   </path>
 
-  <!-- Build up a path structure for a classpath 
+  <!-- Build up a path structure for a classpath
        that includes the libraries and the existing classpath -->
   <path id="libraries">
     <pathelement location="${lib}" />
@@ -83,14 +83,14 @@
   </target>
 
   <target name="compile" depends="parser">
-    <javac srcdir="${autogen}:${src}:${unittests}" destdir="${classes}" debug="on"
-           includeantruntime="false">
+    <javac srcdir="${autogen}:${src}:${unittests}" destdir="${classes}"
+           debug="on" includeantruntime="false">
       <classpath refid="libraries" />
     </javac>
   </target>
 
   <target name="unittests" depends="compile">
-    <junit>
+    <junit failureproperty="junit.failed">
       <classpath>
         <path refid="libraries" />
         <pathelement path="${classes}" />
@@ -102,6 +102,7 @@
         </fileset>
       </batchtest>
     </junit>
+    <fail if="junit.failed" message="Unit tests failed!" />
   </target>
 
   <target name="jar" depends="unittests">
@@ -112,9 +113,11 @@
        <attribute name="Class-Path" value="antlr.jar" />
      </manifest>
     </jar>
-    <!-- Third party libraries can only be found by java -jar if they reside in the same dir
-         but we don't a billion copies floating around, so use symlinks instead. -->
-    <symlink link="${dist}/antlr.jar" resource="${lib}/antlr.jar" overwrite="true" />
+    <!-- Third party libraries can only be found by java -jar if they
+         reside in the same dir but we don't a billion copies floating around,
+         so use symlinks instead. -->
+    <symlink link="${dist}/antlr.jar" resource="${lib}/antlr.jar"
+             overwrite="true" />
   </target>
 
   <target name="integration_tests" depends="jar">

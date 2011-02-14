@@ -71,6 +71,12 @@ public class CLI {
   public static boolean debug;
 
   /**
+   * The graphics flag.  This is true if <tt>-graphics</tt> was passed on
+   * the command line, requesting graphic debugging output.
+   */
+  public static boolean graphics;
+
+  /**
    * Sets up default values for all of the
    * result fields.  Specifically, sets the input and output files
    * to null, the target to DEFAULT, and the extras and extraopts
@@ -111,17 +117,30 @@ public class CLI {
 
     for (int i = 0; i < args.length; i++)
     {
+      // Match single flags.
       if (args[i].equals("-debug")) {
         context = 0;
         debug = true;
+        continue;
       }
-      else if (args[i].equals("-opt"))
-          context = 1;
-      else if (args[i].equals("-o"))
+      if (args[i].equals("-graphics")) {
+        context = 0;
+        graphics = true;
+        continue;
+      } else if (args[i].equals("-opt")) {
+        context = 1;
+        continue;
+      } else if (args[i].equals("-o")) {
         context = 2;
-      else if (args[i].equals("-target"))
+        continue;
+      } else if (args[i].equals("-target")) {
         context = 3;
-      else if (context == 1) {
+        continue;
+      }
+
+      // Parse either flag arguments, or general arguments.
+      switch (context) {
+       case 1:
         boolean hit = false;
         for (int j = 0; j < optnames.length; j++) {
           if (args[i].equals("all") || (args[i].equals(optnames[j]))) {
@@ -133,34 +152,37 @@ public class CLI {
             opts[j] = false;
           }
         }
-        if (!hit)
+        if (!hit) {
           extraopts.addElement(args[i]);
-      }
-      else if (context == 2) {
+        }
+        break;
+       case 2:
         outfile = args[i];
         context = 0;
-      }
-      else if (context == 3) {
+        break;
+       case 3:
         // Process case insensitive.
         String argSansCase = args[i].toLowerCase();
         // accept "scan" and "scanner" due to handout mistake
-        if (argSansCase.equals("scan") || argSansCase.equals("scanner"))
+        if (argSansCase.equals("scan") || argSansCase.equals("scanner")) {
           target = Action.SCAN;
-        else if (argSansCase.equals("parse"))
+        } else if (argSansCase.equals("parse")) {
           target = Action.PARSE;
-        else if (argSansCase.equals("inter"))
+        } else if (argSansCase.equals("inter")) {
           target = Action.INTER;
-        else if (argSansCase.equals("lowir"))
+        } else if (argSansCase.equals("lowir")) {
           target = Action.LOWIR;
-        else if (argSansCase.equals("assembly") ||
-                 argSansCase.equals("codegen"))
+        } else if (argSansCase.equals("assembly") ||
+                   argSansCase.equals("codegen")) {
           target = Action.ASSEMBLY;
-        else
-          target = Action.DEFAULT;     // Anything else is just default
+        } else {
+          target = Action.DEFAULT;
+        }
         context = 0;
-      }
-      else
+        break;
+       default:
         extras.addElement(args[i]);
+      }
     }
 
     // grab infile and lose extra args

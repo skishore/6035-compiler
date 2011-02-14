@@ -11,6 +11,7 @@ import java.io.InputStream;
 import antlr.CharStreamException;
 import antlr.Token;
 import antlr.ANTLRException;
+import antlr.debug.misc.ASTFrame;
 
 import edu.mit.compilers.lizfong.grammar.DecafParser;
 import edu.mit.compilers.lizfong.grammar.DecafParserTokenTypes;
@@ -60,7 +61,7 @@ public class Main {
     // Default to reading from stdin unless we get a valid file input.
     InputStream inputStream = System.in;
 
-    // Prepare the list of all optimization flags for the CLI utility. 
+    // Prepare the list of all optimization flags for the CLI utility.
     String[] optimizations = new String[Optimization.values().length];
     int ii = 0;
     for (Optimization opt : Optimization.values()) {
@@ -124,7 +125,7 @@ public class Main {
 
     // If debug mode is set, enable tracing in the scanner.
     scanner.setTrace(CLI.debug);
-    
+
     Token token;
     boolean done = false;
     while (!done) {
@@ -183,7 +184,7 @@ public class Main {
     try {
       DecafScanner parse_lexer =
         new DecafScanner(new DataInputStream(inputStream));
-      DecafParser parser = new DecafParser(parse_lexer);
+      final DecafParser parser = new DecafParser(parse_lexer);
 
       // The default instantiation is unaware of underlying filenames when
       // pretty-printing exceptions. Set the values appropriately.
@@ -200,6 +201,24 @@ public class Main {
       // If we are in debug mode, output the AST so it can be inspected.
       if (CLI.debug) {
         System.out.println(parser.getAST().toStringList());
+        if (CLI.graphics) {
+          Thread thread = new Thread() {
+            @Override
+            public void run() {
+              ASTFrame frame = new ASTFrame(CLI.infile, parser.getAST());
+              frame.validate();
+              frame.setVisible(true);
+            }
+          };
+
+          thread.run();
+          try {
+            // TODO(lizfong): fix kludge.
+            Thread.sleep(3 * 60 * 1000);
+          } catch (InterruptedException ie) {
+            // ignore
+          }
+        }
       }
 
       // If any errors were printed by the parser, note unsuccessful parse.
