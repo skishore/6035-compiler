@@ -58,6 +58,13 @@ tokens
   @Override
   public void reportError (RecognitionException ex) {
     super.reportError(ex);
+    if (ex instanceof MismatchedTokenException) {
+      MismatchedTokenException mte = (MismatchedTokenException)ex;
+      if (mte.token.getText() == null) {
+        System.err.println(" Previous error indicates unexpected EOF found.");
+      }
+    }
+
     error = true;
   }
   @Override

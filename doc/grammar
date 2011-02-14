@@ -138,3 +138,6 @@ order.
 * I am unsure as to the correctness of the syntax trees - it wasn't specified
   how best to construct them so I took some wild guesses.
 * Concrete parse trees need to be pivoted to eliminate the prime terms.
+* Encountering unexpected EOFs results in "expecting }, found 'null'" rather
+  than "expecting }, found EOF". I have ducttaped a second message to fire
+  after that in order to ensure that it's clear that an EOF is expected.
