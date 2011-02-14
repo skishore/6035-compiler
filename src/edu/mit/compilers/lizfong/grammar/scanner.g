@@ -103,11 +103,5 @@ INT options { paraphrase = "an integer"; } :
   ('0'..'9')+ | "0x" ('0'..'9' | 'a'..'f' | 'A'..'F')+;
 
 // Escape sequences consist of \n, \", \t, \\, and \'.
-// Also match anything else but return an explicit error.
-// Otherwise, the ESC rule fails to match causing CHAR/STRING to not match,
-// and the ID rule is used instead  to swallow the middle of the char/string.
 protected
-ESC :  '\\' ('n'|'"'|'t'|'\\'|'\''|
-             ~('n'|'"'|'t'|'\\'|'\'')
-               {if (true) throw new NoViableAltForCharException(
-                 (char)LA(0), getFilename(), getLine(), getColumn() - 1);});
+ESC :  '\\' ('n'|'"'|'t'|'\\'|'\'');

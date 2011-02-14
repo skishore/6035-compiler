@@ -12,12 +12,7 @@ for file in `dirname $0`/input/*; do
   runscanner $file > $output;
   if ! diff -u $output `dirname $0`/output/`basename $file`.out; then
     echo "File $file scanner output mismatch.";
-    if test -f `dirname $0`/output/`basename $file.alt` &&
-       diff -u $output `dirname $0`/output/`basename $file`.alt; then
-      echo "File $file scanner output matched alternate output.";
-    else
-       fail=1
-    fi
+    fail=1
   fi
   rm $output;
 done

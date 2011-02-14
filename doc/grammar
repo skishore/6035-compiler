@@ -1,25 +1,7 @@
 ==Grammar==
 
 ===Clarification/addition/assumptions===
-I believe my implementation provides a more intuitive result for the provided
-char4 testcase than the expected output. Although the escape sequence is
-invalid, the char is otherwise syntactically correct so it makes little sense
-to me to return a spurious "unexpected newline" error in addition to flagging
-the invalid escape sequence.
-
-I understand what the reference implementation is doing - it consumes the
-bad 'p' and causes the revised input to read as:
-'\'<newline>
-which then constructs a valid escape but causes the char to be unterminated.
-The unterminated char then results in a second spurious error message for the
-same original problem.
-
-Example discrepancy:
---- /tmp/fileq4X65m
-+++ /home/elizabeth/Desktop/6.035/fong-parser/tests/scanner/output/char4.out
-@@ -1 +1,2 @@
- char4 line 2:3: unexpected char: 'p'
-+char4 line 2:5: unexpected char: 0xA
+None.
 
 ==Overview of design, analysis of alternatives, and design decisions==
 I decided to split the grammar rules into the scanner and the parser by
@@ -53,11 +35,14 @@ than the integration testing performed by test.sh.
 The most frustrating experience I had with implementation was testcase char4.
 I spent several hours trying to get the lexer to not attempt to parse the 'p'
 as an identifier once it gave up on making it match a known escape sequence.
+What had happened was that I'd accidentally dropped the 'protected' tag from
+ESC, causing it to resolve in the global context and allowing ID evaluation. 
 
 I realized halfway through implementation that the cause of my reduce/reduce
 conflicts typically was due to duplication of ((some clause)* |) - because *
 matches 0 or more times, the extra alternative of nothing was encapsulated in
-both cases and caused warnings.
+both cases and caused warnings. Removing the extra empty option fixed the
+ambiguity.
 
 I predictably ran into infinite loops while implementing expr due to the
 expr := expr bin_op expr rule and solved the issue using the methods shown in
@@ -132,7 +117,6 @@ possible to extend the language to permit field and method declarations in any
 order.
 
 ==Known problems==
-* Intentional difference in the error messages for invalid escape sequences.
 * Generated syntax trees are a little messy, mostly due to large amounts of
   recursion depth triggered by simple primitives.
 * I am unsure as to the correctness of the syntax trees - it wasn't specified
