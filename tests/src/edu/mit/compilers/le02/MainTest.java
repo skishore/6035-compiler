@@ -1,8 +1,9 @@
 // Copyright (c) 2011 Liz Fong <lizfong@mit.edu>
 // All rights reserved.
 
-package edu.mit.compilers.lizfong;
+package edu.mit.compilers.le02;
 
+import edu.mit.compilers.le02.Main;
 import junit.framework.TestCase;
 
 /**

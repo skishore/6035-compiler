@@ -1,9 +1,10 @@
 // Copyright (c) 2011 Liz Fong <lizfong@mit.edu>
 // All rights reserved.
 
-package edu.mit.compilers.lizfong;
+package edu.mit.compilers.le02;
 
 import java.io.DataInputStream;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,10 +14,10 @@ import antlr.Token;
 import antlr.ANTLRException;
 import antlr.debug.misc.ASTFrame;
 
-import edu.mit.compilers.lizfong.grammar.DecafParser;
-import edu.mit.compilers.lizfong.grammar.DecafParserTokenTypes;
-import edu.mit.compilers.lizfong.grammar.DecafScanner;
-import edu.mit.compilers.lizfong.grammar.DecafScannerTokenTypes;
+import edu.mit.compilers.le02.grammar.DecafParser;
+import edu.mit.compilers.le02.grammar.DecafParserTokenTypes;
+import edu.mit.compilers.le02.grammar.DecafScanner;
+import edu.mit.compilers.le02.grammar.DecafScannerTokenTypes;
 
 import edu.mit.compilers.tools.CLI;
 

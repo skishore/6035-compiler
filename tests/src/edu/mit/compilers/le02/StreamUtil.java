@@ -1,4 +1,4 @@
-package edu.mit.compilers.lizfong;
+package edu.mit.compilers.le02;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

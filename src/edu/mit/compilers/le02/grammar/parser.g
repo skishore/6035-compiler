@@ -1,4 +1,4 @@
-header {package edu.mit.compilers.lizfong.grammar;}
+header {package edu.mit.compilers.le02.grammar;}
 
 options
 {
