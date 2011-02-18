@@ -26,10 +26,11 @@ public final class SyscallArgNode extends ASTNode {
 	public List<ASTNode> getChildren() {
 		List<ASTNode> children = new ArrayList<ASTNode>();
 		
-		if (isString)
+		if (isString) {
 			children.add(str);
-		else
+		} else {
 			children.add(expr);
+		}
 		
 		return children;
 	}

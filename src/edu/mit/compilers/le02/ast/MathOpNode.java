@@ -23,7 +23,8 @@ public final class MathOpNode extends BinaryOpNode {
 		ADD,
 		SUBTRACT,
 		MULTIPLY,
-		DIVIDE
+		DIVIDE,
+		MODULO
 	}	
 
 }
