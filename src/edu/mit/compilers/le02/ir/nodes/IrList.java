@@ -1,7 +1,7 @@
 /**
  * 
  */
-package edu.mit.compilers.le02.ir;
+package edu.mit.compilers.le02.ir.nodes;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 
-public class IrList<T extends IrElement> extends IrElement implements List<T> {
+public class IrList<T extends IrNode> extends IrNode implements List<T> {
 
   private ArrayList<T> list = new ArrayList<T>();
 

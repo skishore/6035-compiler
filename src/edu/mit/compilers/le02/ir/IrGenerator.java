@@ -1,19 +1,24 @@
 package edu.mit.compilers.le02.ir;
 
 import edu.mit.compilers.le02.grammar.DecafParserTokenTypes;
+import edu.mit.compilers.le02.ir.nodes.IrClassDecl;
+import edu.mit.compilers.le02.ir.nodes.IrNode;
+import edu.mit.compilers.le02.ir.nodes.IrFieldDecl;
+import edu.mit.compilers.le02.ir.nodes.IrList;
+import edu.mit.compilers.le02.ir.nodes.IrMethodDecl;
 import antlr.collections.AST;
 
-public class IRGenerator {
+public class IrGenerator {
 
   /** Holds the IRGenerator singleton. */
-  private static IRGenerator instance;
+  private static IrGenerator instance;
 
   /**
    * Retrieves the IRGenerator singleton, creating if necessary.
    */
-  public static IRGenerator getInstance() {
+  public static IrGenerator getInstance() {
     if (instance == null) {
-      instance = new IRGenerator();
+      instance = new IrGenerator();
     }
     return instance;
   }
@@ -21,12 +26,12 @@ public class IRGenerator {
   /**
    * Generates an intermediate representation based on an input AST.
    */
-  public static IrElement GenerateIR(AST root) throws IRException {
+  public static IrNode GenerateIR(AST root) throws IrException {
     return getInstance().visit(root);
   }
 
   @SuppressWarnings("unchecked")
-  public IrElement visit(AST node) throws IRException {
+  public IrNode visit(AST node) throws IrException {
     AST current_node = node;
     if (current_node == null) {
       return null;
@@ -49,55 +54,55 @@ public class IRGenerator {
         (IrList<IrMethodDecl>)visit(methods_ast);
       return new IrClassDecl(name, fields, methods);
      case DecafParserTokenTypes.PROGRAM_FIELDS:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.PROGRAM_METHODS:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.CALL:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.CALL_ARGS:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.CALL_ARG:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.DECLARATION_ARGS:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.DECLARATION_ARG:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.EXPR:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.TERM:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.TERM_PRIME:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.STMT:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.BLOCK:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.BLOCK_VARS:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.BLOCK_STMTS:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.ASSIGNMENT:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.METHOD_DECL:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.LOCAL_VAR_DECL:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.FIELD_DECL:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.TYPES:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.LOCATION:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.BOOLEAN_LITERAL:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.CHAR_LITERAL:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.INTEGER_LITERAL:
-      return new IrElement() {};
+      return new IrNode() {};
      case DecafParserTokenTypes.STRING_LITERAL:
-      return new IrElement() {};
+      return new IrNode() {};
      default:
-      throw new IRException();
+      throw new IrException();
     }
   }
 }
