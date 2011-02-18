@@ -5,11 +5,7 @@ import java.util.List;
 
 public abstract class UnaryOpNode extends ExpressionNode {
 	protected ExpressionNode expr;
-
-	public UnaryOpNode(SourceLocation sl) {
-		super(sl);
-	}
-
+	
 	public UnaryOpNode(SourceLocation sl, ExpressionNode expr) {
 		super(sl);
 		this.expr = expr;
