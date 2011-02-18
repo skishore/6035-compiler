@@ -18,11 +18,13 @@ DeclNode (abstract) - Base class for all declarations
   Fields:
   - type
   - name
+
+FieldDeclNode (abstract) extends DeclNode
   
-FieldDeclNode extends DeclNode - Class for field declarations (globals)
+ArrayDeclNode extends FieldDeclNode - Class for array declarations
   (inherited fields only)
   
-VarDeclNode extends DeclNode - Class for local variable declarations
+VarDeclNode extends FieldDeclNode - Class for local variable declarations
   (inherited fields only)
   
 MethodDeclNode extends DeclNode - Class for method declarations
@@ -143,7 +145,7 @@ SystemCallNode extends CallNode - Represents a system call (callout)
 
 ClassNode extends ASTNode - Represents a class
   Children:
-  - fields: List of FieldDeclNodes
+  - fields: List of DeclNodes
   - methods: List of MethodDeclNodes
 
 StringNode extends ASTNode - Represents a String

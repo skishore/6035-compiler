@@ -3,8 +3,6 @@ package edu.mit.compilers.le02.ast;
 import java.util.Collections;
 import java.util.List;
 
-import edu.mit.compilers.le02.DecafType;
-
 public final class BooleanNode extends ExpressionNode {
 	private boolean value;
 
