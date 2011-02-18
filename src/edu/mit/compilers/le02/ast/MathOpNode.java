@@ -5,16 +5,15 @@ import edu.mit.compilers.le02.DecafType;
 public final class MathOpNode extends BinaryOpNode {
 	private MathOp op;
 
-	public MathOpNode(String filename, int line, int col, MathOp op) {
-		super(filename, line, col);
+	public MathOpNode(SourceLocation sl, MathOp op) {
+		super(sl);
 		this.op = op;
 	}
-
-	@Override
-	public DecafType getType() {
-		return DecafType.INT;
-	}
 	
+	public MathOpNode(SourceLocation sl, ExpressionNode left, ExpressionNode right, MathOp op) {
+		super(sl, left, right);
+		this.op = op;
+	}
 
 	public MathOp getOp() {
 		return op;

@@ -4,11 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class BlockNode extends StatementNode {
-	protected ArrayList<VarDeclNode> decls;
-	protected ArrayList<StatementNode> statements;
+	protected List<VarDeclNode> decls;
+	protected List<StatementNode> statements;
 
-	public BlockNode(String filename, int line, int col) {
-		super(filename, line, col);
+	public BlockNode(SourceLocation sl) {
+		super(sl);
+	}
+
+	public BlockNode(SourceLocation sl, List<VarDeclNode> decls, List<StatementNode> statements) {
+		super(sl);
+		this.decls = decls;
+		this.statements = statements;
 	}
 
 	@Override
@@ -19,4 +25,21 @@ public final class BlockNode extends StatementNode {
 		return children;
 	}
 
+	public List<VarDeclNode> getDecls() {
+		return decls;
+	}
+
+	public void setDecls(List<VarDeclNode> decls) {
+		this.decls = decls;
+	}
+
+	public List<StatementNode> getStatements() {
+		return statements;
+	}
+
+	public void setStatements(List<StatementNode> statements) {
+		this.statements = statements;
+	}
+	
+	
 }

@@ -5,15 +5,15 @@ import edu.mit.compilers.le02.DecafType;
 public final class BoolOpNode extends BinaryOpNode {
 	private BoolOp op;
 
-	public BoolOpNode(String filename, int line, int col, BoolOp op) {
-		super(filename, line, col);
+	public BoolOpNode(SourceLocation sl, BoolOp op) {
+		super(sl);
+	}
+	
+	public BoolOpNode(SourceLocation sl, ExpressionNode left, ExpressionNode right, BoolOp op) {
+		super(sl, left, right);
 		this.op = op;
 	}
 
-	@Override
-	public DecafType getType() {
-		return DecafType.BOOLEAN;
-	}
 
 	public BoolOp getOp() {
 		return op;

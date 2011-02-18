@@ -6,12 +6,18 @@ import java.util.List;
 import edu.mit.compilers.le02.DecafType;
 
 public final class MethodDeclNode extends DeclNode {
-	private ArrayList<VarDeclNode> params;
+	private List<VarDeclNode> params;
 	private BlockNode body;
 
-	public MethodDeclNode(String filename, int line, int col, DecafType type,
+	public MethodDeclNode(SourceLocation sl, DecafType type,
 			String id) {
-		super(filename, line, col, type, id);
+		super(sl, type, id);
+	}
+
+	public MethodDeclNode(SourceLocation sl, DecafType type,
+			String id, List<VarDeclNode> params) {
+		super(sl, type, id);
+		params = this.params;
 	}
 
 	@Override

@@ -7,8 +7,8 @@ public abstract class LocationNode extends ASTNode {
 	protected DecafType type;
 	protected String name;
 
-	public LocationNode(String filename, int line, int col, DecafType type, String name) {
-		super(filename, line, col);
+	public LocationNode(SourceLocation sl, DecafType type, String name) {
+		super(sl);
 		this.type = type;
 		this.name = name;
 	}

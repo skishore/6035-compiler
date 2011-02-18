@@ -52,7 +52,7 @@ AssignNode extends StatementNode - Represents an assignment to a location.
 
 IfNode extends StatementNode - Represents an if/then[/else] statement
   Children:
-  - condition: RelOpNode
+  - condition: ExpressionNode
   - thenBlock: BlockNode
   - elseBlock (optional): BlockNode
   
@@ -80,8 +80,6 @@ CallStatementNode - Represents a method call used as a statement (rather than an
 === Expression Node Classes ===
   
 ExpressionNode (abstract) - Represents an expression that will evaluate to a value
-  Methods:
-  - getType(): returns the type of this expression's value
 
 * Literal Expressions *
 
@@ -142,6 +140,11 @@ SystemCallNode extends CallNode - Represents a system call (callout)
 
   
 === Other Node Classes ===
+
+ClassNode extends ASTNode - Represents a class
+  Children:
+  - fields: List of FieldDeclNodes
+  - methods: List of MethodDeclNodes
 
 StringNode extends ASTNode - Represents a String
   Fields:

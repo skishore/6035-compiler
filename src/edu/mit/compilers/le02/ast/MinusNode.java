@@ -4,13 +4,12 @@ import edu.mit.compilers.le02.DecafType;
 
 public final class MinusNode extends UnaryOpNode {
 
-	public MinusNode(String filename, int line, int col) {
-		super(filename, line, col);
+	public MinusNode(SourceLocation sl) {
+		super(sl);
 	}
 
-	@Override
-	public DecafType getType() {
-		return DecafType.INT;
+	public MinusNode(SourceLocation sl, ExpressionNode expr) {
+		super(sl, expr);
 	}
 
 }

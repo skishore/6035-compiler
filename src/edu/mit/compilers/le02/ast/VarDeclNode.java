@@ -7,9 +7,9 @@ import edu.mit.compilers.le02.DecafType;
 
 public final class VarDeclNode extends DeclNode {
 
-	public VarDeclNode(String filename, int line, int col, DecafType type,
+	public VarDeclNode(SourceLocation sl, DecafType type,
 			String id) {
-		super(filename, line, col, type, id);
+		super(sl, type, id);
 	}
 
 	@Override
