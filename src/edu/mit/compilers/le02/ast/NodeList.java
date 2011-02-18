@@ -1,18 +1,28 @@
 /**
  * 
  */
-package edu.mit.compilers.le02.ir.nodes;
+package edu.mit.compilers.le02.ast;
 
 import java.util.ArrayList;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-
-public class IrList<T extends IrNode> extends IrNode implements List<T> {
+public class NodeList<T extends ASTNode> extends ASTNode implements List<T> {
 
   private ArrayList<T> list = new ArrayList<T>();
+
+  public NodeList(String filename, int line, int col) {
+    super(filename, line, col);
+    
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<ASTNode> getChildren() {
+    return (List<ASTNode>)this;
+  }
 
   @Override
   public boolean add(T e) {
