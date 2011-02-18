@@ -1,7 +1,7 @@
 #!/bin/sh
 
 runsemantics() {
-  java -jar `dirname $0`/../../dist/Compiler.jar -target lowir $1
+  java -jar `dirname $0`/../../dist/Compiler.jar -target inter $1
 }
 
 fail=0
