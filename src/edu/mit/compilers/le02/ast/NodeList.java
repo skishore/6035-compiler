@@ -14,9 +14,8 @@ public class NodeList<T extends ASTNode> extends ASTNode implements List<T> {
 
   private ArrayList<T> list = new ArrayList<T>();
 
-  public NodeList(String filename, int line, int col) {
-    super(filename, line, col);
-    
+  public NodeList(SourceLocation loc) {
+    super(loc);
   }
 
   @SuppressWarnings("unchecked")

@@ -107,11 +107,7 @@ public class Main {
    * file name.
    */
   protected static void reportError (Exception e) {
-    String prefix = "<stdin> ";
-    if (CLI.infile != null) {
-      prefix = CLI.infile + " ";
-    }
-    System.out.println(prefix + e);
+    System.out.println(CLI.getInputFilename() + " " + e);
   }
 
   /**
@@ -208,7 +204,8 @@ public class Main {
           Thread thread = new Thread() {
             @Override
             public void run() {
-              ASTFrame frame = new ASTFrame(CLI.infile, parser.getAST());
+              ASTFrame frame = new ASTFrame(CLI.getInputFilename(),
+                                            parser.getAST());
               frame.validate();
               frame.setVisible(true);
             }

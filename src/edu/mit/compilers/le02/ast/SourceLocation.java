@@ -1,5 +1,8 @@
 package edu.mit.compilers.le02.ast;
 
+import antlr.collections.AST;
+import edu.mit.compilers.tools.CLI;
+
 public final class SourceLocation {
 	private String filename;
 	private int line;
@@ -24,4 +27,14 @@ public final class SourceLocation {
 		this.col = col;
 	}
 
+	/**
+	 * Utility method used to create a SourceLocation from an Antlr AST node.
+	 */
+	public SourceLocation(AST node) {
+	  this(CLI.getInputFilename(), node.getLine(), node.getColumn());
+	}
+
+	public String toString() {
+	  return filename + ":" + line + ":" + col;
+	}
 }
