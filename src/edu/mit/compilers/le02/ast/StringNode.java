@@ -4,23 +4,23 @@ import java.util.Collections;
 import java.util.List;
 
 public final class StringNode extends ASTNode {
-	private String value;
+  private String value;
 
-	public StringNode(SourceLocation sl, String value) {
-		super(sl);
-		this.value = value;
-	}
+  public StringNode(SourceLocation sl, String value) {
+    super(sl);
+    this.value = value;
+  }
 
-	@Override
-	public List<ASTNode> getChildren() {
-		return Collections.emptyList();
-	}
+  @Override
+  public List<ASTNode> getChildren() {
+    return Collections.emptyList();
+  }
 
-	public String getValue() {
-		return value;
-	}
-	
-	@Override
+  public String getValue() {
+    return value;
+  }
+
+  @Override
   public String toString() {
     return value;
   }

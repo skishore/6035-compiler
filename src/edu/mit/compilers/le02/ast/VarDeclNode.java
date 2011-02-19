@@ -12,9 +12,9 @@ public final class VarDeclNode extends FieldDeclNode {
       super(sl, type, id);
     }
 
-	@Override
-	public List<ASTNode> getChildren() {
-		return Collections.emptyList();
-	}
+  @Override
+  public List<ASTNode> getChildren() {
+    return Collections.emptyList();
+  }
 
 }

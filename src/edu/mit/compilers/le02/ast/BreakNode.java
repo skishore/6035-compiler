@@ -5,13 +5,13 @@ import java.util.List;
 
 public final class BreakNode extends StatementNode {
 
-	public BreakNode(SourceLocation sl) {
-		super(sl);
-	}
+  public BreakNode(SourceLocation sl) {
+    super(sl);
+  }
 
-	@Override
-	public List<ASTNode> getChildren() {
-		return Collections.emptyList();
-	}
+  @Override
+  public List<ASTNode> getChildren() {
+    return Collections.emptyList();
+  }
 
 }
