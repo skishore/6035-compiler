@@ -7,10 +7,10 @@ import edu.mit.compilers.le02.DecafType;
 
 public final class VarDeclNode extends FieldDeclNode {
 
-	public VarDeclNode(SourceLocation sl, DecafType type,
-			String id) {
-		super(sl, type, id);
-	}
+    public VarDeclNode(SourceLocation sl, DecafType type, 
+                       String id) {
+         super(sl, type, id);
+    }
 
 	@Override
 	public List<ASTNode> getChildren() {

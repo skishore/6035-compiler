@@ -21,7 +21,7 @@ public abstract class BinaryOpNode extends ExpressionNode {
 		List<ASTNode> children = new ArrayList<ASTNode>();
 		children.add(left);
 		children.add(right);
-		return null;
+		return children;
 	}
 
 	public ExpressionNode getLeft() {
