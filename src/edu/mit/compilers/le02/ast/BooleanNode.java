@@ -19,4 +19,9 @@ public final class BooleanNode extends ExpressionNode {
 	public boolean getValue() {
 		return value;
 	}
+
+	@Override
+  public String toString() {
+    return "" + value;
+  }
 }

@@ -36,6 +36,7 @@ public class Main {
     SCAN_FAILED (1),
     PARSE_FAILED (2),
     SEMANTICS_FAILED (3),
+    FILE_NOT_FOUND (126),
     NO_SUCH_ACTION (127);
 
     private int numericCode;
@@ -83,6 +84,7 @@ public class Main {
       } catch (IOException e) {
         // print the error:
         reportError(e);
+        System.exit(ReturnCode.FILE_NOT_FOUND.numericCode());
       }
     }
 

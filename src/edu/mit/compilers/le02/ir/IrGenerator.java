@@ -81,15 +81,16 @@ public class IrGenerator {
       // TODO(lizfong): contemplate if we want to throw error instead.
       // We should be nullchecking before this is even called.
       if (CLI.debug) {
-        System.out.println("Null node");
+        System.out.println("Warning: asked to visit null node");
       }
       return null;
     }
-    if (CLI.debug) {
-      System.out.println(node.getType() + ": " + node.getText());
-    }
 
     final SourceLocation sl = new SourceLocation(node);
+    if (CLI.debug) {
+      System.out.println("" + sl + " ["+ node.getType() + "]: " + node.getText());
+    }
+
     switch (node.getType()) {
      case DecafParserTokenTypes.PROGRAM:
       // #([PROGRAM,"Prog"], n, f_accum, m_accum);
@@ -503,12 +504,11 @@ public class IrGenerator {
   public <T extends ASTNode> NodeList<T> convertToList(AST parent)
       throws IrException {
     SourceLocation sl = new SourceLocation(parent);
-    AST item = parent.getFirstChild();
     NodeList<T> list = new NodeList<T>(sl);
-    if (item != null) {
-      do {
-        list.add(((T)visit(item)));
-      } while (item.getNextSibling() != null);
+
+    for (AST item = parent.getFirstChild(); item != null;
+         item = item.getNextSibling()) {
+      list.add(((T)visit(item)));
     }
     return list;
   }

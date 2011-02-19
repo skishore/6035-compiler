@@ -20,5 +20,8 @@ public final class StringNode extends ASTNode {
 		return value;
 	}
 	
-
+	@Override
+  public String toString() {
+    return value;
+  }
 }

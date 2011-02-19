@@ -216,8 +216,10 @@ if_stmt!: TK_if LPAREN! cond:expr RPAREN! b_true:block ( // Deliberately empty
 // A for loop contains an initial assignment with a var and an init value,
 // a maximum value, and a block to loop over.
 for_loop!: TK_for var:ID ASSIGN init:expr COMMA! max:expr loop:block
-  { #for_loop = #([TK_for], #([ASSIGNMENT,"Assignment"], var, [ASSIGN], init),
-                  max, loop); };
+  { #for_loop = #([TK_for],
+      #([ASSIGNMENT,"Assignment"],
+        #([LOCATION,"Location"], var), [ASSIGN], init),
+      max, loop); };
 
 // A statement is an assignment, method call, if block, for block,
 // return (containing the value to return), break, continue, and any block.
@@ -267,52 +269,60 @@ method_call!:
 
 // Tier -1: ||
 expr!: zero:term_zero prime:expr_prime
- { #expr = #([EXPR,"Expr"], zero, #([TERM_PRIME,"Term'"], prime)); };
+ { #expr = #([EXPR,"Expr"], zero, prime); };
 expr_prime: (LOGICAL_OR term_zero expr_prime |
              // Deliberately empty
-            );
+            )
+ { #expr_prime = #([TERM_PRIME,"Term'"], #expr_prime); };
 // Tier 0: &&
 term_zero!: one:term_one prime:term_zero_prime
-  { #term_zero = #([TERM,"Term"], one, #([TERM_PRIME,"Term'"], prime)); };
+  { #term_zero = #([TERM,"Term"], one, prime); };
 term_zero_prime: (LOGICAL_AND term_one term_zero_prime |
                   // Deliberately empty
-                 );
+                 )
+  { #term_zero_prime = #([TERM_PRIME,"Term'"], #term_zero_prime); };
 // Tier 1: ==, !=
 term_one!: two:term_two prime:term_one_prime
-  { #term_one = #([TERM,"Term"], two, #([TERM_PRIME,"Term'"], prime)); };
+  { #term_one = #([TERM,"Term"], two, prime); };
 term_one_prime: (EQUALS term_two term_one_prime |
                  NOT_EQUALS term_two term_one_prime |
                  // Deliberately empty
-                );
+                )
+  { #term_one_prime = #([TERM_PRIME,"Term'"], #term_one_prime); };
 // Tier 2: <, >, <=, >=
 term_two!: three:term_three prime:term_two_prime
-  { #term_two = #([TERM,"Term"], three, #([TERM_PRIME,"Term'"], prime)); };
+  { #term_two = #([TERM,"Term"], three, prime); };
 term_two_prime: (LT term_three term_two_prime |
                  GT term_three term_two_prime |
                  LE term_three term_two_prime |
                  GE term_three term_two_prime |
                  // Deliberately empty
-                );
+                )
+  { #term_two_prime = #([TERM_PRIME,"Term'"], #term_two_prime); };
 // Tier 3: +, -
 term_three!: four:term_four prime:term_three_prime
-  { #term_three = #([TERM,"Term"], four, #([TERM_PRIME,"Term'"], prime)); };
+  { #term_three = #([TERM,"Term"], four, prime); };
 term_three_prime: (PLUS term_four term_three_prime |
                    MINUS term_four term_three_prime|
                    // Deliberately empty
-                  );
+                  )
+  { #term_three_prime = #([TERM_PRIME,"Term'"], #term_three_prime); };
 // Tier 4: *, /, %
 term_four!: five:term_five prime:term_four_prime
-  { #term_four = #([TERM,"Term"], five, #([TERM_PRIME,"Term'"], prime)); };
+  { #term_four = #([TERM,"Term"], five, prime); };
 term_four_prime: (TIMES term_five term_four_prime |
                   DIVIDE term_five term_four_prime |
                   MODULO term_five term_four_prime |
                   // Deliberately empty
-                 );
+                 )
+  { #term_four_prime = #([TERM_PRIME,"Term'"], #term_four_prime); };
 // Tier 5: !
 term_five: term_six |! NOT t:term_five
-                       { #term_five = #([TERM,"Term"], NOT, t); };
+                       { #term_five = #([TERM,"Term"], NOT,
+                           #([TERM,"term"], t)); };
 // Tier 6: urnary -
 term_six: term_final |! MINUS t:term_six
-                        { #term_six = #([TERM,"Term"], [UNARY_MINUS, "-"], t); };
+                        { #term_six = #([TERM,"Term"], [UNARY_MINUS, "-"],
+                           #([TERM,"term"], t)); };
 // Tier 7: base expressions and parenthesized subexpressions.
 term_final: location | method_call | literal | LPAREN! expr RPAREN!;
