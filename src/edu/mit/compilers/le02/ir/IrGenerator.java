@@ -6,7 +6,9 @@ import edu.mit.compilers.le02.DecafType;
 import edu.mit.compilers.le02.ast.ArrayDeclNode;
 import edu.mit.compilers.le02.ast.ArrayLocationNode;
 import edu.mit.compilers.le02.ast.AssignNode;
+import edu.mit.compilers.le02.ast.BinaryOpNode;
 import edu.mit.compilers.le02.ast.BlockNode;
+import edu.mit.compilers.le02.ast.BoolOpNode;
 import edu.mit.compilers.le02.ast.BooleanNode;
 import edu.mit.compilers.le02.ast.BreakNode;
 import edu.mit.compilers.le02.ast.CallNode;
@@ -20,10 +22,12 @@ import edu.mit.compilers.le02.ast.ForNode;
 import edu.mit.compilers.le02.ast.IfNode;
 import edu.mit.compilers.le02.ast.IntNode;
 import edu.mit.compilers.le02.ast.LocationNode;
+import edu.mit.compilers.le02.ast.MathOpNode;
 import edu.mit.compilers.le02.ast.MethodCallNode;
 import edu.mit.compilers.le02.ast.MethodDeclNode;
+import edu.mit.compilers.le02.ast.MinusNode;
 import edu.mit.compilers.le02.ast.NodeList;
-import edu.mit.compilers.le02.ast.NodeUtil;
+import edu.mit.compilers.le02.ast.NotNode;
 import edu.mit.compilers.le02.ast.ReturnNode;
 import edu.mit.compilers.le02.ast.ScalarLocationNode;
 import edu.mit.compilers.le02.ast.SourceLocation;
@@ -32,8 +36,11 @@ import edu.mit.compilers.le02.ast.StringNode;
 import edu.mit.compilers.le02.ast.SyscallArgNode;
 import edu.mit.compilers.le02.ast.SystemCallNode;
 import edu.mit.compilers.le02.ast.VarDeclNode;
+import edu.mit.compilers.le02.ast.VariableNode;
 import edu.mit.compilers.le02.grammar.DecafParserTokenTypes;
 import edu.mit.compilers.le02.ast.ASTNode;
+import edu.mit.compilers.le02.ast.BoolOpNode.BoolOp;
+import edu.mit.compilers.le02.ast.MathOpNode.MathOp;
 import edu.mit.compilers.tools.CLI;
 import antlr.collections.AST;
 
@@ -159,18 +166,88 @@ public class IrGenerator {
       return dalist;
 
      case DecafParserTokenTypes.EXPR:
-      return new ExpressionNode(sl) {
-        @Override
-        public List<ASTNode> getChildren() {
-          return NodeUtil.makeChildren(new StringNode(sl, "<expr>"));
-        }
-      };
-
      case DecafParserTokenTypes.TERM:
-      return null;
+      AST termChild = node.getFirstChild();
+      switch (termChild.getType()) {
+        case DecafParserTokenTypes.UNARY_MINUS:
+         return new MinusNode(sl,
+           (ExpressionNode)visit(termChild.getNextSibling()));
+        case DecafParserTokenTypes.NOT:
+         return new NotNode(sl,
+           (ExpressionNode)visit(termChild.getNextSibling()));
+        case DecafParserTokenTypes.TERM:
+         ExpressionNode left = (ExpressionNode)visit(termChild);
+         BinaryOpNode right = (BinaryOpNode)visit(termChild.getNextSibling());
+         return composite(left, right);
+        case DecafParserTokenTypes.LOCATION:
+         return new VariableNode(new SourceLocation(termChild),
+           (LocationNode)visit(termChild));
+        default:
+         // Use general parsing routines.
+         return (ExpressionNode)visit(termChild);
+      }
 
      case DecafParserTokenTypes.TERM_PRIME:
-      return null;
+      AST primeChild = node.getFirstChild();
+      if (primeChild != null) {
+        AST rightTerm = primeChild.getNextSibling();
+        AST nextPrime = rightTerm.getNextSibling();
+        ExpressionNode rightExpr = (ExpressionNode)visit(rightTerm);
+        ExpressionNode nextExpr = (ExpressionNode)visit(nextPrime);
+        BinaryOpNode left;
+        switch (primeChild.getType()) {
+         case DecafParserTokenTypes.LOGICAL_OR:
+          left = new BoolOpNode(sl, null, rightExpr, BoolOp.OR);
+          break;
+         case DecafParserTokenTypes.LOGICAL_AND:
+          left = new BoolOpNode(sl, null, rightExpr, BoolOp.AND);
+          break;
+         case DecafParserTokenTypes.EQUALS:
+          left = new BoolOpNode(sl, null, rightExpr, BoolOp.EQ);
+          break;
+         case DecafParserTokenTypes.NOT_EQUALS:
+          left = new BoolOpNode(sl, null, rightExpr, BoolOp.NEQ);
+          break;
+         case DecafParserTokenTypes.LT:
+          left = new BoolOpNode(sl, null, rightExpr, BoolOp.LT);
+          break;
+         case DecafParserTokenTypes.GT:
+          left = new BoolOpNode(sl, null, rightExpr, BoolOp.GT);
+          break;
+         case DecafParserTokenTypes.LE:
+          left = new BoolOpNode(sl, null, rightExpr, BoolOp.LE);
+          break;
+         case DecafParserTokenTypes.GE:
+          left = new BoolOpNode(sl, null, rightExpr, BoolOp.GE);
+          break;
+         case DecafParserTokenTypes.PLUS:
+          left = new MathOpNode(sl, null, rightExpr, MathOp.ADD);
+          break;
+         case DecafParserTokenTypes.MINUS:
+          left = new MathOpNode(sl, null, rightExpr, MathOp.SUBTRACT);
+          break;
+         case DecafParserTokenTypes.TIMES:
+          left = new MathOpNode(sl, null, rightExpr, MathOp.MULTIPLY);
+          break;
+         case DecafParserTokenTypes.DIVIDE:
+          left = new MathOpNode(sl, null, rightExpr, MathOp.DIVIDE);
+          break;
+         case DecafParserTokenTypes.MODULO:
+          left = new MathOpNode(sl, null, rightExpr, MathOp.MODULO);
+          break;
+         default:
+          throw new IrException(new SourceLocation(primeChild),
+            "Unknown binary operation " + primeChild.getText());
+        }
+        if (nextExpr != null && nextExpr instanceof BinaryOpNode) {
+          BinaryOpNode right = (BinaryOpNode)nextExpr;
+          return composite(left, right);
+        } else {
+          return left;
+        }
+      } else {
+        return null;
+      }
 
      // We need to account for each case of statement separately.
      // statement:
@@ -180,19 +257,26 @@ public class IrGenerator {
       AST loc_ast = node.getFirstChild();
       AST op_ast = loc_ast.getNextSibling();
       AST value_ast = op_ast.getNextSibling();
+
+      LocationNode loc = (LocationNode)visit(loc_ast);
+      VariableNode loc_var = new VariableNode(
+        new SourceLocation(loc_ast), loc);
+      ExpressionNode value = (ExpressionNode)visit(value_ast);
+      SourceLocation op_ast_location = new SourceLocation(op_ast);
+
       switch (op_ast.getType()) {
        case DecafParserTokenTypes.ASSIGN:
-        LocationNode loc = (LocationNode)visit(loc_ast);
-        ExpressionNode value = (ExpressionNode)visit(value_ast);
         return new AssignNode(sl, loc, value);
        case DecafParserTokenTypes.INC_ASSIGN:
-        // Not yet implemented - no AssignIncNode.
-        // TODO(dkoh): fix this.
+        ExpressionNode inc_result = new MathOpNode(op_ast_location,
+          loc_var, value, MathOp.ADD);
+        return new AssignNode(sl, loc, inc_result);
        case DecafParserTokenTypes.DEC_ASSIGN:
-        // Not yet implemented - no AssignDecNode.
-        // TODO(dkoh): fix this.
+        ExpressionNode dec_result = new MathOpNode(op_ast_location,
+          loc_var, value, MathOp.SUBTRACT);
+        return new AssignNode(sl, loc, dec_result);
        default:
-        throw new IrException(new SourceLocation(op_ast),
+        throw new IrException(op_ast_location,
           "Invalid assignment operation " + op_ast.getText());
       }
 
@@ -366,7 +450,7 @@ public class IrGenerator {
       // #([LOCATION,"Location"], n, i)
       AST location_name_ast = node.getFirstChild();
       AST location_index_ast = location_name_ast.getNextSibling();
-      String location_name = location_index_ast.getText();
+      String location_name = location_name_ast.getText();
       if (location_index_ast != null) {
         ExpressionNode location_index =
           (ExpressionNode)visit(location_index_ast);
@@ -411,15 +495,33 @@ public class IrGenerator {
     }
   }
 
+  /**
+   * Converts a subtree containing {@link ASTNode} children of type T to a
+   * {@link NodeList} of those children.
+   */
   @SuppressWarnings("unchecked")
   public <T extends ASTNode> NodeList<T> convertToList(AST parent)
       throws IrException {
     SourceLocation sl = new SourceLocation(parent);
     AST item = parent.getFirstChild();
     NodeList<T> list = new NodeList<T>(sl);
-    do {
-      list.add(((T)visit(item)));
-    } while (item.getNextSibling() != null);
+    if (item != null) {
+      do {
+        list.add(((T)visit(item)));
+      } while (item.getNextSibling() != null);
+    }
     return list;
+  }
+
+  /**
+   * Transforms ([expr]) ([null] [op] [expr]) into ([expr] [op] [expr]).
+   */
+  public ExpressionNode composite(ExpressionNode left, BinaryOpNode right) {
+    if (right != null) {
+      right.setLeft(left);
+      return right;
+    } else {
+      return left;
+    }
   }
 }

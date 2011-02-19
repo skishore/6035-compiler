@@ -27,6 +27,7 @@ tokens
   EXPR;
   TERM;
   TERM_PRIME;
+  UNARY_MINUS;
   CALL_STMT;
   BLOCK;
   BLOCK_VARS;
@@ -263,8 +264,6 @@ method_call!:
 
 // Rewriting the grammar for expression evaluation to not cascade left,
 // and simultaneously ensuring order of operations is observed.
-// TODO(lizfong): write something to pivot this concrete parse tree into the
-// correct AST for expression evaluation.
 
 // Tier -1: ||
 expr!: zero:term_zero prime:expr_prime
@@ -314,6 +313,6 @@ term_five: term_six |! NOT t:term_five
                        { #term_five = #([TERM,"Term"], NOT, t); };
 // Tier 6: urnary -
 term_six: term_final |! MINUS t:term_six
-                        { #term_six = #([TERM,"Term"], MINUS, t); };
+                        { #term_six = #([TERM,"Term"], [UNARY_MINUS, "-"], t); };
 // Tier 7: base expressions and parenthesized subexpressions.
 term_final: location | method_call | literal | LPAREN! expr RPAREN!;
