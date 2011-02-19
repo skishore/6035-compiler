@@ -356,7 +356,7 @@ public class IrGenerator {
 
      case DecafParserTokenTypes.METHOD_DECL:
       // #([METHOD_DECL,"MethodDecl"], ty, vo, name, darg_accum, body);
-      // Either void or a type 
+      // Either void or a type will be present, but not both.
       AST method_return_type_ast = node.getFirstChild();
       AST method_name_ast = method_return_type_ast.getNextSibling();
       AST method_args_ast = method_name_ast.getNextSibling();

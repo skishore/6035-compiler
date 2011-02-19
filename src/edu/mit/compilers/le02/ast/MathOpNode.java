@@ -26,9 +26,9 @@ public final class MathOpNode extends BinaryOpNode {
 		MULTIPLY("*"),
 		DIVIDE("/"),
 		MODULO("%");
-		private String disp; 
+		private String disp;
 		private MathOp(String display) {
-		  disp = display; 
+		  disp = display;
 		}
 		@Override
 		public String toString() {

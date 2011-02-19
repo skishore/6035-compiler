@@ -1,6 +1,3 @@
-/**
- * 
- */
 package edu.mit.compilers.le02.ast;
 
 import java.util.ArrayList;
@@ -10,6 +7,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+/**
+ * A shallow wrapper around an {@link ArrayList} that allows passing of a list
+ * of {@link ASTNode}s as a {@link ASTNode}.
+ */
 public class NodeList<T extends ASTNode> extends ASTNode implements List<T> {
 
   private ArrayList<T> list = new ArrayList<T>();

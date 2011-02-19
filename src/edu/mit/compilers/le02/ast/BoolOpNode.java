@@ -34,7 +34,7 @@ public final class BoolOpNode extends BinaryOpNode {
 		NEQ("!="),
 		AND("&&"),
 		OR("||");
-    private String disp; 
+    private String disp;
     private BoolOp(String display) {
       disp = display;
     }
