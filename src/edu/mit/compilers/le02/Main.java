@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import antlr.ASTFactory;
 import antlr.CharStreamException;
 import antlr.DumpASTVisitor;
 import antlr.Token;
@@ -20,6 +21,7 @@ import edu.mit.compilers.le02.grammar.DecafParser;
 import edu.mit.compilers.le02.grammar.DecafParserTokenTypes;
 import edu.mit.compilers.le02.grammar.DecafScanner;
 import edu.mit.compilers.le02.grammar.DecafScannerTokenTypes;
+import edu.mit.compilers.le02.grammar.LineNumberedAST;
 import edu.mit.compilers.le02.ir.IrException;
 import edu.mit.compilers.le02.ir.IrGenerator;
 
@@ -263,6 +265,11 @@ public class Main {
         parse_lexer.setFilename(CLI.infile);
         parser.setFilename(CLI.infile);
       }
+
+      // Save the line/column numbers so we get meaningful parse data.
+      ASTFactory factory = new ASTFactory();
+      factory.setASTNodeClass(LineNumberedAST.class);
+      parser.setASTFactory(factory);
 
       // Invoke the parser.
       parser.program();
