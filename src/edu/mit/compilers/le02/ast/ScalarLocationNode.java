@@ -7,8 +7,8 @@ import edu.mit.compilers.le02.DecafType;
 
 public final class ScalarLocationNode extends LocationNode {
 
-	public ScalarLocationNode(String filename, int line, int col, DecafType type, String name) {
-		super(filename, line, col, type, name);
+	public ScalarLocationNode(SourceLocation sl, DecafType type, String name) {
+		super(sl, type, name);
 	}
 
 	@Override

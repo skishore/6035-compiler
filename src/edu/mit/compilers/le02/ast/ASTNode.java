@@ -3,27 +3,19 @@ package edu.mit.compilers.le02.ast;
 import java.util.List;
 
 public abstract class ASTNode {
-	protected String filename;
-	protected int line;
-	protected int col;
+	protected SourceLocation sourceLoc;
 	
-	public ASTNode(String filename, int line, int col) {
-		this.filename = filename;
-		this.line = line;
-		this.col = col;
+	public ASTNode() {
+	}
+	
+	public ASTNode(SourceLocation sl) {
+		this.sourceLoc = sl;
 	}
 
-	public String getFilename() {
-		return filename;
+	public SourceLocation getSourceLoc() {
+		return sourceLoc;
 	}
 
-	public int getLine() {
-		return line;
-	}
-
-	public int getCol() {
-		return col;
-	}
 	
 	abstract public List<ASTNode> getChildren();
 

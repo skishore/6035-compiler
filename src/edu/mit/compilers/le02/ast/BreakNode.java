@@ -3,12 +3,10 @@ package edu.mit.compilers.le02.ast;
 import java.util.Collections;
 import java.util.List;
 
-public final class CharNode extends ExpressionNode {
-	private int value;
+public final class BreakNode extends StatementNode {
 
-	public CharNode(SourceLocation sl, char c) {
+	public BreakNode(SourceLocation sl) {
 		super(sl);
-		this.value = c;
 	}
 
 	@Override
@@ -16,7 +14,4 @@ public final class CharNode extends ExpressionNode {
 		return Collections.emptyList();
 	}
 
-	public int getValue() {
-		return value;
-	}
 }

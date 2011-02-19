@@ -6,8 +6,8 @@ public abstract class DeclNode extends ASTNode {
 	protected DecafType type;
 	protected String name;
 
-	public DeclNode(String filename, int line, int col, DecafType type, String id) {
-		super(filename, line, col);
+	public DeclNode(SourceLocation sl, DecafType type, String id) {
+		super(sl);
 		this.type = type;
 		this.name = id;
 	}

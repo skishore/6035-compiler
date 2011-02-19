@@ -3,18 +3,16 @@ package edu.mit.compilers.le02.ast;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.mit.compilers.le02.DecafType;
-
 public final class VariableNode extends ExpressionNode {
 	private LocationNode loc;
 
-	public VariableNode(String filename, int line, int col) {
-		super(filename, line, col);
+	public VariableNode(SourceLocation sl) {
+		super(sl);
 	}
-
-	@Override
-	public DecafType getType() {
-		return loc.getType();
+	
+	public VariableNode(SourceLocation sl, LocationNode loc) {
+		super(sl);
+		this.loc = loc;
 	}
 
 	@Override
@@ -22,6 +20,10 @@ public final class VariableNode extends ExpressionNode {
 		List<ASTNode> children = new ArrayList<ASTNode>();
 		children.add(loc);		
 		return null;
+	}
+
+	public void setLoc(LocationNode loc) {
+		this.loc = loc;
 	}
 
 	public LocationNode getLoc() {

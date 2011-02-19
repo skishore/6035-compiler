@@ -7,8 +7,14 @@ public class AssignNode extends StatementNode {
 	protected LocationNode loc;
 	protected ExpressionNode value;
 
-	public AssignNode(String filename, int line, int col) {
-		super(filename, line, col);
+	public AssignNode(SourceLocation sl) {
+		super(sl);
+	}
+	
+	public AssignNode(SourceLocation sl, LocationNode loc, ExpressionNode value) {
+		super(sl);
+		this.loc = loc;
+		this.value = value;
 	}
 
 	@Override
@@ -18,5 +24,22 @@ public class AssignNode extends StatementNode {
 		children.add(value);
 		return children;
 	}
+
+	public LocationNode getLoc() {
+		return loc;
+	}
+
+	public void setLoc(LocationNode loc) {
+		this.loc = loc;
+	}
+
+	public ExpressionNode getValue() {
+		return value;
+	}
+
+	public void setValue(ExpressionNode value) {
+		this.value = value;
+	}
+
 
 }

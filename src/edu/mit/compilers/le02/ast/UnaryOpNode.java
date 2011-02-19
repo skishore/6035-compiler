@@ -6,15 +6,24 @@ import java.util.List;
 public abstract class UnaryOpNode extends ExpressionNode {
 	protected ExpressionNode expr;
 
-	public UnaryOpNode(String filename, int line, int col) {
-		super(filename, line, col);
+	public UnaryOpNode(SourceLocation sl) {
+		super(sl);
 	}
 
+	public UnaryOpNode(SourceLocation sl, ExpressionNode expr) {
+		super(sl);
+		this.expr = expr;
+	}
+	
 	@Override
 	public List<ASTNode> getChildren() {
 		List<ASTNode> children = new ArrayList<ASTNode>();
 		children.add(expr);
 		return children;
+	}
+
+	public void setExpr(ExpressionNode expr) {
+		this.expr = expr;
 	}
 
 	public ExpressionNode getExpr() {
