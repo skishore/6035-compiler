@@ -1,16 +1,11 @@
 package edu.mit.compilers.le02.ast;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public final class ForNode extends StatementNode {
 	private AssignNode init;
 	private ExpressionNode end;
 	private BlockNode body;
-
-	public ForNode(SourceLocation sl) {
-		super(sl);
-	}
 
 	public ForNode(SourceLocation sl, AssignNode init, ExpressionNode end, BlockNode body) {
 		super(sl);
@@ -21,11 +16,7 @@ public final class ForNode extends StatementNode {
 
 	@Override
 	public List<ASTNode> getChildren() {
-		List<ASTNode> children = new ArrayList<ASTNode>();
-		children.add(init);
-		children.add(end);
-		children.add(body);
-		return children;
+		return NodeUtil.makeChildren(init, end, body);
 	}
 
 	public AssignNode getInit() {

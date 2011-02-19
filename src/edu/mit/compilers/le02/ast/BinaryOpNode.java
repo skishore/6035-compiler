@@ -1,6 +1,5 @@
 package edu.mit.compilers.le02.ast;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public abstract class BinaryOpNode extends ExpressionNode {
@@ -18,10 +17,7 @@ public abstract class BinaryOpNode extends ExpressionNode {
 
 	@Override
 	public List<ASTNode> getChildren() {
-		List<ASTNode> children = new ArrayList<ASTNode>();
-		children.add(left);
-		children.add(right);
-		return children;
+		return NodeUtil.makeChildren(left, right);
 	}
 
 	public ExpressionNode getLeft() {

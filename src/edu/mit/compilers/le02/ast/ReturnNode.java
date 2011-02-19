@@ -1,6 +1,5 @@
 package edu.mit.compilers.le02.ast;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -12,12 +11,7 @@ public final class ReturnNode extends StatementNode {
 		super(sl);
 		this.hasValue = false;
 	}
-	
-	public ReturnNode(SourceLocation sl, boolean hasValue) {
-		super(sl);
-		this.hasValue = hasValue;
-	}
-	
+
 	public ReturnNode(SourceLocation sl, ExpressionNode retValue) {
 		super(sl);
 		this.retValue = retValue;
@@ -26,12 +20,10 @@ public final class ReturnNode extends StatementNode {
 
 	@Override
 	public List<ASTNode> getChildren() {
-		if (!hasValue)
+		if (!hasValue) {
 			return Collections.emptyList();
-		
-		List<ASTNode> children = new ArrayList<ASTNode>();
-		children.add(retValue);
-		return children;
+		}
+		return NodeUtil.makeChildren(retValue);
 	}
 
 	public boolean hasValue() {

@@ -1,6 +1,5 @@
 package edu.mit.compilers.le02.ast;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public final class VariableNode extends ExpressionNode {
@@ -17,9 +16,7 @@ public final class VariableNode extends ExpressionNode {
 
 	@Override
 	public List<ASTNode> getChildren() {
-		List<ASTNode> children = new ArrayList<ASTNode>();
-		children.add(loc);		
-		return null;
+		return NodeUtil.makeChildren(loc);
 	}
 
 	public void setLoc(LocationNode loc) {

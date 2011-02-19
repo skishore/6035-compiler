@@ -27,7 +27,7 @@ tokens
   EXPR;
   TERM;
   TERM_PRIME;
-  STMT;
+  CALL_STMT;
   BLOCK;
   BLOCK_VARS;
   BLOCK_STMTS;
@@ -221,8 +221,9 @@ for_loop!: TK_for var:ID ASSIGN init:expr COMMA! max:expr loop:block
 // A statement is an assignment, method call, if block, for block,
 // return (containing the value to return), break, continue, and any block.
 statement:
-  assignment SEMICOLON! |
-  method_call SEMICOLON! |
+  assignment SEMICOLON! |!
+  m:method_call SEMICOLON!
+    { #statement = #([CALL_STMT, "CallStatement"], m); } |
   if_stmt |
   for_loop |!
   TK_return ( // Deliberately empty

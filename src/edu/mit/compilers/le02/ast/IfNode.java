@@ -9,11 +9,6 @@ public final class IfNode extends StatementNode {
 	private BlockNode elseBlock;
 	private boolean hasElse;
 
-	public IfNode(SourceLocation sl, boolean hasElse) {
-		super(sl);
-		this.hasElse = hasElse;
-	}
-	
 	public IfNode(SourceLocation sl, ExpressionNode condition, BlockNode then) {
 		super(sl);
 		this.condition = condition;
@@ -35,9 +30,10 @@ public final class IfNode extends StatementNode {
 		children.add(condition);
 		children.add(thenBlock);
 		
-		if (hasElse)
+		if (hasElse) {
 			children.add(elseBlock);
-		
+		}
+
 		return children;
 	}
 

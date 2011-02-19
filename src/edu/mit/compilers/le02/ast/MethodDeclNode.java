@@ -10,14 +10,10 @@ public final class MethodDeclNode extends DeclNode {
 	private BlockNode body;
 
 	public MethodDeclNode(SourceLocation sl, DecafType type,
-			String id) {
+			String id, List<VarDeclNode> params, BlockNode body) {
 		super(sl, type, id);
-	}
-
-	public MethodDeclNode(SourceLocation sl, DecafType type,
-			String id, List<VarDeclNode> params) {
-		super(sl, type, id);
-		params = this.params;
+		this.params = params;
+		this.body = body;
 	}
 
 	@Override

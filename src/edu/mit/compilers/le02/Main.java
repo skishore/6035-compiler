@@ -15,10 +15,13 @@ import antlr.Token;
 import antlr.ANTLRException;
 import antlr.debug.misc.ASTFrame;
 
+import edu.mit.compilers.le02.ast.ASTNode;
 import edu.mit.compilers.le02.grammar.DecafParser;
 import edu.mit.compilers.le02.grammar.DecafParserTokenTypes;
 import edu.mit.compilers.le02.grammar.DecafScanner;
 import edu.mit.compilers.le02.grammar.DecafScannerTokenTypes;
+import edu.mit.compilers.le02.ir.IrException;
+import edu.mit.compilers.le02.ir.IrGenerator;
 
 import edu.mit.compilers.tools.CLI;
 
@@ -32,6 +35,7 @@ public class Main {
     SUCCESS (0),
     SCAN_FAILED (1),
     PARSE_FAILED (2),
+    SEMANTICS_FAILED (3),
     NO_SUCH_ACTION (127);
 
     private int numericCode;
@@ -89,9 +93,14 @@ public class Main {
       }
       break;
      case PARSE:
-     case DEFAULT:
       if (!runParser(inputStream)) {
         retCode = ReturnCode.PARSE_FAILED;
+      }
+      break;
+     case INTER:
+     case DEFAULT:
+      if (!generateIR(inputStream)) {
+        retCode = ReturnCode.SEMANTICS_FAILED;
       }
       break;
      default:
@@ -227,6 +236,46 @@ public class Main {
       }
     } catch (ANTLRException e) {
       reportError(e);
+      success = false;
+    }
+    return success;
+  }
+
+  /**
+   * Runs the parser on an input and displays any error messages found while
+   * parsing.
+   *
+   * @param inputStream The stream to read input from.
+   * @return true if parser ran without errors, false if errors found.
+   */
+  protected static boolean generateIR(InputStream inputStream) {
+    boolean success = true;
+    try {
+      DecafScanner parse_lexer =
+        new DecafScanner(new DataInputStream(inputStream));
+      final DecafParser parser = new DecafParser(parse_lexer);
+
+      // The default instantiation is unaware of underlying filenames when
+      // pretty-printing exceptions. Set the values appropriately.
+      if (inputStream instanceof FileInputStream) {
+        parse_lexer.setFilename(CLI.infile);
+        parser.setFilename(CLI.infile);
+      }
+
+      // Invoke the parser.
+      parser.program();
+
+      ASTNode parent = IrGenerator.generateIR(parser.getAST());
+      if (CLI.debug) {
+        System.out.println(parent);
+      }
+    } catch (ANTLRException e) {
+      reportError(e);
+      success = false;
+    } catch (IrException ire) {
+      // Don't use reportError since IrExceptions know the filename and
+      // already know how to pretty-print, unlike antlr exceptions.
+      System.out.println(ire);
       success = false;
     }
     return success;
