@@ -19,4 +19,6 @@ public final class BooleanNode extends ExpressionNode {
 	public boolean getValue() {
 		return value;
 	}
+
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

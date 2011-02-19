@@ -8,4 +8,6 @@ public final class MinusNode extends UnaryOpNode {
 		super(sl, expr);
 	}
 
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

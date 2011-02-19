@@ -41,5 +41,6 @@ public class AssignNode extends StatementNode {
 		this.value = value;
 	}
 
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 
 }

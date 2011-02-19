@@ -41,5 +41,5 @@ public final class BlockNode extends StatementNode {
 		this.statements = statements;
 	}
 	
-	
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

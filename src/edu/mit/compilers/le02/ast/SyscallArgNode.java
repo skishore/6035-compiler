@@ -35,4 +35,5 @@ public final class SyscallArgNode extends ASTNode {
 		return children;
 	}
 
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

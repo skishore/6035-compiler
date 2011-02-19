@@ -18,5 +18,7 @@ public abstract class ASTNode {
 
 	
 	abstract public List<ASTNode> getChildren();
+	
+	abstract public void visit(ASTNodeVisitor v);
 
 }

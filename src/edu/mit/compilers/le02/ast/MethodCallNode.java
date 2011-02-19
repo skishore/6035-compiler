@@ -37,4 +37,6 @@ public final class MethodCallNode extends CallNode {
 		return name;
 	}
 
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

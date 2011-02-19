@@ -8,10 +8,6 @@ import edu.mit.compilers.le02.DecafType;
 public final class ArrayLocationNode extends LocationNode {
 	private ExpressionNode index;
 
-	public ArrayLocationNode(SourceLocation sl, DecafType type, String name) {
-		super(sl, type, name);
-	}
-	
 	public ArrayLocationNode(SourceLocation sl, DecafType type, String name, ExpressionNode index) {
 		super(sl, type, name);
 		this.index = index;
@@ -31,5 +27,7 @@ public final class ArrayLocationNode extends LocationNode {
 	public ExpressionNode getIndex() {
 		return index;
 	}
+	
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 
 }

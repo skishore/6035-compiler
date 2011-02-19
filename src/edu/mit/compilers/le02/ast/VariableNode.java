@@ -30,4 +30,5 @@ public final class VariableNode extends ExpressionNode {
 		return loc;
 	}
 
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

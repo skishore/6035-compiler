@@ -27,4 +27,6 @@ public final class MethodDeclNode extends DeclNode {
 		return children;
 	}
 
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

@@ -41,4 +41,6 @@ public final class ClassNode extends ASTNode {
 		this.methods = methods;
 	}
 
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

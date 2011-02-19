@@ -46,4 +46,6 @@ public final class ReturnNode extends StatementNode {
 		this.retValue = retValue;
 	}
 
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

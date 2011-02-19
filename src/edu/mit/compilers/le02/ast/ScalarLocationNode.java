@@ -15,4 +15,7 @@ public final class ScalarLocationNode extends LocationNode {
 	public List<ASTNode> getChildren() {
 		return Collections.emptyList();
 	}
+
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

@@ -52,4 +52,6 @@ public final class ForNode extends StatementNode {
 		this.body = body;
 	}
 
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

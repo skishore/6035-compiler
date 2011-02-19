@@ -25,4 +25,7 @@ public final class SystemCallNode extends CallNode {
 		return children;
 	}
 
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); };
+
 }

@@ -21,4 +21,5 @@ public final class StringNode extends ASTNode {
 	}
 	
 
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

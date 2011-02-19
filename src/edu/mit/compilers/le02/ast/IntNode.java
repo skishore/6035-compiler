@@ -19,4 +19,7 @@ public final class IntNode extends ExpressionNode {
 	public int getValue() {
 		return value;
 	}
+
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

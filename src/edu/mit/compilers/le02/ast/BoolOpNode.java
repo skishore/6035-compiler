@@ -28,4 +28,7 @@ public final class BoolOpNode extends BinaryOpNode {
 		AND,
 		OR;
 	}	
+	
+
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

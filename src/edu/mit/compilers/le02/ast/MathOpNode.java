@@ -27,4 +27,6 @@ public final class MathOpNode extends BinaryOpNode {
 		MODULO
 	}	
 
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }
