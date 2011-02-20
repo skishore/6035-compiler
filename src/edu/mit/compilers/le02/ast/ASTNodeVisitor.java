@@ -2,7 +2,7 @@ package edu.mit.compilers.le02.ast;
 
 public abstract class ASTNodeVisitor {
 
-  /*
+  /**
    * Helper method: visits the children of the node in order
    */
   protected void defaultBehavior(ASTNode node) {
