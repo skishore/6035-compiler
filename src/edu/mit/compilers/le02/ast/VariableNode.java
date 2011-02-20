@@ -3,31 +3,31 @@ package edu.mit.compilers.le02.ast;
 import java.util.List;
 
 public final class VariableNode extends ExpressionNode {
-	private LocationNode loc;
+  private LocationNode loc;
 
-	public VariableNode(SourceLocation sl) {
-		super(sl);
-	}
-	
-	public VariableNode(SourceLocation sl, LocationNode loc) {
-		super(sl);
-		this.loc = loc;
-	}
+  public VariableNode(SourceLocation sl) {
+    super(sl);
+  }
 
-	@Override
-	public List<ASTNode> getChildren() {
-		return NodeUtil.makeChildren(loc);
-	}
+  public VariableNode(SourceLocation sl, LocationNode loc) {
+    super(sl);
+    this.loc = loc;
+  }
 
-	public void setLoc(LocationNode loc) {
-		this.loc = loc;
-	}
+  @Override
+  public List<ASTNode> getChildren() {
+    return NodeUtil.makeChildren(loc);
+  }
 
-	public LocationNode getLoc() {
-		return loc;
-	}
+  public void setLoc(LocationNode loc) {
+    this.loc = loc;
+  }
 
-	@Override
+  public LocationNode getLoc() {
+    return loc;
+  }
+
+  @Override
   public boolean equals(Object o) {
     if (!(o instanceof VariableNode)) {
       return false;
@@ -37,5 +37,5 @@ public final class VariableNode extends ExpressionNode {
   }
 
   @Override
-	public void visit(ASTNodeVisitor v) { v.accept(this); }
+  public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

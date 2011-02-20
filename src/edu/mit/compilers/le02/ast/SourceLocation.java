@@ -4,37 +4,37 @@ import antlr.collections.AST;
 import edu.mit.compilers.tools.CLI;
 
 public final class SourceLocation {
-	private String filename;
-	private int line;
-	
-	public String getFilename() {
-		return filename;
-	}
+  private String filename;
+  private int line;
 
-	public int getLine() {
-		return line;
-	}
+  public String getFilename() {
+    return filename;
+  }
 
-	public int getCol() {
-		return col;
-	}
+  public int getLine() {
+    return line;
+  }
 
-	private int col;
-	
-	public SourceLocation(String filename, int line, int col) {
-		this.filename = filename;
-		this.line = line;
-		this.col = col;
-	}
+  public int getCol() {
+    return col;
+  }
 
-	/**
-	 * Utility method used to create a SourceLocation from an Antlr AST node.
-	 */
-	public SourceLocation(AST node) {
-	  this(CLI.getInputFilename(), node.getLine(), node.getColumn());
-	}
+  private int col;
 
-	public String toString() {
-	  return filename + ":" + line + ":" + col;
-	}
+  public SourceLocation(String filename, int line, int col) {
+    this.filename = filename;
+    this.line = line;
+    this.col = col;
+  }
+
+  /**
+   * Utility method used to create a SourceLocation from an Antlr AST node.
+   */
+  public SourceLocation(AST node) {
+    this(CLI.getInputFilename(), node.getLine(), node.getColumn());
+  }
+
+  public String toString() {
+    return filename + ":" + line + ":" + col;
+  }
 }

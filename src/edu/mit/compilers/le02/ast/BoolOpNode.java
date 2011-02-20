@@ -4,24 +4,24 @@ import java.util.Arrays;
 
 
 public final class BoolOpNode extends BinaryOpNode {
-	private BoolOp op;
+  private BoolOp op;
 
-	public BoolOpNode(SourceLocation sl, ExpressionNode left, ExpressionNode right, BoolOp op) {
-		super(sl, left, right);
-		this.op = op;
-	}
+  public BoolOpNode(SourceLocation sl, ExpressionNode left, ExpressionNode right, BoolOp op) {
+    super(sl, left, right);
+    this.op = op;
+  }
 
 
-	public BoolOp getOp() {
-		return op;
-	}
+  public BoolOp getOp() {
+    return op;
+  }
 
-	@Override
+  @Override
   public String toString() {
     return op + " " + Arrays.toString(getChildren().toArray());
   }
 
-	@Override
+  @Override
   public boolean equals(Object o) {
     if (!(o instanceof BoolOpNode)) {
       return false;
@@ -32,15 +32,15 @@ public final class BoolOpNode extends BinaryOpNode {
             op.equals(other.getOp()));
   }
 
-	public enum BoolOp {
-		LT("<"),
-		GT(">"),
-		LE("<="),
-		GE(">="),
-		EQ("=="),
-		NEQ("!="),
-		AND("&&"),
-		OR("||");
+  public enum BoolOp {
+    LT("<"),
+    GT(">"),
+    LE("<="),
+    GE(">="),
+    EQ("=="),
+    NEQ("!="),
+    AND("&&"),
+    OR("||");
     private String disp;
     private BoolOp(String display) {
       disp = display;
@@ -49,8 +49,8 @@ public final class BoolOpNode extends BinaryOpNode {
     public String toString() {
       return disp;
     }
-	}	
+  }
 
-	@Override
-	public void visit(ASTNodeVisitor v) { v.accept(this); }
+  @Override
+  public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

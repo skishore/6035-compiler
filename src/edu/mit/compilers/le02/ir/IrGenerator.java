@@ -266,7 +266,7 @@ public class IrGenerator {
   }
 
   /**
-   * Processes an {@link DecafParserTokenTypes.TK_callout} token. 
+   * Processes an {@link DecafParserTokenTypes.TK_callout} token.
    */
   protected SystemCallNode processSyscall(AST node, SourceLocation sl)
       throws IrException {

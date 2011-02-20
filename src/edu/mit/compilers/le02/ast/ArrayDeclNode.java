@@ -6,22 +6,22 @@ import java.util.List;
 import edu.mit.compilers.le02.DecafType;
 
 public final class ArrayDeclNode extends FieldDeclNode {
-	private int length;
+  private int length;
 
-	public ArrayDeclNode(SourceLocation sl, DecafType type, String id, int length) {
-		super(sl, type, id);
-		this.length = length;
-	}
+  public ArrayDeclNode(SourceLocation sl, DecafType type, String id, int length) {
+    super(sl, type, id);
+    this.length = length;
+  }
 
-	@Override
-	public List<ASTNode> getChildren() {
-		return Collections.emptyList();
-	}
+  @Override
+  public List<ASTNode> getChildren() {
+    return Collections.emptyList();
+  }
 
-	public int getLength() {
-		return length;
-	}
-	
-	public void visit(ASTNodeVisitor v) { v.accept(this); }
+  public int getLength() {
+    return length;
+  }
+
+  public void visit(ASTNodeVisitor v) { v.accept(this); }
 
 }

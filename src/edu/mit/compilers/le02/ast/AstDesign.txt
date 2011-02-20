@@ -13,37 +13,37 @@ ASTNode - Base class for all nodes, holds debug info for token
   - column number
 
 === Declaration Node Classes ===
-  
+
 DeclNode (abstract) - Base class for all declarations
   Fields:
   - type
   - name
 
 FieldDeclNode (abstract) extends DeclNode
-  
+
 ArrayDeclNode extends FieldDeclNode - Class for array declarations
   (inherited fields only)
-  
+
 VarDeclNode extends FieldDeclNode - Class for local variable declarations
   (inherited fields only)
-  
+
 MethodDeclNode extends DeclNode - Class for method declarations
-  Children: 
+  Children:
   - params: list of VarDeclNodes
   - methodBody: BlockNode
-  
+
 
 === Statement Node Classes ===
 
 * Basic Statements *
 
-StatementNode (abstract) - Represents a single discrete statement in the code.  
+StatementNode (abstract) - Represents a single discrete statement in the code.
 
 BlockNode extends StatementNode - Represents a newly scoped block of code
   Children:
   - declarations: list of VarDeclNodes
   - statements: list of StatementNodes
- 
+
 AssignNode extends StatementNode - Represents an assignment to a location.
   Children:
   - location: LocationNode
@@ -57,21 +57,21 @@ IfNode extends StatementNode - Represents an if/then[/else] statement
   - condition: ExpressionNode
   - thenBlock: BlockNode
   - elseBlock (optional): BlockNode
-  
+
 ForNode extends StatementNode - Represents a for loop
   Children:
   - init: AssignNode
   - end: ExpressionNode
   - body: BlockNode
-  
+
 BreakNode extends StatementNode - Represent a break statement
 ContinueNode extends StatementNode - Represent a continue statement
 
 ReturnNode extends StatementNode - Represent a break statement
   Children:
   - value (optional): ExpressionNode
-  
-  
+
+
 * Method Call Statements *
 
 CallStatementNode - Represents a method call used as a statement (rather than an expression)
@@ -80,7 +80,7 @@ CallStatementNode - Represents a method call used as a statement (rather than an
 
 
 === Expression Node Classes ===
-  
+
 ExpressionNode (abstract) - Represents an expression that will evaluate to a value
 
 * Literal Expressions *
@@ -90,27 +90,27 @@ LiteralNode (abstract) extends ExpressionNode - Represents a constant (literal) 
 IntNode extends LiteralNode - Represents an int value
   Fields:
   - value
-  
+
 CharNode extends LiteralNode - Represents a char value
   Fields:
   - value
-  
+
 BooleanNode extends LiteralNode - Represents a boolean value
   Fields:
   - value
-  
-  
+
+
 * Operand Expressions *
 
 UnaryOpNode (abstract) extends ExpressionNode - Represents unary operations
   Children:
   - expr: ExpressionNode
-  
+
 BinaryOpNode (abstract) extends ExpressionNode - Represents any binary operation
   Children:
   - left: ExpressionNode
   - right: ExpressionNode
-  
+
 MathOpNode extends BinaryOpNode - Represents a math operation
   Params:
   - op: ADD, SUBTRACT, MULTIPLY, DIVIDE
@@ -118,14 +118,14 @@ MathOpNode extends BinaryOpNode - Represents a math operation
 BoolOpNode extends BinaryOpNode - Represents a boolean operation
   Params:
   - op: LT, GT, LE, GE, EQ, NEQ, AND, OR
-	
+  
 
 * Other Expressions *
 
 VariableNode extends ExpressionNode - Represents the value of a variable (a load)
   Children:
   - location: LocationNode
-  
+
 CallNode (abstract) extends ExpressionNode - Represents the value of a method or system call
 
 MethodCallNode extends CallNode - Represents the value of a method call
@@ -138,9 +138,9 @@ SystemCallNode extends CallNode - Represents a system call (callout)
   Children:
   - funcName: StringNode
   - args: List of CalloutArgNodes
-  
 
-  
+
+
 === Other Node Classes ===
 
 ClassNode extends ASTNode - Represents a class
@@ -151,7 +151,7 @@ ClassNode extends ASTNode - Represents a class
 StringNode extends ASTNode - Represents a String
   Fields:
   - str
-  
+
 CalloutArgNode extends ASTNode - Represents an argument to a syscall
   Fields:
   - isString: indicates whether or not this argument is a string or expr

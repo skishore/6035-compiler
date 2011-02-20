@@ -4,23 +4,23 @@ import java.util.Collections;
 import java.util.List;
 
 public final class BooleanNode extends ExpressionNode {
-	private boolean value;
+  private boolean value;
 
-	public BooleanNode(SourceLocation sl, boolean b) {
-		super(sl);
-		this.value = b;
-	}
+  public BooleanNode(SourceLocation sl, boolean b) {
+    super(sl);
+    this.value = b;
+  }
 
-	@Override
-	public List<ASTNode> getChildren() {
-		return Collections.emptyList();
-	}
+  @Override
+  public List<ASTNode> getChildren() {
+    return Collections.emptyList();
+  }
 
-	public boolean getValue() {
-		return value;
-	}
+  public boolean getValue() {
+    return value;
+  }
 
-	@Override
+  @Override
   public String toString() {
     return "" + value;
   }

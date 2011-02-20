@@ -4,40 +4,40 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class MethodCallNode extends CallNode {
-	private String name;
-	private List<ExpressionNode> args;
+  private String name;
+  private List<ExpressionNode> args;
 
-	public MethodCallNode(SourceLocation sl, String name) {
-		super(sl);
-		this.name = name;
-	}
+  public MethodCallNode(SourceLocation sl, String name) {
+    super(sl);
+    this.name = name;
+  }
 
-	public MethodCallNode(SourceLocation sl, String name, List<ExpressionNode> args) {
-		super(sl);
-		this.name = name;
-		this.args = args;
-	}
+  public MethodCallNode(SourceLocation sl, String name, List<ExpressionNode> args) {
+    super(sl);
+    this.name = name;
+    this.args = args;
+  }
 
-	@Override
-	public List<ASTNode> getChildren() {
-		List<ASTNode> children = new ArrayList<ASTNode>();
-		children.addAll(args);
-		return children;
-	}
+  @Override
+  public List<ASTNode> getChildren() {
+    List<ASTNode> children = new ArrayList<ASTNode>();
+    children.addAll(args);
+    return children;
+  }
 
-	public List<ExpressionNode> getArgs() {
-		return args;
-	}
+  public List<ExpressionNode> getArgs() {
+    return args;
+  }
 
-	public void setArgs(List<ExpressionNode> args) {
-		this.args = args;
-	}
+  public void setArgs(List<ExpressionNode> args) {
+    this.args = args;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public String getName() {
+    return name;
+  }
 
-	@Override
+  @Override
   public boolean equals(Object o) {
     if (!(o instanceof MethodCallNode)) {
       return false;
@@ -47,6 +47,6 @@ public final class MethodCallNode extends CallNode {
             args.equals(other.getArgs()));
   }
 
-	@Override
-	public void visit(ASTNodeVisitor v) { v.accept(this); }
+  @Override
+  public void visit(ASTNodeVisitor v) { v.accept(this); }
 }
