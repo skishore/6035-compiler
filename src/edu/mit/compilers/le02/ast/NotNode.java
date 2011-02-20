@@ -15,4 +15,7 @@ public class NotNode extends UnaryOpNode {
     NotNode other = (NotNode)o;
     return expr.equals(other.expr);
   }
+
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

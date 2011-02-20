@@ -47,4 +47,6 @@ public final class MathOpNode extends BinaryOpNode {
 		}
 	}	
 
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

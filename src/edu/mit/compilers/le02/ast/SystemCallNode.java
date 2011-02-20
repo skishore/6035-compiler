@@ -42,4 +42,7 @@ public final class SystemCallNode extends CallNode {
     return (funcName.equals(other.getFuncName()) &&
             args.equals(other.getArgs()));
   }
+
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); };
 }

@@ -15,4 +15,7 @@ public final class MinusNode extends UnaryOpNode {
     MinusNode other = (MinusNode)o;
     return expr.equals(other.expr);
   }
+
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

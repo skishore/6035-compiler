@@ -50,4 +50,7 @@ public final class BoolOpNode extends BinaryOpNode {
       return disp;
     }
 	}	
+
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

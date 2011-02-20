@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class ClassNode extends ASTNode {
+	private String name;
 	protected List<FieldDeclNode> fields;
 	protected List<MethodDeclNode> methods;
 
@@ -11,10 +12,15 @@ public final class ClassNode extends ASTNode {
 		super(sl);
 	}
 
-	public ClassNode(SourceLocation sl, List<FieldDeclNode> fields, List<MethodDeclNode> methods) {
+	public ClassNode(SourceLocation sl, String name, List<FieldDeclNode> fields, List<MethodDeclNode> methods) {
 		super(sl);
+		this.name = name;
 		this.fields = fields;
 		this.methods = methods;
+	}
+	
+	public String getName() {
+		return name;
 	}
 
 	@Override
@@ -41,4 +47,6 @@ public final class ClassNode extends ASTNode {
 		this.methods = methods;
 	}
 
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

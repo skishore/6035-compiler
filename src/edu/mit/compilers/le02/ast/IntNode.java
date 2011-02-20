@@ -25,11 +25,14 @@ public final class IntNode extends ExpressionNode {
 	  return "" + value;
 	}
 
-	 @Override
-	  public boolean equals(Object o) {
-	    if (!(o instanceof IntNode)) {
-	      return false;
-	    }
-	    return value == ((IntNode)o).getValue();
-	  }
+	@Override
+  public boolean equals(Object o) {
+    if (!(o instanceof IntNode)) {
+      return false;
+    }
+    return value == ((IntNode)o).getValue();
+  }
+
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

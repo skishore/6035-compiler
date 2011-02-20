@@ -22,5 +22,6 @@ public abstract class ASTNode {
 	  return this.getClass().getSimpleName() + Arrays.toString(getChildren().toArray());
 	}
 	
-	abstract public List<ASTNode> getChildren();
+	abstract public List<ASTNode> getChildren();	
+	abstract public void visit(ASTNodeVisitor v);
 }

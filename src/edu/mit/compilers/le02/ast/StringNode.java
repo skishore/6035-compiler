@@ -32,4 +32,7 @@ public final class StringNode extends ASTNode {
 	  }
 	  return value.equals(((StringNode)o).getValue());
 	}
+
+  @Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

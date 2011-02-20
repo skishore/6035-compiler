@@ -23,6 +23,8 @@ public final class ArrayLocationNode extends LocationNode {
 	public ExpressionNode getIndex() {
 		return index;
 	}
+	
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 
   @Override
   public boolean equals(Object o) {

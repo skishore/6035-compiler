@@ -32,4 +32,6 @@ public class AssignNode extends StatementNode {
 	public void setValue(ExpressionNode value) {
 		this.value = value;
 	}
+
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

@@ -35,4 +35,7 @@ public final class VariableNode extends ExpressionNode {
     VariableNode other = (VariableNode)o;
     return loc.equals(other.getLoc());
   }
+
+  @Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

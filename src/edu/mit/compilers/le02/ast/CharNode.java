@@ -27,4 +27,7 @@ public final class CharNode extends ExpressionNode {
     }
     return value == ((CharNode)o).getValue();
   }
+
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

@@ -21,5 +21,7 @@ public final class ArrayDeclNode extends FieldDeclNode {
 	public int getLength() {
 		return length;
 	}
+	
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 
 }

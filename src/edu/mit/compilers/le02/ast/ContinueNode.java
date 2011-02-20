@@ -14,4 +14,6 @@ public final class ContinueNode extends StatementNode {
 		return Collections.emptyList();
 	}
 
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

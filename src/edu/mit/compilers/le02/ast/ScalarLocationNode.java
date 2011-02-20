@@ -24,4 +24,7 @@ public final class ScalarLocationNode extends LocationNode {
     return (name.equals(other.getName()) &&
             type.equals(other.getType()));
   }
+
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

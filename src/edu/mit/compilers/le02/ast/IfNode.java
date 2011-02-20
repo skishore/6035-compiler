@@ -65,4 +65,6 @@ public final class IfNode extends StatementNode {
 		return hasElse;
 	}
 
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

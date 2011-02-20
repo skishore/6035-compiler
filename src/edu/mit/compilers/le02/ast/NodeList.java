@@ -138,4 +138,10 @@ public class NodeList<T extends ASTNode> extends ASTNode implements List<T> {
   public <U> U[] toArray(U[] a) {
     return list.toArray(a);
   }
+
+  public void visit(ASTNodeVisitor v) {
+    for (ASTNode item : this) {
+      item.visit(v);
+    }
+  }
 }

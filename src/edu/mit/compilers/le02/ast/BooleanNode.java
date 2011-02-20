@@ -32,4 +32,7 @@ public final class BooleanNode extends ExpressionNode {
     }
     return value == ((BooleanNode)o).getValue();
   }
+
+  @Override
+  public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

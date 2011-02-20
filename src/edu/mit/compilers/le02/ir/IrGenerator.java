@@ -255,15 +255,14 @@ public class IrGenerator {
     AST methods_ast = fields_ast.getNextSibling();
     assert(methods_ast.getNextSibling() == null);
 
-    // Name is unused in our AST, but if we needed it, we would use:
-    // String name = name_ast.getText();
+    String name = name_ast.getText();
     @SuppressWarnings("unchecked")
     List<FieldDeclNode> fields =
       (List<FieldDeclNode>)visit(fields_ast);
     @SuppressWarnings("unchecked")
     List<MethodDeclNode> methods =
       (List<MethodDeclNode>)visit(methods_ast);
-    return new ClassNode(sl, fields, methods);
+    return new ClassNode(sl, name, fields, methods);
   }
 
   /**

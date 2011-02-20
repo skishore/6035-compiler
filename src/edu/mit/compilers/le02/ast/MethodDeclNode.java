@@ -30,4 +30,7 @@ public final class MethodDeclNode extends DeclNode {
 	public BlockNode getBody() {
 	  return body;
 	}
+
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

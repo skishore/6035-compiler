@@ -46,4 +46,7 @@ public final class MethodCallNode extends CallNode {
     return (name.equals(other.getName()) &&
             args.equals(other.getArgs()));
   }
+
+	@Override
+	public void visit(ASTNodeVisitor v) { v.accept(this); }
 }
