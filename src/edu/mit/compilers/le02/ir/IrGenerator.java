@@ -328,8 +328,7 @@ public class IrGenerator {
   }
 
   /**
-   * Processes an {@link DecafParserTokenTypes.EXPR} or a
-   * {@link DecafParserTokenTypes.TERM} token.
+   * Processes an {@link DecafParserTokenTypes.TERMF} token.
    */
   protected ExpressionNode processTermF(AST node, SourceLocation sl)
       throws IrException {

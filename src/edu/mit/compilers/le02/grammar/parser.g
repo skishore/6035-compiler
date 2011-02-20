@@ -106,8 +106,11 @@ tokens
 //
 // Primitives - must be flagged with appropriate type.
 //
-bool_literal!: t:TK_true | f:TK_false
-  { #bool_literal = #([BOOLEAN_LITERAL,"Bool"], t, f); };
+bool_literal!:
+  t:TK_true
+    { #bool_literal = #([BOOLEAN_LITERAL,"Bool"], t); } |
+  f:TK_false
+    { #bool_literal = #([BOOLEAN_LITERAL,"Bool"], f); };
 int_literal!: i:INT
   { #int_literal = #([INTEGER_LITERAL,"Int"], i); };
 char_literal!: c:CHAR

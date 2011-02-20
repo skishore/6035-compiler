@@ -15,6 +15,7 @@ import edu.mit.compilers.le02.ast.ClassNode;
 import edu.mit.compilers.le02.ast.IntNode;
 import edu.mit.compilers.le02.ast.MathOpNode;
 import edu.mit.compilers.le02.ast.MinusNode;
+import edu.mit.compilers.le02.ast.NotNode;
 import edu.mit.compilers.le02.ast.ScalarLocationNode;
 import edu.mit.compilers.le02.ast.SourceLocation;
 import edu.mit.compilers.le02.ast.BoolOpNode.BoolOp;
@@ -78,46 +79,7 @@ public class IrGeneratorTest extends TestCase {
     try {
       parser.program();
       ASTNode root = IrGenerator.generateIR(parser.getAST());
-      /*
-       We expect to get output looking like the following:
-       ClassNode[
-         VarDeclNode[],
-         ArrayDeclNode[],
-         MethodDeclNode[
-           BlockNode[
-             AssignNode[
-               ScalarLocationNode[],
-               - [
-                 + [
-                   + [
-                     + [1, 2],
-                     * [3, 4]
-                   ],
-                   / [5, 10]
-                 ],
-                 % [2, 3]
-               ]
-             ],
-             AssignNode[
-               ArrayLocationNode[],
-               || [
-                 false,
-                 == [
-                   + [
-                     + [
-                       + [1, 2],
-                       * [3, 4]
-                     ],
-                     / [5, 10]
-                   ],
-                   % [MinusNode[2], 3]
-                 ]
-               ]
-             ]
-           ]
-         ]
-       ]
-       */
+
       // Take a nice walk through the tree.
       assert(root instanceof ClassNode);
       ClassNode classNode = (ClassNode)root;
@@ -173,21 +135,21 @@ public class IrGeneratorTest extends TestCase {
         firstAssignment.getValue());
       assertEquals(
         new BoolOpNode(null,
-          new BooleanNode(null, false),
+          new NotNode(null, new BooleanNode(null, true)),
           new BoolOpNode(null,
             new MathOpNode(null,
               new MathOpNode(null,
-                new MathOpNode(null,
-                  new IntNode(null, 1),
-                  new IntNode(null, 2),
-                  MathOp.ADD),
-                new MathOpNode(null,
-                  new IntNode(null, 3),
-                  new IntNode(null, 4),
-                  MathOp.MULTIPLY),
+                new IntNode(null, 1),
+                new IntNode(null, 2),
                 MathOp.ADD),
               new MathOpNode(null,
-                new IntNode(null, 5),
+                new MathOpNode(null,
+                  new IntNode(null, 3),
+                  new MathOpNode(null,
+                    new IntNode(null, 4),
+                    new IntNode(null, 5),
+                    MathOp.ADD),
+                  MathOp.MULTIPLY),
                 new IntNode(null, 10),
                 MathOp.DIVIDE),
               MathOp.ADD),
@@ -213,7 +175,7 @@ public class IrGeneratorTest extends TestCase {
   "  boolean b[10];\n" +
   "  void main() {\n" +
   "    a = 1 + 2 + 3 * 4 + 5 / 10 - 2 % 3;\n" +
-  "    b[1] = false || 1 + 2 + 3 * 4 + 5 / 10 == -2 % 3;\n" +
+  "    b[1] = !true || 1 + 2 + 3 * (4 + 5) / 10 == -2 % 3;\n" +
   "  }\n" +
   "}\n";
 
