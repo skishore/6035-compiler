@@ -5,10 +5,6 @@ import java.util.List;
 public final class VariableNode extends ExpressionNode {
   private LocationNode loc;
 
-  public VariableNode(SourceLocation sl) {
-    super(sl);
-  }
-
   public VariableNode(SourceLocation sl, LocationNode loc) {
     super(sl);
     this.loc = loc;

@@ -6,7 +6,8 @@ import java.util.Arrays;
 public final class MathOpNode extends BinaryOpNode {
   private MathOp op;
 
-  public MathOpNode(SourceLocation sl, ExpressionNode left, ExpressionNode right, MathOp op) {
+  public MathOpNode(SourceLocation sl,
+                    ExpressionNode left, ExpressionNode right, MathOp op) {
     super(sl, left, right);
     this.op = op;
   }

@@ -7,7 +7,8 @@ public final class BlockNode extends StatementNode {
   protected List<VarDeclNode> decls;
   protected List<StatementNode> statements;
 
-  public BlockNode(SourceLocation sl, List<VarDeclNode> decls, List<StatementNode> statements) {
+  public BlockNode(SourceLocation sl,
+                   List<VarDeclNode> decls, List<StatementNode> statements) {
     super(sl);
     this.decls = decls;
     this.statements = statements;

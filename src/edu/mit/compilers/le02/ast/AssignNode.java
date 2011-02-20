@@ -6,7 +6,8 @@ public class AssignNode extends StatementNode {
   protected LocationNode loc;
   protected ExpressionNode value;
 
-  public AssignNode(SourceLocation sl, LocationNode loc, ExpressionNode value) {
+  public AssignNode(SourceLocation sl,
+                    LocationNode loc, ExpressionNode value) {
     super(sl);
     this.loc = loc;
     this.value = value;

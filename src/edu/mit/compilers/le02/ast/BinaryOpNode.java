@@ -9,7 +9,8 @@ public abstract class BinaryOpNode extends ExpressionNode {
     super(sl);
   }
 
-  public BinaryOpNode(SourceLocation sl, ExpressionNode left, ExpressionNode right) {
+  public BinaryOpNode(SourceLocation sl,
+                      ExpressionNode left, ExpressionNode right) {
     super(sl);
     this.left = left;
     this.right = right;

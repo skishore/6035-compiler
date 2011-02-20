@@ -5,10 +5,8 @@ import java.util.List;
 
 public final class SyscallArgNode extends ASTNode {
   private boolean isString;
-
   private ExpressionNode expr;
   private StringNode str;
-
 
   public SyscallArgNode(SourceLocation sl, ExpressionNode expr) {
     super(sl);

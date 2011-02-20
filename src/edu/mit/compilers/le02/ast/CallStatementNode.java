@@ -6,11 +6,6 @@ import java.util.List;
 public final class CallStatementNode extends StatementNode {
   private CallNode call;
 
-  public CallStatementNode(SourceLocation sl) {
-    super(sl);
-  }
-
-
   public CallStatementNode(SourceLocation sl, CallNode call) {
     super(sl);
     this.call = call;

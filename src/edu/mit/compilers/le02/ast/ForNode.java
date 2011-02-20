@@ -7,7 +7,8 @@ public final class ForNode extends StatementNode {
   private ExpressionNode end;
   private BlockNode body;
 
-  public ForNode(SourceLocation sl, AssignNode init, ExpressionNode end, BlockNode body) {
+  public ForNode(SourceLocation sl,
+                 AssignNode init, ExpressionNode end, BlockNode body) {
     super(sl);
     this.init = init;
     this.end = end;

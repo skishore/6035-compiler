@@ -8,11 +8,9 @@ public final class ClassNode extends ASTNode {
   protected List<FieldDeclNode> fields;
   protected List<MethodDeclNode> methods;
 
-  public ClassNode(SourceLocation sl) {
-    super(sl);
-  }
-
-  public ClassNode(SourceLocation sl, String name, List<FieldDeclNode> fields, List<MethodDeclNode> methods) {
+  public ClassNode(SourceLocation sl,
+                   String name, List<FieldDeclNode> fields,
+                   List<MethodDeclNode> methods) {
     super(sl);
     this.name = name;
     this.fields = fields;

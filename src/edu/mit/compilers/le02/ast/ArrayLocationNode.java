@@ -6,7 +6,8 @@ import java.util.List;
 public final class ArrayLocationNode extends LocationNode {
   private ExpressionNode index;
 
-  public ArrayLocationNode(SourceLocation sl, String name, ExpressionNode index) {
+  public ArrayLocationNode(SourceLocation sl,
+                           String name, ExpressionNode index) {
     super(sl, name);
     this.index = index;
   }
