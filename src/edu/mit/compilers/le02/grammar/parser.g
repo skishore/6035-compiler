@@ -155,7 +155,7 @@ field_decl!:
                   astFactory.addASTChild(currentAST,
                         #([FIELD_DECL,"FieldDecl"], t_copy, n1, s1));}
                 )
-       (COMMA (n2:ID ( // Deliberately empty
+       (COMMA! (n2:ID ( // Deliberately empty
                       | LSQUARE! s2:int_literal RSQUARE!)
                       {AST t_copy = astFactory.create(#t);
                       astFactory.addASTChild(currentAST,
@@ -212,14 +212,14 @@ assignment!: loc:location op:assign_op value:expr
 
 // An if statement contains the condition, the block to execute if true, and
 // optionally the block to execute if false.
-if_stmt!: TK_if LPAREN! cond:expr RPAREN! b_true:block ( // Deliberately empty
-                                           | TK_else b_false:block)
-  { #if_stmt = #([TK_if], cond, b_true, b_false); };
+if_stmt!: i:TK_if LPAREN! cond:expr RPAREN! b_true:block ( // Deliberately empty
+                                           | TK_else! b_false:block)
+  { #if_stmt = #(i, cond, b_true, b_false); };
 
 // A for loop contains an initial assignment with a var and an init value,
 // a maximum value, and a block to loop over.
-for_loop!: TK_for var:ID ASSIGN init:expr COMMA! max:expr loop:block
-  { #for_loop = #([TK_for],
+for_loop!: f:TK_for var:ID ASSIGN init:expr COMMA! max:expr loop:block
+  { #for_loop = #(f,
       #([ASSIGNMENT,"Assignment"],
         #([LOCATION,"Location"], var), [ASSIGN], init),
       max, loop); };
@@ -232,9 +232,9 @@ statement:
     { #statement = #([CALL_STMT, "CallStatement"], m); } |
   if_stmt |
   for_loop |!
-  TK_return ( // Deliberately empty
-              | r:expr) SEMICOLON!
-    {#statement = #([TK_return], r);} |
+  r:TK_return ( // Deliberately empty
+              | v:expr) SEMICOLON!
+    {#statement = #(r, v);} |
   TK_break SEMICOLON! |
   TK_continue SEMICOLON! |
   block
@@ -251,9 +251,9 @@ callout_arg: expr | string_literal;
 // A direct call contains a method name and a list of arguments.
 method_call!:
   { AST carg_accum = #([CALL_ARGS,"Args"]); }
-  (TK_callout LPAREN! cf:string_literal (COMMA! ca:callout_arg
+  (c:TK_callout LPAREN! cf:string_literal (COMMA! ca:callout_arg
        {carg_accum.addChild(#([CALL_ARG,"Arg"], ca));})* RPAREN!
-       { #method_call = #([TK_callout], cf, carg_accum); } |
+       { #method_call = #(c, cf, carg_accum); } |
   m:method_name LPAREN! ( // Deliberately empty
                           | (a1:expr
                              {carg_accum.addChild(#([CALL_ARG,"Arg"], a1));}
