@@ -364,64 +364,63 @@ public class IrGenerator {
   protected ExpressionNode processTermPrime(AST node, SourceLocation sl)
       throws IrException {
     AST primeChild = node.getFirstChild();
-    if (primeChild != null) {
-      AST rightTerm = primeChild.getNextSibling();
-      AST nextPrime = rightTerm.getNextSibling();
-      ExpressionNode rightExpr = (ExpressionNode)visit(rightTerm);
-      ExpressionNode nextExpr = (ExpressionNode)visit(nextPrime);
-      BinaryOpNode left;
-      switch (primeChild.getType()) {
-       case DecafParserTokenTypes.LOGICAL_OR:
-        left = new BoolOpNode(sl, null, rightExpr, BoolOp.OR);
-        break;
-       case DecafParserTokenTypes.LOGICAL_AND:
-        left = new BoolOpNode(sl, null, rightExpr, BoolOp.AND);
-        break;
-       case DecafParserTokenTypes.EQUALS:
-        left = new BoolOpNode(sl, null, rightExpr, BoolOp.EQ);
-        break;
-       case DecafParserTokenTypes.NOT_EQUALS:
-        left = new BoolOpNode(sl, null, rightExpr, BoolOp.NEQ);
-        break;
-       case DecafParserTokenTypes.LT:
-        left = new BoolOpNode(sl, null, rightExpr, BoolOp.LT);
-        break;
-       case DecafParserTokenTypes.GT:
-        left = new BoolOpNode(sl, null, rightExpr, BoolOp.GT);
-        break;
-       case DecafParserTokenTypes.LE:
-        left = new BoolOpNode(sl, null, rightExpr, BoolOp.LE);
-        break;
-       case DecafParserTokenTypes.GE:
-        left = new BoolOpNode(sl, null, rightExpr, BoolOp.GE);
-        break;
-       case DecafParserTokenTypes.PLUS:
-        left = new MathOpNode(sl, null, rightExpr, MathOp.ADD);
-        break;
-       case DecafParserTokenTypes.MINUS:
-        left = new MathOpNode(sl, null, rightExpr, MathOp.SUBTRACT);
-        break;
-       case DecafParserTokenTypes.TIMES:
-        left = new MathOpNode(sl, null, rightExpr, MathOp.MULTIPLY);
-        break;
-       case DecafParserTokenTypes.DIVIDE:
-        left = new MathOpNode(sl, null, rightExpr, MathOp.DIVIDE);
-        break;
-       case DecafParserTokenTypes.MODULO:
-        left = new MathOpNode(sl, null, rightExpr, MathOp.MODULO);
-        break;
-       default:
-        throw new IrException(new SourceLocation(primeChild),
-          "Unknown binary operation " + primeChild.getText());
-      }
-      if (nextExpr != null && nextExpr instanceof BinaryOpNode) {
-        BinaryOpNode right = (BinaryOpNode)nextExpr;
-        return composite(left, right);
-      } else {
-        return left;
-      }
-    } else {
+    if (primeChild == null) {
       return null;
+    }
+    AST rightTerm = primeChild.getNextSibling();
+    AST nextPrime = rightTerm.getNextSibling();
+    ExpressionNode rightExpr = (ExpressionNode)visit(rightTerm);
+    ExpressionNode nextExpr = (ExpressionNode)visit(nextPrime);
+    BinaryOpNode left;
+    switch (primeChild.getType()) {
+     case DecafParserTokenTypes.LOGICAL_OR:
+      left = new BoolOpNode(sl, null, rightExpr, BoolOp.OR);
+      break;
+     case DecafParserTokenTypes.LOGICAL_AND:
+      left = new BoolOpNode(sl, null, rightExpr, BoolOp.AND);
+      break;
+     case DecafParserTokenTypes.EQUALS:
+      left = new BoolOpNode(sl, null, rightExpr, BoolOp.EQ);
+      break;
+     case DecafParserTokenTypes.NOT_EQUALS:
+      left = new BoolOpNode(sl, null, rightExpr, BoolOp.NEQ);
+      break;
+     case DecafParserTokenTypes.LT:
+      left = new BoolOpNode(sl, null, rightExpr, BoolOp.LT);
+      break;
+     case DecafParserTokenTypes.GT:
+      left = new BoolOpNode(sl, null, rightExpr, BoolOp.GT);
+      break;
+     case DecafParserTokenTypes.LE:
+      left = new BoolOpNode(sl, null, rightExpr, BoolOp.LE);
+      break;
+     case DecafParserTokenTypes.GE:
+      left = new BoolOpNode(sl, null, rightExpr, BoolOp.GE);
+      break;
+     case DecafParserTokenTypes.PLUS:
+      left = new MathOpNode(sl, null, rightExpr, MathOp.ADD);
+      break;
+     case DecafParserTokenTypes.MINUS:
+      left = new MathOpNode(sl, null, rightExpr, MathOp.SUBTRACT);
+      break;
+     case DecafParserTokenTypes.TIMES:
+      left = new MathOpNode(sl, null, rightExpr, MathOp.MULTIPLY);
+      break;
+     case DecafParserTokenTypes.DIVIDE:
+      left = new MathOpNode(sl, null, rightExpr, MathOp.DIVIDE);
+      break;
+     case DecafParserTokenTypes.MODULO:
+      left = new MathOpNode(sl, null, rightExpr, MathOp.MODULO);
+      break;
+     default:
+      throw new IrException(new SourceLocation(primeChild),
+        "Unknown binary operation " + primeChild.getText());
+    }
+    if (nextExpr != null && nextExpr instanceof BinaryOpNode) {
+      BinaryOpNode right = (BinaryOpNode)nextExpr;
+      return composite(left, right);
+    } else {
+      return left;
     }
   }
 
@@ -503,8 +502,6 @@ public class IrGenerator {
       throws IrException {
     // #([LOCAL_VAR_DECL,"VarDecl"], t, n)
     // #([DECLARATION_ARG,"Arg"], arg1t, arg1n)
-    // TODO(dkoh): do we want to distinguish local variable declarations
-    // from argument declarations in our AST?
     AST local_type_ast = node.getFirstChild();
     AST local_name_ast = local_type_ast.getNextSibling();
 
@@ -633,25 +630,24 @@ public class IrGenerator {
    */
   protected ExpressionNode composite(ExpressionNode left, BinaryOpNode right)
       throws IrException {
-    if (right != null) {
-      BinaryOpNode inner = right;
-      while (inner != null && inner.getLeft() != null) {
-        ExpressionNode prospective = inner.getLeft();
-        if (prospective instanceof BinaryOpNode) {
-          inner = (BinaryOpNode)prospective;
-        } else {
-          throw new IrException(prospective.getSourceLoc(),
-            "Unable to composite expression into a full BinaryOpNode.");
-        }
-      }
-      if (inner == null) {
-        throw new IrException(right.getSourceLoc(),
-          "Unable to composite expression into a full BinaryOpNode.");
-      }
-      inner.setLeft(left);
-      return right;
-    } else {
+    if (right == null) {
       return left;
     }
+    BinaryOpNode inner = right;
+    while (inner != null && inner.getLeft() != null) {
+      ExpressionNode prospective = inner.getLeft();
+      if (prospective instanceof BinaryOpNode) {
+        inner = (BinaryOpNode)prospective;
+      } else {
+        throw new IrException(prospective.getSourceLoc(),
+          "Unable to composite expression into a full BinaryOpNode.");
+      }
+    }
+    if (inner == null) {
+      throw new IrException(right.getSourceLoc(),
+        "Unable to composite expression into a full BinaryOpNode.");
+    }
+    inner.setLeft(left);
+    return right;
   }
 }
