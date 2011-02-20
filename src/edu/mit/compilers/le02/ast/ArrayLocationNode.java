@@ -24,4 +24,14 @@ public final class ArrayLocationNode extends LocationNode {
 		return index;
 	}
 
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof ArrayLocationNode)) {
+      return false;
+    }
+    ArrayLocationNode other = (ArrayLocationNode)o;
+    return (name.equals(other.getName()) &&
+            type.equals(other.getType()) &&
+            index.equals(other.getIndex()));
+  }
 }

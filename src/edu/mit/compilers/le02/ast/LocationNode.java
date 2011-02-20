@@ -32,4 +32,5 @@ public abstract class LocationNode extends ASTNode {
 	public String getName() {
 		return name;
 	}
+
 }

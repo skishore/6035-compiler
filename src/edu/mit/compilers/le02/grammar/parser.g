@@ -27,7 +27,7 @@ tokens
   EXPR;
   TERM;
   TERM_PRIME;
-  UNARY_MINUS;
+  TERMF;
   CALL_STMT;
   BLOCK;
   BLOCK_VARS;
@@ -317,12 +317,13 @@ term_four_prime: (TIMES term_five term_four_prime |
                  )
   { #term_four_prime = #([TERM_PRIME,"Term'"], #term_four_prime); };
 // Tier 5: !
-term_five: term_six |! NOT t:term_five
-                       { #term_five = #([TERM,"Term"], NOT,
-                           #([TERM,"term"], t)); };
+term_five!: t6:term_six { #term_five = #([TERMF,"TermF"], t6); } |
+            n:NOT t5:term_five
+              { #term_five = #([TERMF,"TermF"], n,
+                  #([TERMF,"TermF"], t5)); };
 // Tier 6: urnary -
-term_six: term_final |! MINUS t:term_six
-                        { #term_six = #([TERM,"Term"], [UNARY_MINUS, "-"],
-                           #([TERM,"term"], t)); };
+term_six: term_final |! m:MINUS t:term_six
+                        { #term_six = #([TERMF,"TermF"], m,
+                            #([TERMF,"TermF"], t)); };
 // Tier 7: base expressions and parenthesized subexpressions.
 term_final: location | method_call | literal | LPAREN! expr RPAREN!;

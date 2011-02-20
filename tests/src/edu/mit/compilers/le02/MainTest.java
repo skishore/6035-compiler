@@ -28,13 +28,7 @@ public class MainTest extends TestCase {
    * Smoketest for parser.
    */
   public void testSmokeParser() {
-    assertTrue(Main.runParser(StreamUtil.createInputStream(
-      "class Program {\n" +
-      "  int a;\n" +
-      "  void main() {\n" +
-      "    a = a + 1;\n" +
-      "  }\n" +
-      "}\n")));
+    assertTrue(Main.runParser(StreamUtil.createInputStream(GOOD_PROGRAM)));
     assertFalse(Main.runParser(StreamUtil.createInputStream(
       "class Program {\n" +
       "  int a\n" +
@@ -43,4 +37,18 @@ public class MainTest extends TestCase {
       "  }\n" +
       "}\n")));
   }
+
+  /**
+   * Smoketest for IR builder.
+   */
+  public void testSmokeIrBuilder() {
+    assertTrue(Main.generateIR(StreamUtil.createInputStream(GOOD_PROGRAM)));
+  }
+
+  private static String GOOD_PROGRAM = "class Program {\n" +
+    "  int a;\n" +
+    "  void main() {\n" +
+    "    a = a + 1;\n" +
+    "  }\n" +
+    "}\n";
 }

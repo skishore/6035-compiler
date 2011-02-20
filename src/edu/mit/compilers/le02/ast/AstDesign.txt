@@ -111,11 +111,11 @@ BinaryOpNode (abstract) extends ExpressionNode - Represents any binary operation
   - left: ExpressionNode
   - right: ExpressionNode
   
-MathOpNode (abstract) extends BinaryOpNode - Represents a math operation
+MathOpNode extends BinaryOpNode - Represents a math operation
   Params:
   - op: ADD, SUBTRACT, MULTIPLY, DIVIDE
 
-BoolOpNode (abstract) extends BinaryOpNode - Represents a boolean operation
+BoolOpNode extends BinaryOpNode - Represents a boolean operation
   Params:
   - op: LT, GT, LE, GE, EQ, NEQ, AND, OR
 	

@@ -23,4 +23,11 @@ public final class MethodDeclNode extends DeclNode {
 		return children;
 	}
 
+	public List<VarDeclNode> getParams() {
+	  return params;
+	}
+
+	public BlockNode getBody() {
+	  return body;
+	}
 }

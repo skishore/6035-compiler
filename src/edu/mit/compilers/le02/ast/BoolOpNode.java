@@ -6,10 +6,6 @@ import java.util.Arrays;
 public final class BoolOpNode extends BinaryOpNode {
 	private BoolOp op;
 
-	public BoolOpNode(SourceLocation sl, BoolOp op) {
-		super(sl);
-	}
-	
 	public BoolOpNode(SourceLocation sl, ExpressionNode left, ExpressionNode right, BoolOp op) {
 		super(sl, left, right);
 		this.op = op;
@@ -23,6 +19,17 @@ public final class BoolOpNode extends BinaryOpNode {
 	@Override
   public String toString() {
     return op + " " + Arrays.toString(getChildren().toArray());
+  }
+
+	@Override
+  public boolean equals(Object o) {
+    if (!(o instanceof BoolOpNode)) {
+      return false;
+    }
+    BoolOpNode other = (BoolOpNode)o;
+    return (left.equals(other.left) &&
+            right.equals(other.right) &&
+            op.equals(other.getOp()));
   }
 
 	public enum BoolOp {

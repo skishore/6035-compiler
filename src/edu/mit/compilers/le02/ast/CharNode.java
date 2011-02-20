@@ -19,4 +19,12 @@ public final class CharNode extends ExpressionNode {
 	public int getValue() {
 		return value;
 	}
+
+ @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof CharNode)) {
+      return false;
+    }
+    return value == ((CharNode)o).getValue();
+  }
 }

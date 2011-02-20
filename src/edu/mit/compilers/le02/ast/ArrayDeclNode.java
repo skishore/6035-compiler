@@ -10,6 +10,7 @@ public final class ArrayDeclNode extends FieldDeclNode {
 
 	public ArrayDeclNode(SourceLocation sl, DecafType type, String id, int length) {
 		super(sl, type, id);
+		this.length = length;
 	}
 
 	@Override

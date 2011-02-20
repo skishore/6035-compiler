@@ -27,4 +27,12 @@ public final class VariableNode extends ExpressionNode {
 		return loc;
 	}
 
+	@Override
+  public boolean equals(Object o) {
+    if (!(o instanceof VariableNode)) {
+      return false;
+    }
+    VariableNode other = (VariableNode)o;
+    return loc.equals(other.getLoc());
+  }
 }

@@ -14,4 +14,14 @@ public final class ScalarLocationNode extends LocationNode {
 	public List<ASTNode> getChildren() {
 		return Collections.emptyList();
 	}
+
+	@Override
+  public boolean equals(Object o) {
+    if (!(o instanceof ScalarLocationNode)) {
+      return false;
+    }
+    ScalarLocationNode other = (ScalarLocationNode)o;
+    return (name.equals(other.getName()) &&
+            type.equals(other.getType()));
+  }
 }

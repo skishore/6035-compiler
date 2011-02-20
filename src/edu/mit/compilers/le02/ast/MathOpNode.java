@@ -20,6 +20,17 @@ public final class MathOpNode extends BinaryOpNode {
 	  return op + " " + Arrays.toString(getChildren().toArray());
 	}
 
+	@Override
+	public boolean equals(Object o) {
+	  if (!(o instanceof MathOpNode)) {
+	    return false;
+	  }
+	  MathOpNode other = (MathOpNode)o;
+	  return (left.equals(other.left) &&
+	          right.equals(other.right) &&
+	          op.equals(other.getOp()));
+	}
+
 	public enum MathOp {
 		ADD("+"),
 		SUBTRACT("-"),

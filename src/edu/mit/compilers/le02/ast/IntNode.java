@@ -24,4 +24,12 @@ public final class IntNode extends ExpressionNode {
 	public String toString() {
 	  return "" + value;
 	}
+
+	 @Override
+	  public boolean equals(Object o) {
+	    if (!(o instanceof IntNode)) {
+	      return false;
+	    }
+	    return value == ((IntNode)o).getValue();
+	  }
 }

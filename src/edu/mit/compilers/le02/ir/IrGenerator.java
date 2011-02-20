@@ -78,12 +78,8 @@ public class IrGenerator {
    */
   public ASTNode visit(AST node) throws IrException {
     if (node == null) {
-      // TODO(lizfong): contemplate if we want to throw error instead.
-      // We should be nullchecking before this is even called.
-      if (CLI.debug) {
-        System.out.println("Warning: asked to visit null node");
-      }
-      return null;
+      throw new IrException(new SourceLocation("<unknown>", -1, -1),
+        "Attempted to visit null node. Check if parse tree is malformed.");
     }
 
     final SourceLocation sl = new SourceLocation(node);
@@ -93,24 +89,7 @@ public class IrGenerator {
 
     switch (node.getType()) {
      case DecafParserTokenTypes.PROGRAM:
-      // #([PROGRAM,"Prog"], n, f_accum, m_accum);
-      AST name_ast = node.getFirstChild();
-      assert(name_ast != null);
-      assert(name_ast.getType() == DecafParserTokenTypes.ID);
-
-      AST fields_ast = name_ast.getNextSibling();
-      AST methods_ast = fields_ast.getNextSibling();
-      assert(methods_ast.getNextSibling() == null);
-
-      // Name is unused in our AST, but if we needed it, we would use:
-      // String name = name_ast.getText();
-      @SuppressWarnings("unchecked")
-      List<FieldDeclNode> fields =
-        (List<FieldDeclNode>)visit(fields_ast);
-      @SuppressWarnings("unchecked")
-      List<MethodDeclNode> methods =
-        (List<MethodDeclNode>)visit(methods_ast);
-      return new ClassNode(sl, fields, methods);
+      return processProgram(node, sl);
 
      case DecafParserTokenTypes.PROGRAM_FIELDS:
       // #([PROGRAM_FIELDS,"Fields"], f1, f2, ...)
@@ -123,24 +102,10 @@ public class IrGenerator {
       return mdlist;
 
      case DecafParserTokenTypes.TK_callout:
-      // #([TK_callout], cf, carg_accum);
-      AST callout_target_ast = node.getFirstChild();
-      AST callout_args_ast = callout_target_ast.getNextSibling();
-      StringNode callout_target = (StringNode)visit(callout_target_ast);
-      @SuppressWarnings("unchecked")
-      List<SyscallArgNode> callout_args =
-        (List<SyscallArgNode>)visit(callout_args_ast);
-      return new SystemCallNode(sl, callout_target, callout_args);
+      return processSyscall(node, sl);
 
      case DecafParserTokenTypes.CALL:
-      // #([CALL,"Call"], f, carg_accum);
-      AST call_target_ast = node.getFirstChild();
-      AST call_args_ast = call_target_ast.getNextSibling();
-      String call_method = call_target_ast.getText();
-      @SuppressWarnings("unchecked")
-      List<ExpressionNode> call_args =
-        (List<ExpressionNode>)visit(call_args_ast);
-      return new MethodCallNode(sl, call_method, call_args);
+      return processMethodCall(node, sl);
 
      case DecafParserTokenTypes.CALL_ARGS:
        // #([CALL_ARGS,"Args"], a1, a2, ...)
@@ -148,18 +113,7 @@ public class IrGenerator {
        return calist;
 
      case DecafParserTokenTypes.CALL_ARG:
-      AST call_arg = node.getFirstChild();
-      SourceLocation call_arg_loc = new SourceLocation(call_arg);
-      switch (call_arg.getType()) {
-       case DecafParserTokenTypes.EXPR:
-        return new SyscallArgNode(call_arg_loc,
-                                   (ExpressionNode)visit(call_arg));
-       case DecafParserTokenTypes.STRING_LITERAL:
-        return new SyscallArgNode(call_arg_loc,
-                                   (StringNode)visit(call_arg));
-       default:
-         throw new IrException(call_arg_loc, "Invalid syscall argument type");
-      }
+      return processSyscallArg(node, sl);
 
      case DecafParserTokenTypes.DECLARATION_ARGS:
       // #([DECLARATION_ARGS,"Args"], a1, a2, ...)
@@ -168,118 +122,19 @@ public class IrGenerator {
 
      case DecafParserTokenTypes.EXPR:
      case DecafParserTokenTypes.TERM:
-      AST termChild = node.getFirstChild();
-      switch (termChild.getType()) {
-        case DecafParserTokenTypes.UNARY_MINUS:
-         return new MinusNode(sl,
-           (ExpressionNode)visit(termChild.getNextSibling()));
-        case DecafParserTokenTypes.NOT:
-         return new NotNode(sl,
-           (ExpressionNode)visit(termChild.getNextSibling()));
-        case DecafParserTokenTypes.TERM:
-         ExpressionNode left = (ExpressionNode)visit(termChild);
-         BinaryOpNode right = (BinaryOpNode)visit(termChild.getNextSibling());
-         return composite(left, right);
-        case DecafParserTokenTypes.LOCATION:
-         return new VariableNode(new SourceLocation(termChild),
-           (LocationNode)visit(termChild));
-        default:
-         // Use general parsing routines.
-         return (ExpressionNode)visit(termChild);
-      }
+      return processTerm(node, sl);
 
      case DecafParserTokenTypes.TERM_PRIME:
-      AST primeChild = node.getFirstChild();
-      if (primeChild != null) {
-        AST rightTerm = primeChild.getNextSibling();
-        AST nextPrime = rightTerm.getNextSibling();
-        ExpressionNode rightExpr = (ExpressionNode)visit(rightTerm);
-        ExpressionNode nextExpr = (ExpressionNode)visit(nextPrime);
-        BinaryOpNode left;
-        switch (primeChild.getType()) {
-         case DecafParserTokenTypes.LOGICAL_OR:
-          left = new BoolOpNode(sl, null, rightExpr, BoolOp.OR);
-          break;
-         case DecafParserTokenTypes.LOGICAL_AND:
-          left = new BoolOpNode(sl, null, rightExpr, BoolOp.AND);
-          break;
-         case DecafParserTokenTypes.EQUALS:
-          left = new BoolOpNode(sl, null, rightExpr, BoolOp.EQ);
-          break;
-         case DecafParserTokenTypes.NOT_EQUALS:
-          left = new BoolOpNode(sl, null, rightExpr, BoolOp.NEQ);
-          break;
-         case DecafParserTokenTypes.LT:
-          left = new BoolOpNode(sl, null, rightExpr, BoolOp.LT);
-          break;
-         case DecafParserTokenTypes.GT:
-          left = new BoolOpNode(sl, null, rightExpr, BoolOp.GT);
-          break;
-         case DecafParserTokenTypes.LE:
-          left = new BoolOpNode(sl, null, rightExpr, BoolOp.LE);
-          break;
-         case DecafParserTokenTypes.GE:
-          left = new BoolOpNode(sl, null, rightExpr, BoolOp.GE);
-          break;
-         case DecafParserTokenTypes.PLUS:
-          left = new MathOpNode(sl, null, rightExpr, MathOp.ADD);
-          break;
-         case DecafParserTokenTypes.MINUS:
-          left = new MathOpNode(sl, null, rightExpr, MathOp.SUBTRACT);
-          break;
-         case DecafParserTokenTypes.TIMES:
-          left = new MathOpNode(sl, null, rightExpr, MathOp.MULTIPLY);
-          break;
-         case DecafParserTokenTypes.DIVIDE:
-          left = new MathOpNode(sl, null, rightExpr, MathOp.DIVIDE);
-          break;
-         case DecafParserTokenTypes.MODULO:
-          left = new MathOpNode(sl, null, rightExpr, MathOp.MODULO);
-          break;
-         default:
-          throw new IrException(new SourceLocation(primeChild),
-            "Unknown binary operation " + primeChild.getText());
-        }
-        if (nextExpr != null && nextExpr instanceof BinaryOpNode) {
-          BinaryOpNode right = (BinaryOpNode)nextExpr;
-          return composite(left, right);
-        } else {
-          return left;
-        }
-      } else {
-        return null;
-      }
+      return processTermPrime(node, sl);
+
+     case DecafParserTokenTypes.TERMF:
+      return processTermF(node, sl);
 
      // We need to account for each case of statement separately.
      // statement:
      //  assignment SEMICOLON! |
      case DecafParserTokenTypes.ASSIGNMENT:
-      // #assignment = #([ASSIGNMENT,"Assignment"], loc, op, value)
-      AST loc_ast = node.getFirstChild();
-      AST op_ast = loc_ast.getNextSibling();
-      AST value_ast = op_ast.getNextSibling();
-
-      LocationNode loc = (LocationNode)visit(loc_ast);
-      VariableNode loc_var = new VariableNode(
-        new SourceLocation(loc_ast), loc);
-      ExpressionNode value = (ExpressionNode)visit(value_ast);
-      SourceLocation op_ast_location = new SourceLocation(op_ast);
-
-      switch (op_ast.getType()) {
-       case DecafParserTokenTypes.ASSIGN:
-        return new AssignNode(sl, loc, value);
-       case DecafParserTokenTypes.INC_ASSIGN:
-        ExpressionNode inc_result = new MathOpNode(op_ast_location,
-          loc_var, value, MathOp.ADD);
-        return new AssignNode(sl, loc, inc_result);
-       case DecafParserTokenTypes.DEC_ASSIGN:
-        ExpressionNode dec_result = new MathOpNode(op_ast_location,
-          loc_var, value, MathOp.SUBTRACT);
-        return new AssignNode(sl, loc, dec_result);
-       default:
-        throw new IrException(op_ast_location,
-          "Invalid assignment operation " + op_ast.getText());
-      }
+      return processAssignment(node, sl);
 
      //  method_call SEMICOLON! |
      case DecafParserTokenTypes.CALL_STMT:
@@ -325,6 +180,7 @@ public class IrGenerator {
       } else {
        return new ReturnNode(sl);
       }
+
      //  TK_break SEMICOLON! |
      case DecafParserTokenTypes.TK_break:
       return new BreakNode(sl);
@@ -355,110 +211,17 @@ public class IrGenerator {
       return bslist;
 
      case DecafParserTokenTypes.METHOD_DECL:
-      // #([METHOD_DECL,"MethodDecl"], ty, vo, name, darg_accum, body);
-      // Either void or a type will be present, but not both.
-      AST method_return_type_ast = node.getFirstChild();
-      AST method_name_ast = method_return_type_ast.getNextSibling();
-      AST method_args_ast = method_name_ast.getNextSibling();
-      AST method_body_ast = method_args_ast.getNextSibling();
-
-      SourceLocation method_return_type_loc =
-        new SourceLocation(method_return_type_ast);
-      DecafType method_return_type;
-      switch (method_return_type_ast.getType()) {
-       case DecafParserTokenTypes.TK_int:
-        method_return_type = DecafType.INT;
-        break;
-       case DecafParserTokenTypes.TK_boolean:
-        method_return_type = DecafType.BOOLEAN;
-        break;
-       case DecafParserTokenTypes.TK_void:
-        method_return_type = DecafType.VOID;
-        break;
-       default:
-        throw new IrException(method_return_type_loc,
-          "Invalid method return type");
-      }
-      String method_name = method_name_ast.getText();
-      @SuppressWarnings("unchecked")
-      List<VarDeclNode> method_args = (List<VarDeclNode>)visit(method_args_ast);
-      BlockNode method_body = (BlockNode)visit(method_body_ast);
-      return new MethodDeclNode(sl, method_return_type, method_name,
-                                method_args, method_body);
+      return processMethodDecl(node, sl);
 
      case DecafParserTokenTypes.LOCAL_VAR_DECL:
      case DecafParserTokenTypes.DECLARATION_ARG:
-      // #([LOCAL_VAR_DECL,"VarDecl"], t, n)
-      // #([DECLARATION_ARG,"Arg"], arg1t, arg1n)
-      // TODO(dkoh): do we want to distinguish local variable declarations
-      // from argument declarations in our AST?
-      AST local_type_ast = node.getFirstChild();
-      AST local_name_ast = local_type_ast.getNextSibling();
-
-      SourceLocation local_type_location = new SourceLocation(local_type_ast);
-      String local_name = local_name_ast.getText();
-      DecafType local_type;
-      switch (local_type_ast.getType()) {
-       case DecafParserTokenTypes.TK_boolean:
-        local_type = DecafType.BOOLEAN;
-        break;
-       case DecafParserTokenTypes.TK_int:
-        local_type = DecafType.INT;
-        break;
-       default:
-        throw new IrException(local_type_location, "Invalid array type");
-      }
-      return new VarDeclNode(sl, local_type, local_name);
+      return processArgOrLocal(node, sl);
 
      case DecafParserTokenTypes.FIELD_DECL:
-      // #([FIELD_DECL,"FieldDecl"], type, name, size)
-      AST field_type_ast = node.getFirstChild();
-      AST field_name_ast = field_type_ast.getNextSibling();
-      AST field_size_ast = field_name_ast.getNextSibling();
-
-      SourceLocation field_type_location = new SourceLocation(field_type_ast);
-      String field_name = field_name_ast.getText();
-      DecafType field_type;
-      if (field_size_ast != null) {
-        switch (field_type_ast.getType()) {
-         case DecafParserTokenTypes.TK_boolean:
-          field_type = DecafType.BOOLEAN_ARRAY;
-          break;
-         case DecafParserTokenTypes.TK_int:
-          field_type = DecafType.INT_ARRAY;
-          break;
-         default:
-          throw new IrException(field_type_location, "Invalid scalar type");
-        }
-        int array_size = ((IntNode)visit(field_size_ast)).getValue();
-        return new ArrayDeclNode(
-          sl, field_type, field_name, array_size);
-      } else {
-        switch (field_type_ast.getType()) {
-         case DecafParserTokenTypes.TK_boolean:
-          field_type = DecafType.BOOLEAN;
-          break;
-         case DecafParserTokenTypes.TK_int:
-          field_type = DecafType.INT;
-          break;
-         default:
-          throw new IrException(field_type_location, "Invalid array type");
-        }
-        return new VarDeclNode(sl, field_type, field_name);
-      }
+      return processFieldDec(node, sl);
 
      case DecafParserTokenTypes.LOCATION:
-      // #([LOCATION,"Location"], n, i)
-      AST location_name_ast = node.getFirstChild();
-      AST location_index_ast = location_name_ast.getNextSibling();
-      String location_name = location_name_ast.getText();
-      if (location_index_ast != null) {
-        ExpressionNode location_index =
-          (ExpressionNode)visit(location_index_ast);
-        return new ArrayLocationNode(sl, location_name, location_index);
-      } else {
-        return new ScalarLocationNode(sl, location_name);
-      }
+      return processLocation(node, sl);
 
      case DecafParserTokenTypes.BOOLEAN_LITERAL:
       return new BooleanNode(sl,
@@ -468,25 +231,7 @@ public class IrGenerator {
       return new CharNode(sl, node.getFirstChild().getText().charAt(0));
 
      case DecafParserTokenTypes.INTEGER_LITERAL:
-      String raw_int = node.getFirstChild().getText();
-      String HEX_PREFIX = "0x";
-      int HEX_RADIX = 16;
-      if (raw_int.startsWith(HEX_PREFIX)) {
-        try {
-          return new IntNode(sl, Integer.parseInt(
-            raw_int.substring(HEX_PREFIX.length()), HEX_RADIX));
-        } catch (NumberFormatException nfe) {
-          // Since 0x[a-fA-F0-9]+ must parse, this means we were out of range.
-          throw new IrException(sl, "Out of range");
-        }
-      } else {
-        try {
-          return new IntNode(sl, Integer.parseInt(raw_int));
-        } catch (NumberFormatException nfe) {
-          // Since [0-9]+ must parse, this means we were out of range.
-          throw new IrException(sl, "Out of range value: " + raw_int);
-        }
-      }
+      return processInt(node, sl);
 
      case DecafParserTokenTypes.STRING_LITERAL:
       return new StringNode(sl, node.getFirstChild().getText());
@@ -497,11 +242,382 @@ public class IrGenerator {
   }
 
   /**
+   * Processes a {@link DecafParserTokenTypes.PROGRAM} token.
+   */
+  protected ClassNode processProgram(AST node, SourceLocation sl)
+      throws IrException {
+    // #([PROGRAM,"Prog"], n, f_accum, m_accum);
+    AST name_ast = node.getFirstChild();
+    assert(name_ast != null);
+    assert(name_ast.getType() == DecafParserTokenTypes.ID);
+
+    AST fields_ast = name_ast.getNextSibling();
+    AST methods_ast = fields_ast.getNextSibling();
+    assert(methods_ast.getNextSibling() == null);
+
+    // Name is unused in our AST, but if we needed it, we would use:
+    // String name = name_ast.getText();
+    @SuppressWarnings("unchecked")
+    List<FieldDeclNode> fields =
+      (List<FieldDeclNode>)visit(fields_ast);
+    @SuppressWarnings("unchecked")
+    List<MethodDeclNode> methods =
+      (List<MethodDeclNode>)visit(methods_ast);
+    return new ClassNode(sl, fields, methods);
+  }
+
+  /**
+   * Processes an {@link DecafParserTokenTypes.TK_callout} token. 
+   */
+  protected SystemCallNode processSyscall(AST node, SourceLocation sl)
+      throws IrException {
+    // #([TK_callout], cf, carg_accum);
+    AST callout_target_ast = node.getFirstChild();
+    AST callout_args_ast = callout_target_ast.getNextSibling();
+    StringNode callout_target = (StringNode)visit(callout_target_ast);
+    @SuppressWarnings("unchecked")
+    List<SyscallArgNode> callout_args =
+      (List<SyscallArgNode>)visit(callout_args_ast);
+    return new SystemCallNode(sl, callout_target, callout_args);
+  }
+
+  /**
+   * Processes an {@link DecafParserTokenTypes.CALL_ARG} token.
+   */
+  protected SyscallArgNode processSyscallArg(AST node, SourceLocation sl)
+      throws IrException {
+    AST call_arg = node.getFirstChild();
+    SourceLocation call_arg_loc = new SourceLocation(call_arg);
+    switch (call_arg.getType()) {
+     case DecafParserTokenTypes.EXPR:
+      return new SyscallArgNode(call_arg_loc,
+                                 (ExpressionNode)visit(call_arg));
+     case DecafParserTokenTypes.STRING_LITERAL:
+      return new SyscallArgNode(call_arg_loc,
+                                 (StringNode)visit(call_arg));
+     default:
+       throw new IrException(call_arg_loc, "Invalid syscall argument type");
+    }
+  }
+
+  /**
+   * Processes an {@link DecafParserTokenTypes.CALL} token.
+   */
+  protected MethodCallNode processMethodCall(AST node, SourceLocation sl)
+      throws IrException {
+    // #([CALL,"Call"], f, carg_accum);
+    AST call_target_ast = node.getFirstChild();
+    AST call_args_ast = call_target_ast.getNextSibling();
+    String call_method = call_target_ast.getText();
+    @SuppressWarnings("unchecked")
+    List<ExpressionNode> call_args =
+      (List<ExpressionNode>)visit(call_args_ast);
+    return new MethodCallNode(sl, call_method, call_args);
+  }
+
+  /**
+   * Processes an {@link DecafParserTokenTypes.EXPR} or a
+   * {@link DecafParserTokenTypes.TERM} token.
+   */
+  protected ExpressionNode processTerm(AST node, SourceLocation sl)
+      throws IrException {
+    AST termChild = node.getFirstChild();
+    ExpressionNode left = (ExpressionNode)visit(termChild);
+    BinaryOpNode right = (BinaryOpNode)visit(termChild.getNextSibling());
+    return composite(left, right);
+  }
+
+  /**
+   * Processes an {@link DecafParserTokenTypes.EXPR} or a
+   * {@link DecafParserTokenTypes.TERM} token.
+   */
+  protected ExpressionNode processTermF(AST node, SourceLocation sl)
+      throws IrException {
+    AST termChild = node.getFirstChild();
+    switch (termChild.getType()) {
+     case DecafParserTokenTypes.MINUS:
+      return new MinusNode(sl,
+        (ExpressionNode)visit(termChild.getNextSibling()));
+     case DecafParserTokenTypes.NOT:
+      return new NotNode(sl,
+        (ExpressionNode)visit(termChild.getNextSibling()));
+     case DecafParserTokenTypes.LOCATION:
+      return new VariableNode(new SourceLocation(termChild),
+        (LocationNode)visit(termChild));
+     case DecafParserTokenTypes.CALL:
+     case DecafParserTokenTypes.TK_callout:
+     case DecafParserTokenTypes.INTEGER_LITERAL:
+     case DecafParserTokenTypes.CHAR_LITERAL:
+     case DecafParserTokenTypes.BOOLEAN_LITERAL:
+     case DecafParserTokenTypes.EXPR:
+     case DecafParserTokenTypes.TERMF:
+       // Use general parsing routines.
+       return (ExpressionNode)visit(termChild);
+     default:
+      throw new IrException(new SourceLocation(termChild),
+        "Unknown expression terminal " + termChild.getType());
+    }
+  }
+
+  /**
+   * Processes a {@link DecafParserTokenTypes.TERM_PRIME} token.
+   */
+  protected ExpressionNode processTermPrime(AST node, SourceLocation sl)
+      throws IrException {
+    AST primeChild = node.getFirstChild();
+    if (primeChild != null) {
+      AST rightTerm = primeChild.getNextSibling();
+      AST nextPrime = rightTerm.getNextSibling();
+      ExpressionNode rightExpr = (ExpressionNode)visit(rightTerm);
+      ExpressionNode nextExpr = (ExpressionNode)visit(nextPrime);
+      BinaryOpNode left;
+      switch (primeChild.getType()) {
+       case DecafParserTokenTypes.LOGICAL_OR:
+        left = new BoolOpNode(sl, null, rightExpr, BoolOp.OR);
+        break;
+       case DecafParserTokenTypes.LOGICAL_AND:
+        left = new BoolOpNode(sl, null, rightExpr, BoolOp.AND);
+        break;
+       case DecafParserTokenTypes.EQUALS:
+        left = new BoolOpNode(sl, null, rightExpr, BoolOp.EQ);
+        break;
+       case DecafParserTokenTypes.NOT_EQUALS:
+        left = new BoolOpNode(sl, null, rightExpr, BoolOp.NEQ);
+        break;
+       case DecafParserTokenTypes.LT:
+        left = new BoolOpNode(sl, null, rightExpr, BoolOp.LT);
+        break;
+       case DecafParserTokenTypes.GT:
+        left = new BoolOpNode(sl, null, rightExpr, BoolOp.GT);
+        break;
+       case DecafParserTokenTypes.LE:
+        left = new BoolOpNode(sl, null, rightExpr, BoolOp.LE);
+        break;
+       case DecafParserTokenTypes.GE:
+        left = new BoolOpNode(sl, null, rightExpr, BoolOp.GE);
+        break;
+       case DecafParserTokenTypes.PLUS:
+        left = new MathOpNode(sl, null, rightExpr, MathOp.ADD);
+        break;
+       case DecafParserTokenTypes.MINUS:
+        left = new MathOpNode(sl, null, rightExpr, MathOp.SUBTRACT);
+        break;
+       case DecafParserTokenTypes.TIMES:
+        left = new MathOpNode(sl, null, rightExpr, MathOp.MULTIPLY);
+        break;
+       case DecafParserTokenTypes.DIVIDE:
+        left = new MathOpNode(sl, null, rightExpr, MathOp.DIVIDE);
+        break;
+       case DecafParserTokenTypes.MODULO:
+        left = new MathOpNode(sl, null, rightExpr, MathOp.MODULO);
+        break;
+       default:
+        throw new IrException(new SourceLocation(primeChild),
+          "Unknown binary operation " + primeChild.getText());
+      }
+      if (nextExpr != null && nextExpr instanceof BinaryOpNode) {
+        BinaryOpNode right = (BinaryOpNode)nextExpr;
+        return composite(left, right);
+      } else {
+        return left;
+      }
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Processes a {@link DecafParserTokenTypes.ASSIGNMENT} token.
+   */
+  protected AssignNode processAssignment(AST node, SourceLocation sl)
+      throws IrException {
+    // #assignment = #([ASSIGNMENT,"Assignment"], loc, op, value)
+    AST loc_ast = node.getFirstChild();
+    AST op_ast = loc_ast.getNextSibling();
+    AST value_ast = op_ast.getNextSibling();
+
+    LocationNode loc = (LocationNode)visit(loc_ast);
+    VariableNode loc_var = new VariableNode(
+      new SourceLocation(loc_ast), loc);
+    ExpressionNode value = (ExpressionNode)visit(value_ast);
+    SourceLocation op_ast_location = new SourceLocation(op_ast);
+
+    switch (op_ast.getType()) {
+     case DecafParserTokenTypes.ASSIGN:
+      return new AssignNode(sl, loc, value);
+     case DecafParserTokenTypes.INC_ASSIGN:
+      ExpressionNode inc_result = new MathOpNode(op_ast_location,
+        loc_var, value, MathOp.ADD);
+      return new AssignNode(sl, loc, inc_result);
+     case DecafParserTokenTypes.DEC_ASSIGN:
+      ExpressionNode dec_result = new MathOpNode(op_ast_location,
+        loc_var, value, MathOp.SUBTRACT);
+      return new AssignNode(sl, loc, dec_result);
+     default:
+      throw new IrException(op_ast_location,
+        "Invalid assignment operation " + op_ast.getText());
+    }
+  }
+
+  /**
+   * Processes a {@link DecafParserTokenTypes.METHOD_DECL} token.
+   */
+  protected MethodDeclNode processMethodDecl(AST node, SourceLocation sl)
+      throws IrException {
+    // #([METHOD_DECL,"MethodDecl"], ty, vo, name, darg_accum, body);
+    // Either void or a type will be present, but not both.
+    AST method_return_type_ast = node.getFirstChild();
+    AST method_name_ast = method_return_type_ast.getNextSibling();
+    AST method_args_ast = method_name_ast.getNextSibling();
+    AST method_body_ast = method_args_ast.getNextSibling();
+
+    SourceLocation method_return_type_loc =
+      new SourceLocation(method_return_type_ast);
+    DecafType method_return_type;
+    switch (method_return_type_ast.getType()) {
+     case DecafParserTokenTypes.TK_int:
+      method_return_type = DecafType.INT;
+      break;
+     case DecafParserTokenTypes.TK_boolean:
+      method_return_type = DecafType.BOOLEAN;
+      break;
+     case DecafParserTokenTypes.TK_void:
+      method_return_type = DecafType.VOID;
+      break;
+     default:
+      throw new IrException(method_return_type_loc,
+        "Invalid method return type");
+    }
+    String method_name = method_name_ast.getText();
+    @SuppressWarnings("unchecked")
+    List<VarDeclNode> method_args = (List<VarDeclNode>)visit(method_args_ast);
+    BlockNode method_body = (BlockNode)visit(method_body_ast);
+    return new MethodDeclNode(sl, method_return_type, method_name,
+                              method_args, method_body);
+  }
+
+  /**
+   * Processes a {@link DecafParserTokenTypes.LOCAL_VAR_DECL} or a
+   * {@link DecafParserTokenTypes.DECLARATION_ARG} token.
+   */
+  protected VarDeclNode processArgOrLocal(AST node, SourceLocation sl)
+      throws IrException {
+    // #([LOCAL_VAR_DECL,"VarDecl"], t, n)
+    // #([DECLARATION_ARG,"Arg"], arg1t, arg1n)
+    // TODO(dkoh): do we want to distinguish local variable declarations
+    // from argument declarations in our AST?
+    AST local_type_ast = node.getFirstChild();
+    AST local_name_ast = local_type_ast.getNextSibling();
+
+    SourceLocation local_type_location = new SourceLocation(local_type_ast);
+    String local_name = local_name_ast.getText();
+    DecafType local_type;
+    switch (local_type_ast.getType()) {
+     case DecafParserTokenTypes.TK_boolean:
+      local_type = DecafType.BOOLEAN;
+      break;
+     case DecafParserTokenTypes.TK_int:
+      local_type = DecafType.INT;
+      break;
+     default:
+      throw new IrException(local_type_location, "Invalid array type");
+    }
+    return new VarDeclNode(sl, local_type, local_name);
+  }
+
+  /**
+   * Processes a {@link DecafParserTokenTypes.FIELD_DECL} token.
+   */
+  protected FieldDeclNode processFieldDec(AST node, SourceLocation sl)
+      throws IrException {
+    // #([FIELD_DECL,"FieldDecl"], type, name, size)
+    AST field_type_ast = node.getFirstChild();
+    AST field_name_ast = field_type_ast.getNextSibling();
+    AST field_size_ast = field_name_ast.getNextSibling();
+
+    SourceLocation field_type_location = new SourceLocation(field_type_ast);
+    String field_name = field_name_ast.getText();
+    DecafType field_type;
+    if (field_size_ast != null) {
+      switch (field_type_ast.getType()) {
+       case DecafParserTokenTypes.TK_boolean:
+        field_type = DecafType.BOOLEAN_ARRAY;
+        break;
+       case DecafParserTokenTypes.TK_int:
+        field_type = DecafType.INT_ARRAY;
+        break;
+       default:
+        throw new IrException(field_type_location, "Invalid scalar type");
+      }
+      int array_size = ((IntNode)visit(field_size_ast)).getValue();
+      return new ArrayDeclNode(
+        sl, field_type, field_name, array_size);
+    } else {
+      switch (field_type_ast.getType()) {
+       case DecafParserTokenTypes.TK_boolean:
+        field_type = DecafType.BOOLEAN;
+        break;
+       case DecafParserTokenTypes.TK_int:
+        field_type = DecafType.INT;
+        break;
+       default:
+        throw new IrException(field_type_location, "Invalid array type");
+      }
+      return new VarDeclNode(sl, field_type, field_name);
+    }
+  }
+
+  /**
+   * Processes a {@link DecafParserTokenTypes.LOCATION} token.
+   */
+  protected LocationNode processLocation(AST node, SourceLocation sl)
+      throws IrException {
+    // #([LOCATION,"Location"], n, i)
+    AST location_name_ast = node.getFirstChild();
+    AST location_index_ast = location_name_ast.getNextSibling();
+    String location_name = location_name_ast.getText();
+    if (location_index_ast != null) {
+      ExpressionNode location_index =
+        (ExpressionNode)visit(location_index_ast);
+      return new ArrayLocationNode(sl, location_name, location_index);
+    } else {
+      return new ScalarLocationNode(sl, location_name);
+    }
+  }
+
+
+  /**
+   * Processes an {@link DecafParserTokenTypes.INTEGER_LITERAL} token.
+   */
+  protected IntNode processInt(AST node, SourceLocation sl)
+      throws IrException {
+    String raw_int = node.getFirstChild().getText();
+    String HEX_PREFIX = "0x";
+    int HEX_RADIX = 16;
+    if (raw_int.startsWith(HEX_PREFIX)) {
+      try {
+        return new IntNode(sl, Integer.parseInt(
+          raw_int.substring(HEX_PREFIX.length()), HEX_RADIX));
+      } catch (NumberFormatException nfe) {
+        // Since 0x[a-fA-F0-9]+ must parse, this means we were out of range.
+        throw new IrException(sl, "Out of range");
+      }
+    } else {
+      try {
+        return new IntNode(sl, Integer.parseInt(raw_int));
+      } catch (NumberFormatException nfe) {
+        // Since [0-9]+ must parse, this means we were out of range.
+        throw new IrException(sl, "Out of range value: " + raw_int);
+      }
+    }
+  }
+
+  /**
    * Converts a subtree containing {@link ASTNode} children of type T to a
    * {@link NodeList} of those children.
    */
   @SuppressWarnings("unchecked")
-  public <T extends ASTNode> NodeList<T> convertToList(AST parent)
+  protected <T extends ASTNode> NodeList<T> convertToList(AST parent)
       throws IrException {
     SourceLocation sl = new SourceLocation(parent);
     NodeList<T> list = new NodeList<T>(sl);
@@ -516,9 +632,24 @@ public class IrGenerator {
   /**
    * Transforms ([expr]) ([null] [op] [expr]) into ([expr] [op] [expr]).
    */
-  public ExpressionNode composite(ExpressionNode left, BinaryOpNode right) {
+  protected ExpressionNode composite(ExpressionNode left, BinaryOpNode right)
+      throws IrException {
     if (right != null) {
-      right.setLeft(left);
+      BinaryOpNode inner = right;
+      while (inner != null && inner.getLeft() != null) {
+        ExpressionNode prospective = inner.getLeft();
+        if (prospective instanceof BinaryOpNode) {
+          inner = (BinaryOpNode)prospective;
+        } else {
+          throw new IrException(prospective.getSourceLoc(),
+            "Unable to composite expression into a full BinaryOpNode.");
+        }
+      }
+      if (inner == null) {
+        throw new IrException(right.getSourceLoc(),
+          "Unable to composite expression into a full BinaryOpNode.");
+      }
+      inner.setLeft(left);
       return right;
     } else {
       return left;

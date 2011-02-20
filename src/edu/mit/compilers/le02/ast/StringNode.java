@@ -24,4 +24,12 @@ public final class StringNode extends ASTNode {
   public String toString() {
     return value;
   }
+
+	@Override
+	public boolean equals(Object o) {
+	  if (!(o instanceof StringNode)) {
+	    return false;
+	  }
+	  return value.equals(((StringNode)o).getValue());
+	}
 }

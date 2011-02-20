@@ -37,4 +37,13 @@ public final class MethodCallNode extends CallNode {
 		return name;
 	}
 
+	@Override
+  public boolean equals(Object o) {
+    if (!(o instanceof MethodCallNode)) {
+      return false;
+    }
+    MethodCallNode other = (MethodCallNode)o;
+    return (name.equals(other.getName()) &&
+            args.equals(other.getArgs()));
+  }
 }

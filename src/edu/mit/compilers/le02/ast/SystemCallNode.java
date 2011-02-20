@@ -25,4 +25,21 @@ public final class SystemCallNode extends CallNode {
 		return children;
 	}
 
+	public StringNode getFuncName() {
+	  return funcName;
+	}
+
+	public List<SyscallArgNode> getArgs() {
+	  return args;
+	}
+
+	@Override
+  public boolean equals(Object o) {
+    if (!(o instanceof SystemCallNode)) {
+      return false;
+    }
+    SystemCallNode other = (SystemCallNode)o;
+    return (funcName.equals(other.getFuncName()) &&
+            args.equals(other.getArgs()));
+  }
 }

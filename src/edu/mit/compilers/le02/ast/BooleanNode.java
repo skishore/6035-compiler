@@ -24,4 +24,12 @@ public final class BooleanNode extends ExpressionNode {
   public String toString() {
     return "" + value;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof BooleanNode)) {
+      return false;
+    }
+    return value == ((BooleanNode)o).getValue();
+  }
 }

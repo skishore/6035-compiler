@@ -35,4 +35,12 @@ public final class SyscallArgNode extends ASTNode {
 		return children;
 	}
 
+	@Override
+  public boolean equals(Object o) {
+    if (!(o instanceof SyscallArgNode)) {
+      return false;
+    }
+    SyscallArgNode other = (SyscallArgNode)o;
+    return getChildren().equals(other.getChildren());
+  }
 }
