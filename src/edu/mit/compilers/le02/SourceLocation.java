@@ -1,4 +1,4 @@
-package edu.mit.compilers.le02.ast;
+package edu.mit.compilers.le02;
 
 import antlr.collections.AST;
 import edu.mit.compilers.tools.CLI;

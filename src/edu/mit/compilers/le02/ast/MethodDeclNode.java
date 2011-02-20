@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.mit.compilers.le02.DecafType;
+import edu.mit.compilers.le02.SourceLocation;
 
 public final class MethodDeclNode extends DeclNode {
   private List<VarDeclNode> params;

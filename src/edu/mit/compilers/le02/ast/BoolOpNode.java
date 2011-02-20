@@ -2,6 +2,8 @@ package edu.mit.compilers.le02.ast;
 
 import java.util.Arrays;
 
+import edu.mit.compilers.le02.SourceLocation;
+
 
 public final class BoolOpNode extends BinaryOpNode {
   private BoolOp op;

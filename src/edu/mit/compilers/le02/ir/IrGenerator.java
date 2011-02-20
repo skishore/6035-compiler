@@ -3,6 +3,7 @@ package edu.mit.compilers.le02.ir;
 import java.util.List;
 
 import edu.mit.compilers.le02.DecafType;
+import edu.mit.compilers.le02.SourceLocation;
 import edu.mit.compilers.le02.ast.ArrayDeclNode;
 import edu.mit.compilers.le02.ast.ArrayLocationNode;
 import edu.mit.compilers.le02.ast.AssignNode;
@@ -30,7 +31,6 @@ import edu.mit.compilers.le02.ast.NodeList;
 import edu.mit.compilers.le02.ast.NotNode;
 import edu.mit.compilers.le02.ast.ReturnNode;
 import edu.mit.compilers.le02.ast.ScalarLocationNode;
-import edu.mit.compilers.le02.ast.SourceLocation;
 import edu.mit.compilers.le02.ast.StatementNode;
 import edu.mit.compilers.le02.ast.StringNode;
 import edu.mit.compilers.le02.ast.SyscallArgNode;
