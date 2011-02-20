@@ -317,6 +317,13 @@ public class IrGenerator {
   /**
    * Processes an {@link DecafParserTokenTypes.EXPR} or a
    * {@link DecafParserTokenTypes.TERM} token.
+   *
+   * All Expr or Term nodes consist of a left node containing either
+   * another Term node or a TermF node, and a right node consisting of
+   * a (possibly empty) Term' node (thus either a BinaryOpNode or null).
+   * We collect both halves, and then composite them together, inserting
+   * the left node into the empty space reserved for it in the right node.
+   * If the right node is null, composite simply returns the left node.
    */
   protected ExpressionNode processTerm(AST node, SourceLocation sl)
       throws IrException {
@@ -328,6 +335,12 @@ public class IrGenerator {
 
   /**
    * Processes an {@link DecafParserTokenTypes.TERMF} token.
+   *
+   * All TermF nodes contain either other TermF nodes, a literal, an unary
+   * expression containing another TermF node, or a parenthesized Expr node.
+   *
+   * We evaluate the unary expression if present, and otherwise just return
+   * the recursively evaluated base literal contained within.
    */
   protected ExpressionNode processTermF(AST node, SourceLocation sl)
       throws IrException {
@@ -359,6 +372,16 @@ public class IrGenerator {
 
   /**
    * Processes a {@link DecafParserTokenTypes.TERM_PRIME} token.
+   *
+   * A Term' node either:
+   * Is empty, in which case we propagate null up the transform tree, or
+   * Contains the operator of a binary operation, the right operand of the
+   * binary operation, and possibly another chained Term' node following the
+   * right operand.
+   *
+   * We construct the BinaryOpNode, leaving the left operand blank, evaluate
+   * the right operand and place it in the BinaryOpNode, and possibly
+   * composite the BinaryOpNode with the chained Term' node to its right.
    */
   protected ExpressionNode processTermPrime(AST node, SourceLocation sl)
       throws IrException {
