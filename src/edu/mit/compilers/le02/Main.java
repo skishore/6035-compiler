@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import antlr.CharStreamException;
+import antlr.DumpASTVisitor;
 import antlr.Token;
 import antlr.ANTLRException;
 import antlr.debug.misc.ASTFrame;
@@ -201,7 +202,8 @@ public class Main {
 
       // If we are in debug mode, output the AST so it can be inspected.
       if (CLI.debug) {
-        System.out.println(parser.getAST().toStringList());
+        DumpASTVisitor dumper = new DumpASTVisitor();
+        dumper.visit(parser.getAST());
         if (CLI.graphics) {
           Thread thread = new Thread() {
             @Override
