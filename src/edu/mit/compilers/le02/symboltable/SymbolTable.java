@@ -19,28 +19,32 @@ public class SymbolTable {
 	 * @return True if entry was successful
 	 */
 	public boolean put(String id, Descriptor descriptor){
-		boolean unique = true;
-		SymbolTable st = this;
-		while(st!=null){
-			if(st.contains(id)){
-				unique = false;
-			}
-			st = st.getParent();
-		}
-		if(!unique){
+		if(this.getRecursive(id)!=null){
 			//TODO: Throw Exception Here
 			System.out.println("Duplicate identifier");
+			return false;
 		}else{
 				if(descriptor!=null){
 					this.table.put(id, descriptor);
 				}
+				return true;
 		}
-		return unique;
-		
 	}
 	
 	public Descriptor get(String id){
 		return this.table.get(id);
+	}
+	
+	public Descriptor getRecursive(String id){
+		Descriptor d = null;
+		SymbolTable st = this;
+		while(st!=null){
+			if(st.contains(id)){
+				d=st.get(id);
+			}
+			st = st.getParent();
+		}
+		return d;
 	}
 	
 	public boolean contains(String id){
