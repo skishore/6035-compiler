@@ -4,49 +4,49 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class ClassNode extends ASTNode {
-	private String name;
-	protected List<FieldDeclNode> fields;
-	protected List<MethodDeclNode> methods;
+  private String name;
+  protected List<FieldDeclNode> fields;
+  protected List<MethodDeclNode> methods;
 
-	public ClassNode(SourceLocation sl) {
-		super(sl);
-	}
+  public ClassNode(SourceLocation sl) {
+    super(sl);
+  }
 
-	public ClassNode(SourceLocation sl, String name, List<FieldDeclNode> fields, List<MethodDeclNode> methods) {
-		super(sl);
-		this.name = name;
-		this.fields = fields;
-		this.methods = methods;
-	}
-	
-	public String getName() {
-		return name;
-	}
+  public ClassNode(SourceLocation sl, String name, List<FieldDeclNode> fields, List<MethodDeclNode> methods) {
+    super(sl);
+    this.name = name;
+    this.fields = fields;
+    this.methods = methods;
+  }
 
-	@Override
-	public List<ASTNode> getChildren() {
-		List<ASTNode> children = new ArrayList<ASTNode>();
-		children.addAll(fields);
-		children.addAll(methods);
-		return children;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public List<FieldDeclNode> getFields() {
-		return fields;
-	}
+  @Override
+  public List<ASTNode> getChildren() {
+    List<ASTNode> children = new ArrayList<ASTNode>();
+    children.addAll(fields);
+    children.addAll(methods);
+    return children;
+  }
 
-	public void setFields(List<FieldDeclNode> fields) {
-		this.fields = fields;
-	}
+  public List<FieldDeclNode> getFields() {
+    return fields;
+  }
 
-	public List<MethodDeclNode> getMethods() {
-		return methods;
-	}
+  public void setFields(List<FieldDeclNode> fields) {
+    this.fields = fields;
+  }
 
-	public void setMethods(List<MethodDeclNode> methods) {
-		this.methods = methods;
-	}
+  public List<MethodDeclNode> getMethods() {
+    return methods;
+  }
 
-	@Override
-	public void visit(ASTNodeVisitor v) { v.accept(this); }
+  public void setMethods(List<MethodDeclNode> methods) {
+    this.methods = methods;
+  }
+
+  @Override
+  public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

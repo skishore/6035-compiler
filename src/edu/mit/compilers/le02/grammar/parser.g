@@ -27,7 +27,8 @@ tokens
   EXPR;
   TERM;
   TERM_PRIME;
-  STMT;
+  TERMF;
+  CALL_STMT;
   BLOCK;
   BLOCK_VARS;
   BLOCK_STMTS;
@@ -35,7 +36,6 @@ tokens
   METHOD_DECL;
   LOCAL_VAR_DECL;
   FIELD_DECL;
-  TYPES;
   LOCATION;
   BOOLEAN_LITERAL;
   CHAR_LITERAL;
@@ -106,8 +106,11 @@ tokens
 //
 // Primitives - must be flagged with appropriate type.
 //
-bool_literal!: t:TK_true | f:TK_false
-  { #bool_literal = #([BOOLEAN_LITERAL,"Bool"], t, f); };
+bool_literal!:
+  t:TK_true
+    { #bool_literal = #([BOOLEAN_LITERAL,"Bool"], t); } |
+  f:TK_false
+    { #bool_literal = #([BOOLEAN_LITERAL,"Bool"], f); };
 int_literal!: i:INT
   { #int_literal = #([INTEGER_LITERAL,"Int"], i); };
 char_literal!: c:CHAR
@@ -152,7 +155,7 @@ field_decl!:
                   astFactory.addASTChild(currentAST,
                         #([FIELD_DECL,"FieldDecl"], t_copy, n1, s1));}
                 )
-       (COMMA (n2:ID ( // Deliberately empty
+       (COMMA! (n2:ID ( // Deliberately empty
                       | LSQUARE! s2:int_literal RSQUARE!)
                       {AST t_copy = astFactory.create(#t);
                       astFactory.addASTChild(currentAST,
@@ -209,26 +212,29 @@ assignment!: loc:location op:assign_op value:expr
 
 // An if statement contains the condition, the block to execute if true, and
 // optionally the block to execute if false.
-if_stmt!: TK_if LPAREN! cond:expr RPAREN! b_true:block ( // Deliberately empty
-                                           | TK_else b_false:block)
-  { #if_stmt = #([TK_if], cond, b_true, b_false); };
+if_stmt!: i:TK_if LPAREN! cond:expr RPAREN! b_true:block ( // Deliberately empty
+                                           | TK_else! b_false:block)
+  { #if_stmt = #(i, cond, b_true, b_false); };
 
 // A for loop contains an initial assignment with a var and an init value,
 // a maximum value, and a block to loop over.
-for_loop!: TK_for var:ID ASSIGN init:expr COMMA! max:expr loop:block
-  { #for_loop = #([TK_for], #([ASSIGNMENT,"Assignment"], var, [ASSIGN], init),
-                  max, loop); };
+for_loop!: f:TK_for var:ID ASSIGN init:expr COMMA! max:expr loop:block
+  { #for_loop = #(f,
+      #([ASSIGNMENT,"Assignment"],
+        #([LOCATION,"Location"], var), [ASSIGN], init),
+      max, loop); };
 
 // A statement is an assignment, method call, if block, for block,
 // return (containing the value to return), break, continue, and any block.
 statement:
-  assignment SEMICOLON! |
-  method_call SEMICOLON! |
+  assignment SEMICOLON! |!
+  m:method_call SEMICOLON!
+    { #statement = #([CALL_STMT, "CallStatement"], m); } |
   if_stmt |
   for_loop |!
-  TK_return ( // Deliberately empty
-              | r:expr) SEMICOLON!
-    {#statement = #([TK_return], r);} |
+  r:TK_return ( // Deliberately empty
+              | v:expr) SEMICOLON!
+    {#statement = #(r, v);} |
   TK_break SEMICOLON! |
   TK_continue SEMICOLON! |
   block
@@ -245,9 +251,9 @@ callout_arg: expr | string_literal;
 // A direct call contains a method name and a list of arguments.
 method_call!:
   { AST carg_accum = #([CALL_ARGS,"Args"]); }
-  (TK_callout LPAREN! cf:string_literal (COMMA! ca:callout_arg
+  (c:TK_callout LPAREN! cf:string_literal (COMMA! ca:callout_arg
        {carg_accum.addChild(#([CALL_ARG,"Arg"], ca));})* RPAREN!
-       { #method_call = #([TK_callout], cf, carg_accum); } |
+       { #method_call = #(c, cf, carg_accum); } |
   m:method_name LPAREN! ( // Deliberately empty
                           | (a1:expr
                              {carg_accum.addChild(#([CALL_ARG,"Arg"], a1));}
@@ -263,57 +269,64 @@ method_call!:
 
 // Rewriting the grammar for expression evaluation to not cascade left,
 // and simultaneously ensuring order of operations is observed.
-// TODO(lizfong): write something to pivot this concrete parse tree into the
-// correct AST for expression evaluation.
 
 // Tier -1: ||
 expr!: zero:term_zero prime:expr_prime
- { #expr = #([EXPR,"Expr"], zero, #([TERM_PRIME,"Term'"], prime)); };
+ { #expr = #([EXPR,"Expr"], zero, prime); };
 expr_prime: (LOGICAL_OR term_zero expr_prime |
              // Deliberately empty
-            );
+            )
+ { #expr_prime = #([TERM_PRIME,"Term'"], #expr_prime); };
 // Tier 0: &&
 term_zero!: one:term_one prime:term_zero_prime
-  { #term_zero = #([TERM,"Term"], one, #([TERM_PRIME,"Term'"], prime)); };
+  { #term_zero = #([TERM,"Term"], one, prime); };
 term_zero_prime: (LOGICAL_AND term_one term_zero_prime |
                   // Deliberately empty
-                 );
+                 )
+  { #term_zero_prime = #([TERM_PRIME,"Term'"], #term_zero_prime); };
 // Tier 1: ==, !=
 term_one!: two:term_two prime:term_one_prime
-  { #term_one = #([TERM,"Term"], two, #([TERM_PRIME,"Term'"], prime)); };
+  { #term_one = #([TERM,"Term"], two, prime); };
 term_one_prime: (EQUALS term_two term_one_prime |
                  NOT_EQUALS term_two term_one_prime |
                  // Deliberately empty
-                );
+                )
+  { #term_one_prime = #([TERM_PRIME,"Term'"], #term_one_prime); };
 // Tier 2: <, >, <=, >=
 term_two!: three:term_three prime:term_two_prime
-  { #term_two = #([TERM,"Term"], three, #([TERM_PRIME,"Term'"], prime)); };
+  { #term_two = #([TERM,"Term"], three, prime); };
 term_two_prime: (LT term_three term_two_prime |
                  GT term_three term_two_prime |
                  LE term_three term_two_prime |
                  GE term_three term_two_prime |
                  // Deliberately empty
-                );
+                )
+  { #term_two_prime = #([TERM_PRIME,"Term'"], #term_two_prime); };
 // Tier 3: +, -
 term_three!: four:term_four prime:term_three_prime
-  { #term_three = #([TERM,"Term"], four, #([TERM_PRIME,"Term'"], prime)); };
+  { #term_three = #([TERM,"Term"], four, prime); };
 term_three_prime: (PLUS term_four term_three_prime |
                    MINUS term_four term_three_prime|
                    // Deliberately empty
-                  );
+                  )
+  { #term_three_prime = #([TERM_PRIME,"Term'"], #term_three_prime); };
 // Tier 4: *, /, %
 term_four!: five:term_five prime:term_four_prime
-  { #term_four = #([TERM,"Term"], five, #([TERM_PRIME,"Term'"], prime)); };
+  { #term_four = #([TERM,"Term"], five, prime); };
 term_four_prime: (TIMES term_five term_four_prime |
                   DIVIDE term_five term_four_prime |
                   MODULO term_five term_four_prime |
                   // Deliberately empty
-                 );
+                 )
+  { #term_four_prime = #([TERM_PRIME,"Term'"], #term_four_prime); };
 // Tier 5: !
-term_five: term_six |! NOT t:term_five
-                       { #term_five = #([TERM,"Term"], NOT, t); };
+term_five!: t6:term_six { #term_five = #([TERMF,"TermF"], t6); } |
+            n:NOT t5:term_five
+              { #term_five = #([TERMF,"TermF"], n,
+                  #([TERMF,"TermF"], t5)); };
 // Tier 6: urnary -
-term_six: term_final |! MINUS t:term_six
-                        { #term_six = #([TERM,"Term"], MINUS, t); };
+term_six: term_final |! m:MINUS t:term_six
+                        { #term_six = #([TERMF,"TermF"], m,
+                            #([TERMF,"TermF"], t)); };
 // Tier 7: base expressions and parenthesized subexpressions.
 term_final: location | method_call | literal | LPAREN! expr RPAREN!;

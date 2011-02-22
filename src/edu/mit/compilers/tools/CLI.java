@@ -91,6 +91,17 @@ public class CLI {
   }
 
   /**
+   * Display infile - it will either be &gt;stdin&lt; or the filename.
+   */
+  public static String getInputFilename() {
+    if (infile != null) {
+      return infile;
+    } else {
+      return "<stdin>";
+    }
+  }
+
+  /**
    * Parse the command-line arguments.  Sets all of the result fields
    * accordingly. <BR>
    *

@@ -5,15 +5,15 @@ import java.util.List;
 
 public final class ContinueNode extends StatementNode {
 
-	public ContinueNode(SourceLocation sl) {
-		super(sl);
-	}
+  public ContinueNode(SourceLocation sl) {
+    super(sl);
+  }
 
-	@Override
-	public List<ASTNode> getChildren() {
-		return Collections.emptyList();
-	}
+  @Override
+  public List<ASTNode> getChildren() {
+    return Collections.emptyList();
+  }
 
-	@Override
-	public void visit(ASTNodeVisitor v) { v.accept(this); }
+  @Override
+  public void visit(ASTNodeVisitor v) { v.accept(this); }
 }

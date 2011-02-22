@@ -6,6 +6,7 @@ options
   language = "Java";
 }
 
+{@SuppressWarnings("unchecked")}
 class DecafScanner extends Lexer;
 options
 {

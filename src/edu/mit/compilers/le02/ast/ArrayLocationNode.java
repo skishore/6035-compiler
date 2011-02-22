@@ -1,33 +1,39 @@
 package edu.mit.compilers.le02.ast;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import edu.mit.compilers.le02.DecafType;
 
 public final class ArrayLocationNode extends LocationNode {
-	private ExpressionNode index;
+  private ExpressionNode index;
 
-	public ArrayLocationNode(SourceLocation sl, DecafType type, String name, ExpressionNode index) {
-		super(sl, type, name);
-		this.index = index;
-	}
+  public ArrayLocationNode(SourceLocation sl, String name, ExpressionNode index) {
+    super(sl, name);
+    this.index = index;
+  }
 
-	@Override
-	public List<ASTNode> getChildren() {
-		List<ASTNode> children = new ArrayList<ASTNode>();
-		children.add(index);
-		return children;
-	}
+  @Override
+  public List<ASTNode> getChildren() {
+    return NodeUtil.makeChildren(index);
+  }
 
-	public void setIndex(ExpressionNode index) {
-		this.index = index;
-	}
+  public void setIndex(ExpressionNode index) {
+    this.index = index;
+  }
 
-	public ExpressionNode getIndex() {
-		return index;
-	}
-	
-	public void visit(ASTNodeVisitor v) { v.accept(this); }
+  public ExpressionNode getIndex() {
+    return index;
+  }
 
+  public void visit(ASTNodeVisitor v) { v.accept(this); }
+
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof ArrayLocationNode)) {
+      return false;
+    }
+    ArrayLocationNode other = (ArrayLocationNode)o;
+    return (name.equals(other.getName()) &&
+            type.equals(other.getType()) &&
+            index.equals(other.getIndex()));
+  }
 }

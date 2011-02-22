@@ -9,15 +9,21 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import antlr.ASTFactory;
 import antlr.CharStreamException;
+import antlr.DumpASTVisitor;
 import antlr.Token;
 import antlr.ANTLRException;
 import antlr.debug.misc.ASTFrame;
 
+import edu.mit.compilers.le02.ast.ASTNode;
 import edu.mit.compilers.le02.grammar.DecafParser;
 import edu.mit.compilers.le02.grammar.DecafParserTokenTypes;
 import edu.mit.compilers.le02.grammar.DecafScanner;
 import edu.mit.compilers.le02.grammar.DecafScannerTokenTypes;
+import edu.mit.compilers.le02.grammar.LineNumberedAST;
+import edu.mit.compilers.le02.ir.IrException;
+import edu.mit.compilers.le02.ir.IrGenerator;
 
 import edu.mit.compilers.tools.CLI;
 
@@ -31,6 +37,8 @@ public class Main {
     SUCCESS (0),
     SCAN_FAILED (1),
     PARSE_FAILED (2),
+    SEMANTICS_FAILED (3),
+    FILE_NOT_FOUND (126),
     NO_SUCH_ACTION (127);
 
     private int numericCode;
@@ -78,6 +86,7 @@ public class Main {
       } catch (IOException e) {
         // print the error:
         reportError(e);
+        System.exit(ReturnCode.FILE_NOT_FOUND.numericCode());
       }
     }
 
@@ -88,9 +97,14 @@ public class Main {
       }
       break;
      case PARSE:
-     case DEFAULT:
       if (!runParser(inputStream)) {
         retCode = ReturnCode.PARSE_FAILED;
+      }
+      break;
+     case INTER:
+     case DEFAULT:
+      if (!generateIR(inputStream)) {
+        retCode = ReturnCode.SEMANTICS_FAILED;
       }
       break;
      default:
@@ -106,11 +120,7 @@ public class Main {
    * file name.
    */
   protected static void reportError (Exception e) {
-    String prefix = "<stdin> ";
-    if (CLI.infile != null) {
-      prefix = CLI.infile + " ";
-    }
-    System.out.println(prefix + e);
+    System.out.println(CLI.getInputFilename() + " " + e);
   }
 
   /**
@@ -201,12 +211,14 @@ public class Main {
 
       // If we are in debug mode, output the AST so it can be inspected.
       if (CLI.debug) {
-        System.out.println(parser.getAST().toStringList());
+        DumpASTVisitor dumper = new DumpASTVisitor();
+        dumper.visit(parser.getAST());
         if (CLI.graphics) {
           Thread thread = new Thread() {
             @Override
             public void run() {
-              ASTFrame frame = new ASTFrame(CLI.infile, parser.getAST());
+              ASTFrame frame = new ASTFrame(CLI.getInputFilename(),
+                                            parser.getAST());
               frame.validate();
               frame.setVisible(true);
             }
@@ -228,6 +240,52 @@ public class Main {
       }
     } catch (ANTLRException e) {
       reportError(e);
+      success = false;
+    }
+    return success;
+  }
+
+  /**
+   * Runs the parser on an input and displays any error messages found while
+   * parsing.
+   *
+   * @param inputStream The stream to read input from.
+   * @return true if parser ran without errors, false if errors found.
+   */
+  protected static boolean generateIR(InputStream inputStream) {
+    boolean success = true;
+    try {
+      DecafScanner parse_lexer =
+        new DecafScanner(new DataInputStream(inputStream));
+      final DecafParser parser = new DecafParser(parse_lexer);
+
+      // The default instantiation is unaware of underlying filenames when
+      // pretty-printing exceptions. Set the values appropriately.
+      if (inputStream instanceof FileInputStream) {
+        parse_lexer.setFilename(CLI.infile);
+        parser.setFilename(CLI.infile);
+      }
+
+      // Save the line/column numbers so we get meaningful parse data.
+      ASTFactory factory = new ASTFactory();
+      factory.setASTNodeClass(LineNumberedAST.class);
+      parser.setASTFactory(factory);
+
+      // Invoke the parser.
+      parser.program();
+
+      ASTNode parent = IrGenerator.generateIR(parser.getAST());
+      if (CLI.debug) {
+        System.out.println(parent);
+      }
+    } catch (ANTLRException e) {
+      reportError(e);
+      success = false;
+    } catch (IrException ire) {
+      // Don't use reportError since IrExceptions know the filename and
+      // already know how to pretty-print, unlike antlr exceptions.
+      System.out.println(ire);
+      ire.printStackTrace(System.out);
       success = false;
     }
     return success;

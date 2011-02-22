@@ -4,71 +4,67 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class IfNode extends StatementNode {
-	private ExpressionNode condition;
-	private BlockNode thenBlock;
-	private BlockNode elseBlock;
-	private boolean hasElse;
+  private ExpressionNode condition;
+  private BlockNode thenBlock;
+  private BlockNode elseBlock;
+  private boolean hasElse;
 
-	public IfNode(SourceLocation sl, boolean hasElse) {
-		super(sl);
-		this.hasElse = hasElse;
-	}
-	
-	public IfNode(SourceLocation sl, ExpressionNode condition, BlockNode then) {
-		super(sl);
-		this.condition = condition;
-		this.thenBlock = then;
-		this.hasElse = false;
-	}
+  public IfNode(SourceLocation sl, ExpressionNode condition, BlockNode then) {
+    super(sl);
+    this.condition = condition;
+    this.thenBlock = then;
+    this.hasElse = false;
+  }
 
-	public IfNode(SourceLocation sl, ExpressionNode condition, BlockNode thenBlock, BlockNode elseBlock) {
-		super(sl);
-		this.condition = condition;
-		this.thenBlock = thenBlock;
-		this.elseBlock = elseBlock;
-		this.hasElse = true;
-	}
+  public IfNode(SourceLocation sl, ExpressionNode condition, BlockNode thenBlock, BlockNode elseBlock) {
+    super(sl);
+    this.condition = condition;
+    this.thenBlock = thenBlock;
+    this.elseBlock = elseBlock;
+    this.hasElse = true;
+  }
 
-	@Override
-	public List<ASTNode> getChildren() {
-		List<ASTNode> children = new ArrayList<ASTNode>();
-		children.add(condition);
-		children.add(thenBlock);
-		
-		if (hasElse)
-			children.add(elseBlock);
-		
-		return children;
-	}
+  @Override
+  public List<ASTNode> getChildren() {
+    List<ASTNode> children = new ArrayList<ASTNode>();
+    children.add(condition);
+    children.add(thenBlock);
 
-	public ExpressionNode getCondition() {
-		return condition;
-	}
+    if (hasElse) {
+      children.add(elseBlock);
+    }
 
-	public void setCondition(ExpressionNode condition) {
-		this.condition = condition;
-	}
+    return children;
+  }
 
-	public BlockNode getThenBlock() {
-		return thenBlock;
-	}
+  public ExpressionNode getCondition() {
+    return condition;
+  }
 
-	public void setThenBlock(BlockNode thenBlock) {
-		this.thenBlock = thenBlock;
-	}
+  public void setCondition(ExpressionNode condition) {
+    this.condition = condition;
+  }
 
-	public BlockNode getElseBlock() {
-		return elseBlock;
-	}
+  public BlockNode getThenBlock() {
+    return thenBlock;
+  }
 
-	public void setElseBlock(BlockNode elseBlock) {
-		this.elseBlock = elseBlock;
-	}
+  public void setThenBlock(BlockNode thenBlock) {
+    this.thenBlock = thenBlock;
+  }
 
-	public boolean hasElse() {
-		return hasElse;
-	}
+  public BlockNode getElseBlock() {
+    return elseBlock;
+  }
 
-	@Override
-	public void visit(ASTNodeVisitor v) { v.accept(this); }
+  public void setElseBlock(BlockNode elseBlock) {
+    this.elseBlock = elseBlock;
+  }
+
+  public boolean hasElse() {
+    return hasElse;
+  }
+
+  @Override
+  public void visit(ASTNodeVisitor v) { v.accept(this); }
 }
