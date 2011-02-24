@@ -1,114 +1,123 @@
 package edu.mit.compilers.le02.stgenerator;
 
 import edu.mit.compilers.le02.ast.ASTNode;
+import edu.mit.compilers.le02.ast.ASTNodeVisitor;
 import edu.mit.compilers.le02.ast.ClassNode;
-import edu.mit.compilers.le02.ast.DeclNode;
 import edu.mit.compilers.le02.ast.FieldDeclNode;
 import edu.mit.compilers.le02.ast.MethodDeclNode;
-import edu.mit.compilers.le02.ast.SourceLocation;
+import edu.mit.compilers.le02.ast.SyscallArgNode;
 import edu.mit.compilers.le02.ast.VarDeclNode;
 import edu.mit.compilers.le02.symboltable.ClassDescriptor;
 import edu.mit.compilers.le02.symboltable.Descriptor;
+import edu.mit.compilers.le02.symboltable.FieldDescriptor;
+import edu.mit.compilers.le02.symboltable.LocalDescriptor;
 import edu.mit.compilers.le02.symboltable.MethodDescriptor;
+import edu.mit.compilers.le02.symboltable.ParamDescriptor;
 import edu.mit.compilers.le02.symboltable.SymbolTable;
-import edu.mit.compilers.le02.symboltable.TypeDescriptor;
 
-public class SymbolTableGenerator {
-	/** Holds the SymbolTableGenerator singleton. */
-	private static SymbolTableGenerator instance;
+public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
+  private SymbolTable currParent = null;
+  private boolean isField = false;
+  private boolean isParam = false;
 
-	/**
-	 * Retrieves the SymbolTableGenerator singleton, creating if necessary.
-	 */
-	public static SymbolTableGenerator getInstance() {
-		if (instance == null) {
-			instance = new SymbolTableGenerator();
-		}
-		return instance;
-	}
+  /** Holds the SymbolTableVisitor singleton. */
+  private static SymbolTableGenerator instance;
 
-	/**
-	 * Generates an symbol table based on an input IR.
-	 */
-	public static SymbolTable generateSymbolTable(ASTNode root)
-			throws SymbolTableException {
-		assert(root instanceof ClassNode);
-		return getInstance().createClassST((ClassNode)root);
-	}
+  /**
+   * Retrieves the SymbolTableVisitor singleton, creating if necessary.
+   */
+  public static SymbolTableGenerator getInstance() {
+    if (instance == null) {
+      instance = new SymbolTableGenerator();
+    }
+    return instance;
+  }
 
-	/**
-	 * Converts a single node into a descriptor.
-	 * 
-	 * @param node The AST node.
-	 * @return descriptor The descriptor.
-	 * @throws SymbolTableException if any errors were encountered.
-	 */
-	public Descriptor expand(SymbolTable parent, ASTNode node)
-			throws SymbolTableException {
-		Descriptor descriptor = null;
-		if (node == null) {
-			throw new SymbolTableException(new SourceLocation("<unknown>", -1,
-					-1),
-					"Attempted to visit null node. Check if if tree is malformed.");
+  /**
+   * Generates an symbol table based on an input IR.
+   */
+  public static SymbolTable generateSymbolTable(ASTNode root)
+      throws SymbolTableException {
+    assert(root instanceof ClassNode);
+    return getInstance().createClassST((ClassNode)root);
+  }
 
-		} else if (node instanceof ClassNode) {
-			// Create a descriptor for a classNode
-			
-			//Create and fill fieldSymbolTable
-			SymbolTable fieldSymbolTable = new SymbolTable(parent);
-			for (FieldDeclNode n : ((ClassNode) node).getFields()) {
-				fieldSymbolTable.put(n.getName(), 
-						this.expand(fieldSymbolTable,n));
-			}
+  /**
+   * Converts a ClassNode into a SymbolTable.  The root of all ASTNode trees 
+   * must be a ClassNode, otherwise we should throw an exception
+   * 
+   * @param root The root of our AST tree
+   * @return SymbolTable The expanded SymbolTable
+   */
+  public SymbolTable createClassST(ClassNode root) throws SymbolTableException {
+    SymbolTable st = new SymbolTable(null);
+    currParent = st;
+    st.put(root.getName(), this.visit(root));
+    return st;
+  }
+  
+  public Descriptor accept(ClassNode node) {
+    SymbolTable parent = currParent;
 
-			//Create and fill methodSymbolTable
-			SymbolTable methodSymbolTable = new SymbolTable(fieldSymbolTable);
-			for (MethodDeclNode m : ((ClassNode) node).getMethods()) {
-				methodSymbolTable.put(m.getName(), 
-						this.expand(methodSymbolTable, m));
-			}
-			
-			descriptor = new ClassDescriptor(parent, 
-					((ClassNode) node).getName(), fieldSymbolTable, methodSymbolTable);
-		} else if (node instanceof MethodDeclNode) {
-			// Create a descriptor for a MethodDeclNode
-			
-			//Create and fill paramSymbolTable
-			SymbolTable paramSymbolTable = new SymbolTable(parent);
-			for (VarDeclNode v : ((MethodDeclNode) node).getParams()) {
-				paramSymbolTable.put(v.getName(), 
-						this.expand(paramSymbolTable, v));
-			}
+    //Create and fill fieldSymbolTable
+    SymbolTable fieldSymbolTable = new SymbolTable(parent);
+    currParent = fieldSymbolTable;
+    isField = true;
+    for (FieldDeclNode n : node.getFields()) {
+      fieldSymbolTable.put(n.getName(), this.visit(n));
+    }
+    isField = false;
 
-			//Create and fill localSymbolTable
-			SymbolTable localSymbolTable = new SymbolTable(paramSymbolTable);
-			for (VarDeclNode v : ((MethodDeclNode) node).getBody().getDecls()) {
-				localSymbolTable.put(v.getName(), 
-						this.expand(localSymbolTable, v));
-			}
-			
-			descriptor = new MethodDescriptor(parent,
-					((MethodDeclNode) node).getName(), localSymbolTable, 
-					paramSymbolTable, (MethodDeclNode) node);
+    //Create and fill methodSymbolTable
+    SymbolTable methodSymbolTable = new SymbolTable(fieldSymbolTable);
+    currParent = methodSymbolTable;
+    for (MethodDeclNode m : node.getMethods()) {
+      methodSymbolTable.put(m.getName(), this.visit(m));
+    }
+    
+    currParent = parent;
+    return new ClassDescriptor(parent, node.getName(), fieldSymbolTable, 
+                               methodSymbolTable);
+  }
 
-		} else if (node instanceof DeclNode) {
-			// Create a descriptor for a DeclNode
-			descriptor = new TypeDescriptor(parent,
-					((DeclNode) node).getName(), ((DeclNode) node).getType());
-		}
+  public Descriptor accept(MethodDeclNode node) {
+    SymbolTable parent = currParent;
 
-		return descriptor;
-	}
+    //Create and fill paramSymbolTable
+    SymbolTable paramSymbolTable = new SymbolTable(parent);
+    currParent = paramSymbolTable;
+    isParam = true;
+    for (VarDeclNode v : node.getParams()) {
+      paramSymbolTable.put(v.getName(), this.visit(v));
+    }
 
-	/**
-	 * Converts a ClassNode into a SymbolTable.  The root of all ASTNode trees must be a ClassNode, otherwise we should throw an exception
-	 * 
-	 * @param root The root of our AST tree
-	 * @return SymbolTable The expanded SymbolTable
-	 */
-	public SymbolTable createClassST(ClassNode root) throws SymbolTableException{
-		SymbolTable st = new SymbolTable(null);
-		st.put(root.getName(), this.expand(st, root));
-		return st;
-	}
+    //Create and fill localSymbolTable
+    SymbolTable localSymbolTable = new SymbolTable(paramSymbolTable);
+    currParent = localSymbolTable;
+    isParam = false;
+    for (VarDeclNode v : node.getBody().getDecls()) {
+      localSymbolTable.put(v.getName(), this.visit(v));
+    }
+    
+    currParent = parent;
+    return new MethodDescriptor(parent, node.getName(), node.getType(),
+                                localSymbolTable, paramSymbolTable, 
+                                node.getBody());
+  }
+  
+  public Descriptor accept(FieldDeclNode node) {
+    return new FieldDescriptor(currParent, node.getName(), node.getType());
+  }
+
+  public Descriptor accept(VarDeclNode node) {
+    if (isField) {
+      return new FieldDescriptor(currParent, node.getName(), node.getType());
+    }
+    else if (isParam) {
+      return new ParamDescriptor(currParent, node.getName(), node.getType());
+    }
+    else {
+      return new LocalDescriptor(currParent, node.getName(), node.getType());
+    }
+  }
 }

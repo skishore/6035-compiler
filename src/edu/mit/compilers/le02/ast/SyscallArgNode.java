@@ -44,6 +44,8 @@ public final class SyscallArgNode extends ASTNode {
     return getChildren().equals(other.getChildren());
   }
 
-   @Override
-  public void visit(ASTNodeVisitor v) { v.accept(this); }
+  @Override
+  public <T> T accept(ASTNodeVisitor<T> v) { 
+    return v.visit(this); 
+  }
 }

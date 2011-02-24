@@ -139,9 +139,9 @@ public class NodeList<T extends ASTNode> extends ASTNode implements List<T> {
     return list.toArray(a);
   }
 
-  public void visit(ASTNodeVisitor v) {
-    for (ASTNode item : this) {
-      item.visit(v);
-    }
+  @Override
+  public <T> T accept(ASTNodeVisitor<T> v) { 
+    return v.visit(this); 
   }
+  
 }

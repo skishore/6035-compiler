@@ -48,7 +48,7 @@ public class SymbolTable {
 				d = st.getMap().get(id);
 				if (primitive == null){
 					return d;
-				}else if (primitive && d instanceof TypeDescriptor ||
+				}else if (primitive && d instanceof TypedDescriptor ||
 						!primitive && d instanceof MethodDescriptor) {
 					return d;
 				}

@@ -1,16 +1,18 @@
 package edu.mit.compilers.le02.symboltable;
 
+import edu.mit.compilers.le02.DecafType;
 import edu.mit.compilers.le02.ast.ASTNode;
-import edu.mit.compilers.le02.ast.MethodDeclNode;
+import edu.mit.compilers.le02.ast.BlockNode;
 
-public class MethodDescriptor extends Descriptor{
+public class MethodDescriptor extends TypedDescriptor{
 	ASTNode code;
 	SymbolTable localSymbolTable;
 	SymbolTable paramSymbolTable;
 	
-	public MethodDescriptor(SymbolTable parent, String id, SymbolTable localSymbolTable, 
-			SymbolTable paramSymbolTable, MethodDeclNode node){
-		super(parent, id);
+	public MethodDescriptor(SymbolTable parent, String id, DecafType type,
+	                        SymbolTable localSymbolTable, 
+	                        SymbolTable paramSymbolTable, BlockNode node){
+		super(parent, id, type);
 		
 		this.code = node;
 		this.paramSymbolTable = paramSymbolTable;

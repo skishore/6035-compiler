@@ -22,6 +22,6 @@ public final class ArrayDeclNode extends FieldDeclNode {
     return length;
   }
 
-  public void visit(ASTNodeVisitor v) { v.accept(this); }
+  public <T> T accept(ASTNodeVisitor<T> v) { return v.visit(this); }
 
 }

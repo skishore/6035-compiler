@@ -3,9 +3,13 @@ package edu.mit.compilers.le02.ast;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.mit.compilers.le02.DecafType;
+import edu.mit.compilers.le02.symboltable.MethodDescriptor;
+
 public final class MethodCallNode extends CallNode {
   private String name;
   private List<ExpressionNode> args;
+  private MethodDescriptor desc;
 
   public MethodCallNode(SourceLocation sl, String name) {
     super(sl);
@@ -47,6 +51,21 @@ public final class MethodCallNode extends CallNode {
             args.equals(other.getArgs()));
   }
 
+  public MethodDescriptor getDesc() {
+    return desc;
+  }
+
+  public void setDesc(MethodDescriptor desc) {
+    this.desc = desc;
+  }
+
   @Override
-  public void visit(ASTNodeVisitor v) { v.accept(this); }
+  public <T> T accept(ASTNodeVisitor<T> v) { 
+    return v.visit(this); 
+  }
+
+  @Override
+  public DecafType getType() {
+    return desc.getType();
+  }
 }

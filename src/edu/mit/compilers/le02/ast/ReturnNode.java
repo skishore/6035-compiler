@@ -39,5 +39,7 @@ public final class ReturnNode extends StatementNode {
   }
 
   @Override
-  public void visit(ASTNodeVisitor v) { v.accept(this); }
+  public <T> T accept(ASTNodeVisitor<T> v) { 
+    return v.visit(this); 
+  }
 }

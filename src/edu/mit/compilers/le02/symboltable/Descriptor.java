@@ -1,5 +1,6 @@
 package edu.mit.compilers.le02.symboltable;
 
+
 public abstract class Descriptor {
 	private SymbolTable parent;
 	private String id;
@@ -18,5 +19,6 @@ public abstract class Descriptor {
 	}
 	
 	public abstract String toString();
+
 	
 }

@@ -33,5 +33,5 @@ public class AssignNode extends StatementNode {
     this.value = value;
   }
 
-  public void visit(ASTNodeVisitor v) { v.accept(this); }
+  public <T> T accept(ASTNodeVisitor<T> v) { return v.visit(this); }
 }

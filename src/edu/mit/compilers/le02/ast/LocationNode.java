@@ -1,11 +1,13 @@
 package edu.mit.compilers.le02.ast;
 
 import edu.mit.compilers.le02.DecafType;
+import edu.mit.compilers.le02.symboltable.TypedDescriptor;
 
 
 public abstract class LocationNode extends ASTNode {
   protected DecafType type;
   protected String name;
+  protected TypedDescriptor desc;
 
   /**
    * Initializes a LocationNode with no DecafType.
@@ -31,6 +33,14 @@ public abstract class LocationNode extends ASTNode {
 
   public String getName() {
     return name;
+  }
+
+  public TypedDescriptor getDesc() {
+    return desc;
+  }
+
+  public void setDesc(TypedDescriptor desc) {
+    this.desc = desc;
   }
 
 }
