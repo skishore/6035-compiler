@@ -10,7 +10,7 @@ public class MethodDescriptor extends Descriptor{
 	
 	public MethodDescriptor(SymbolTable parent, String id, SymbolTable localSymbolTable, 
 			SymbolTable paramSymbolTable, MethodDeclNode node){
-		super(parent,id);
+		super(parent, id);
 		
 		this.code = node;
 		this.paramSymbolTable = paramSymbolTable;

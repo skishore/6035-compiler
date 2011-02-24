@@ -278,9 +278,8 @@ public class Main {
       parser.program();
 
       ASTNode parent = IrGenerator.generateIR(parser.getAST());
-      //////////////////////////////
       SymbolTable st = SymbolTableGenerator.generateSymbolTable(parent);
-      //////////////////////////////
+      
       if (CLI.debug) {
         System.out.println(parent);
       }

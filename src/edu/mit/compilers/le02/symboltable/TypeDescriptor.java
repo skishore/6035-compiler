@@ -7,7 +7,7 @@ public class TypeDescriptor extends Descriptor{
 	public DecafType type;
 	
 	public TypeDescriptor(SymbolTable parent, String id, DecafType type){
-		super(parent,id);
+		super(parent, id);
 		this.type = type;
 	}
 	
