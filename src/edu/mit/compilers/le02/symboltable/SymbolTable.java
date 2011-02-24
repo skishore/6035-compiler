@@ -1,14 +1,15 @@
 package edu.mit.compilers.le02.symboltable;
 
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SymbolTable {
 	private SymbolTable parent;
-	private Hashtable<String,Descriptor> table;
+	private Map <String, Descriptor> table;
 	
 	public SymbolTable(SymbolTable parent){
 		this.parent = parent;
-		this.table = new Hashtable<String,Descriptor>();
+		this.table = new HashMap <String, Descriptor>();
 	}
 
 	/**

@@ -4,19 +4,19 @@ import edu.mit.compilers.le02.DecafType;
 
 public class TypeDescriptor extends Descriptor{
 	
-	public DecafType TYPE;
+	public DecafType type;
 	
 	public TypeDescriptor(SymbolTable parent, String id, DecafType type){
 		super(parent,id);
-		this.TYPE = type;
+		this.type = type;
 	}
 	
 	public DecafType getType(){
-		return this.TYPE;
+		return this.type;
 	}
 	
 	public String toString(){
-		return this.TYPE.toString();
+		return this.type.toString();
 	}
 
 }

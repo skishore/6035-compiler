@@ -2,7 +2,6 @@
 // All rights reserved.
 
 package edu.mit.compilers.le02;
-
 import java.io.DataInputStream;
 
 import java.io.FileInputStream;
@@ -24,9 +23,10 @@ import edu.mit.compilers.le02.grammar.DecafScannerTokenTypes;
 import edu.mit.compilers.le02.grammar.LineNumberedAST;
 import edu.mit.compilers.le02.ir.IrException;
 import edu.mit.compilers.le02.ir.IrGenerator;
+import edu.mit.compilers.le02.stgenerator.SymbolTableException;
+import edu.mit.compilers.le02.stgenerator.SymbolTableGenerator;
 import edu.mit.compilers.le02.symboltable.SymbolTable;
-import edu.mit.compilers.le02.symboltable.SymbolTableGenerator;
-import edu.mit.compilers.le02.symboltable.SymbolTableException;
+
 
 import edu.mit.compilers.tools.CLI;
 
@@ -278,11 +278,9 @@ public class Main {
       parser.program();
 
       ASTNode parent = IrGenerator.generateIR(parser.getAST());
-      
-      //Create Symbol Table
+      //////////////////////////////
       SymbolTable st = SymbolTableGenerator.generateSymbolTable(parent);
-
-
+      //////////////////////////////
       if (CLI.debug) {
         System.out.println(parent);
       }
@@ -295,12 +293,8 @@ public class Main {
       System.out.println(ire);
       ire.printStackTrace(System.out);
       success = false;
-    } catch (SymbolTableException e) {
-      // Don't use reportError since SymbolTableExceptions know the filename and
-      // already know how to pretty-print, unlike antlr exceptions.
-      System.out.println(e);
-      e.printStackTrace(System.out);
-      success = false;
+    } catch (SymbolTableException e){
+    	//TODO
     }
     return success;
   }

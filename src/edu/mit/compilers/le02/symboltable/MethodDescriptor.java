@@ -18,8 +18,8 @@ public class MethodDescriptor extends Descriptor{
 	}
 	
 	public String toString(){
-		return "["+ this.paramSymbolTable.toString() +"],["+
-		this.localSymbolTable.toString()+"]";
+		return "[" + this.paramSymbolTable.toString() + 
+			"],[" + this.localSymbolTable.toString() + "]";
 		
 	}
 }
