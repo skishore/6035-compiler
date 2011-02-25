@@ -84,7 +84,8 @@ public class IrGenerator {
 
     final SourceLocation sl = new SourceLocation(node);
     if (CLI.debug) {
-      System.out.println("" + sl + " ["+ node.getType() + "]: " + node.getText());
+      System.out.println("" + sl + " ["+ node.getType() + "]: " +
+                         node.getText());
     }
 
     switch (node.getType()) {

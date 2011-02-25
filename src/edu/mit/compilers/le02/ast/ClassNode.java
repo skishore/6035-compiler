@@ -13,11 +13,9 @@ public final class ClassNode extends ASTNode {
   protected List<MethodDeclNode> methods;
   protected ClassDescriptor desc;
 
-  public ClassNode(SourceLocation sl) {
-    super(sl);
-  }
-
-  public ClassNode(SourceLocation sl, String name, List<FieldDeclNode> fields, List<MethodDeclNode> methods) {
+  public ClassNode(SourceLocation sl,
+                   String name, List<FieldDeclNode> fields,
+                   List<MethodDeclNode> methods) {
     super(sl);
     this.name = name;
     this.fields = fields;
@@ -59,7 +57,7 @@ public final class ClassNode extends ASTNode {
   public void setDesc(ClassDescriptor desc) {
     this.desc = desc;
   }
-
+  
   @Override
   public <T> T accept(ASTNodeVisitor<T> v) { 
     return v.visit(this); 

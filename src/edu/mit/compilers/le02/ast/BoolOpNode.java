@@ -9,11 +9,11 @@ import edu.mit.compilers.le02.DecafType;
 public final class BoolOpNode extends BinaryOpNode {
   private BoolOp op;
 
-  public BoolOpNode(SourceLocation sl, ExpressionNode left, ExpressionNode right, BoolOp op) {
+  public BoolOpNode(SourceLocation sl,
+                    ExpressionNode left, ExpressionNode right, BoolOp op) {
     super(sl, left, right);
     this.op = op;
   }
-
 
   public BoolOp getOp() {
     return op;

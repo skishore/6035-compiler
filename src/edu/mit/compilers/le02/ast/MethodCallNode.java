@@ -18,7 +18,8 @@ public final class MethodCallNode extends CallNode {
     this.name = name;
   }
 
-  public MethodCallNode(SourceLocation sl, String name, List<ExpressionNode> args) {
+  public MethodCallNode(SourceLocation sl,
+                        String name, List<ExpressionNode> args) {
     super(sl);
     this.name = name;
     this.args = args;

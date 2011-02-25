@@ -8,9 +8,6 @@ import edu.mit.compilers.le02.SourceLocation;
 public abstract class ASTNode {
   protected SourceLocation sourceLoc;
 
-  public ASTNode() {
-  }
-
   public ASTNode(SourceLocation sl) {
     this.sourceLoc = sl;
   }
@@ -21,7 +18,8 @@ public abstract class ASTNode {
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName() + Arrays.toString(getChildren().toArray());
+    return this.getClass().getSimpleName() 
+           + Arrays.toString(getChildren().toArray());
   }
 
   abstract public List<ASTNode> getChildren();

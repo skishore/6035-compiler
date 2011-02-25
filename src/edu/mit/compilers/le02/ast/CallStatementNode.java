@@ -8,11 +8,6 @@ import edu.mit.compilers.le02.SourceLocation;
 public final class CallStatementNode extends StatementNode {
   private CallNode call;
 
-  public CallStatementNode(SourceLocation sl) {
-    super(sl);
-  }
-
-
   public CallStatementNode(SourceLocation sl, CallNode call) {
     super(sl);
     this.call = call;
@@ -24,7 +19,6 @@ public final class CallStatementNode extends StatementNode {
     children.add(call);
     return children;
   }
-
 
   public CallNode getCall() {
     return call;

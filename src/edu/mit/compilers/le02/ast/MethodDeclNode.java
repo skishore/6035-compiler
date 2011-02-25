@@ -9,9 +9,9 @@ import edu.mit.compilers.le02.SourceLocation;
 public final class MethodDeclNode extends DeclNode {
   private List<VarDeclNode> params;
   private BlockNode body;
-
+  
   public MethodDeclNode(SourceLocation sl, DecafType type,
-      String id, List<VarDeclNode> params, BlockNode body) {
+                        String id, List<VarDeclNode> params, BlockNode body) {
     super(sl, type, id);
     this.params = params;
     this.body = body;

@@ -4,11 +4,11 @@ import java.util.List;
 
 import edu.mit.compilers.le02.SourceLocation;
 
-
 public final class ArrayLocationNode extends LocationNode {
   private ExpressionNode index;
 
-  public ArrayLocationNode(SourceLocation sl, String name, ExpressionNode index) {
+  public ArrayLocationNode(SourceLocation sl, String name, 
+                           ExpressionNode index) {
     super(sl, name);
     this.index = index;
   }

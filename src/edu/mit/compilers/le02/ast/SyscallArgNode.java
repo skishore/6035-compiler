@@ -7,10 +7,8 @@ import edu.mit.compilers.le02.SourceLocation;
 
 public final class SyscallArgNode extends ASTNode {
   private boolean isString;
-
   private ExpressionNode expr;
   private StringNode str;
-
 
   public SyscallArgNode(SourceLocation sl, ExpressionNode expr) {
     super(sl);
@@ -27,7 +25,6 @@ public final class SyscallArgNode extends ASTNode {
   @Override
   public List<ASTNode> getChildren() {
     List<ASTNode> children = new ArrayList<ASTNode>();
-
     if (isString) {
       children.add(str);
     } else {

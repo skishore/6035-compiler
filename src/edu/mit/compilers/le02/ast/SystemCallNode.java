@@ -11,11 +11,8 @@ public final class SystemCallNode extends CallNode {
   private StringNode funcName;
   private List<SyscallArgNode> args;
 
-  public SystemCallNode(SourceLocation sl) {
-    super(sl);
-  }
-
-  public SystemCallNode(SourceLocation sl, StringNode name, List<SyscallArgNode> args) {
+  public SystemCallNode(SourceLocation sl,
+                        StringNode name, List<SyscallArgNode> args) {
     super(sl);
     this.funcName = name;
     this.args = args;
