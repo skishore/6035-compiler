@@ -9,7 +9,8 @@ import edu.mit.compilers.le02.SourceLocation;
 public final class ArrayDeclNode extends FieldDeclNode {
   private int length;
 
-  public ArrayDeclNode(SourceLocation sl, DecafType type, String id, int length) {
+  public ArrayDeclNode(SourceLocation sl,
+                       DecafType type, String id, int length) {
     super(sl, type, id);
     this.length = length;
   }

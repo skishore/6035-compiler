@@ -7,10 +7,8 @@ import edu.mit.compilers.le02.SourceLocation;
 
 public final class SyscallArgNode extends ASTNode {
   private boolean isString;
-
   private ExpressionNode expr;
   private StringNode str;
-
 
   public SyscallArgNode(SourceLocation sl, ExpressionNode expr) {
     super(sl);

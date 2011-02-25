@@ -13,7 +13,8 @@ public final class ClassNode extends ASTNode {
   protected List<MethodDeclNode> methods;
   protected ClassDescriptor desc;
 
-  public ClassNode(SourceLocation sl, String name, List<FieldDeclNode> fields, 
+  public ClassNode(SourceLocation sl,
+                   String name, List<FieldDeclNode> fields,
                    List<MethodDeclNode> methods) {
     super(sl);
     this.name = name;

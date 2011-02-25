@@ -8,9 +8,6 @@ import edu.mit.compilers.le02.SourceLocation;
 public abstract class ASTNode {
   protected SourceLocation sourceLoc;
 
-  public ASTNode() {
-  }
-
   public ASTNode(SourceLocation sl) {
     this.sourceLoc = sl;
   }
