@@ -2,6 +2,7 @@ package edu.mit.compilers.le02.ast;
 
 import java.util.Arrays;
 
+import edu.mit.compilers.le02.DecafType;
 import edu.mit.compilers.le02.SourceLocation;
 
 
@@ -50,5 +51,12 @@ public final class MathOpNode extends BinaryOpNode {
   }
 
   @Override
-  public void visit(ASTNodeVisitor v) { v.accept(this); }
+  public <T> T accept(ASTNodeVisitor<T> v) { 
+    return v.visit(this); 
+  }
+
+  @Override
+  public DecafType getType() {
+    return DecafType.INT;
+  }
 }

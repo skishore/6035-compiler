@@ -3,6 +3,7 @@ package edu.mit.compilers.le02.ast;
 import java.util.Arrays;
 
 import edu.mit.compilers.le02.SourceLocation;
+import edu.mit.compilers.le02.DecafType;
 
 
 public final class BoolOpNode extends BinaryOpNode {
@@ -54,5 +55,12 @@ public final class BoolOpNode extends BinaryOpNode {
   }
 
   @Override
-  public void visit(ASTNodeVisitor v) { v.accept(this); }
+  public <T> T accept(ASTNodeVisitor<T> v) { 
+    return v.visit(this); 
+  }
+
+  @Override
+  public DecafType getType() {
+    return DecafType.BOOLEAN;
+  }
 }
