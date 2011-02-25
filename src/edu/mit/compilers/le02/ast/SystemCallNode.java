@@ -3,6 +3,8 @@ package edu.mit.compilers.le02.ast;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.mit.compilers.le02.DecafType;
+
 public final class SystemCallNode extends CallNode {
   private StringNode funcName;
   private List<SyscallArgNode> args;
@@ -41,5 +43,12 @@ public final class SystemCallNode extends CallNode {
   }
 
   @Override
-  public void visit(ASTNodeVisitor v) { v.accept(this); };
+  public <T> T accept(ASTNodeVisitor<T> v) { 
+    return v.visit(this); 
+  }
+
+  @Override
+  public DecafType getType() {
+    return DecafType.INT;
+  }
 }

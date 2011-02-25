@@ -1,7 +1,7 @@
 package edu.mit.compilers.le02.symboltable;
 
 
-public class ClassDescriptor extends Descriptor{
+public class ClassDescriptor extends Descriptor {
 	private SymbolTable methodSymbolTable;
 	private SymbolTable fieldSymbolTable;
 	
@@ -20,6 +20,7 @@ public class ClassDescriptor extends Descriptor{
 		return fieldSymbolTable;
 	}
 	
+	@Override
 	public String toString(){
 		return "[" + fieldSymbolTable.toString() + 
 			"],[" +methodSymbolTable.toString() + "]";

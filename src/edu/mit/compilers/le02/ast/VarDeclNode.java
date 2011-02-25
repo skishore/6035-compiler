@@ -17,5 +17,8 @@ public final class VarDeclNode extends FieldDeclNode {
     return Collections.emptyList();
   }
 
-  public void visit(ASTNodeVisitor v) { v.accept(this); }
+  @Override
+  public <T> T accept(ASTNodeVisitor<T> v) { 
+    return v.visit(this); 
+  }
 }

@@ -1,5 +1,7 @@
 package edu.mit.compilers.le02.ast;
 
+import edu.mit.compilers.le02.DecafType;
+
 
 public class NotNode extends UnaryOpNode {
 
@@ -17,5 +19,12 @@ public class NotNode extends UnaryOpNode {
   }
 
   @Override
-  public void visit(ASTNodeVisitor v) { v.accept(this); }
+  public <T> T accept(ASTNodeVisitor<T> v) { 
+    return v.visit(this); 
+  }
+
+  @Override
+  public DecafType getType() {
+    return DecafType.BOOLEAN;
+  }
 }

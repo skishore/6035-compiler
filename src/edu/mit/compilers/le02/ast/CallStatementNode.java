@@ -30,6 +30,8 @@ public final class CallStatementNode extends StatementNode {
 
 
   @Override
-  public void visit(ASTNodeVisitor v) { v.accept(this); }
+  public <T> T accept(ASTNodeVisitor<T> v) { 
+    return v.visit(this); 
+  }
 
 }
