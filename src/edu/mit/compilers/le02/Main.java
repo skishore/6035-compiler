@@ -305,8 +305,10 @@ public class Main {
       System.out.println(ire);
       ire.printStackTrace(System.out);
       success = false;
-    } catch (SymbolTableException e){
-    	//TODO
+    } catch (SymbolTableException ste) {
+      System.out.println(ste);
+      ste.printStackTrace(System.out);
+      success = false;
     }
     return success;
   }
