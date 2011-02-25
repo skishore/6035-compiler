@@ -11,7 +11,6 @@ import java.io.InputStream;
 import antlr.ASTFactory;
 import antlr.CharStreamException;
 import antlr.DumpASTVisitor;
-import antlr.RecognitionException;
 import antlr.Token;
 import antlr.ANTLRException;
 import antlr.TokenStreamRecognitionException;
@@ -24,7 +23,6 @@ import edu.mit.compilers.le02.grammar.DecafScanner;
 import edu.mit.compilers.le02.grammar.DecafScannerTokenTypes;
 import edu.mit.compilers.le02.grammar.LineNumberedAST;
 import edu.mit.compilers.le02.grammar.ScanException;
-import edu.mit.compilers.le02.ir.IrException;
 import edu.mit.compilers.le02.ir.IrGenerator;
 import edu.mit.compilers.le02.stgenerator.SymbolTableException;
 import edu.mit.compilers.le02.stgenerator.SymbolTableGenerator;
@@ -98,18 +96,18 @@ public class Main {
 
     switch (CLI.target) {
      case SCAN:
-      if (!runScanner(inputStream)) {
+      if (!runScanner(inputStream) || !ErrorReporting.noErrors()) {
         retCode = ReturnCode.SCAN_FAILED;
       }
       break;
      case PARSE:
-      if (!runParser(inputStream)) {
+      if (!runParser(inputStream) || !ErrorReporting.noErrors()) {
         retCode = ReturnCode.PARSE_FAILED;
       }
       break;
      case INTER:
      case DEFAULT:
-      if (!generateIR(inputStream)) {
+      if (!generateIR(inputStream) || !ErrorReporting.noErrors()) {
         retCode = ReturnCode.SEMANTICS_FAILED;
       }
       break;
@@ -298,12 +296,6 @@ public class Main {
       }
     } catch (ANTLRException e) {
       ErrorReporting.reportErrorCompat(e);
-      success = false;
-    } catch (IrException ire) {
-      // Don't use reportError since IrExceptions know the filename and
-      // already know how to pretty-print, unlike antlr exceptions.
-      System.out.println(ire);
-      ire.printStackTrace(System.out);
       success = false;
     } catch (SymbolTableException ste) {
       System.out.println(ste);

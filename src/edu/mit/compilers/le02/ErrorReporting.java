@@ -49,6 +49,14 @@ public class ErrorReporting {
     }
   }
 
+  public static boolean noErrors() {
+    return errorList.isEmpty();
+  }
+
+  public static void clearErrors() {
+    errorList.clear();
+  }
+
   private static List<CompilerException> errorList =
     new ArrayList<CompilerException>();
 }

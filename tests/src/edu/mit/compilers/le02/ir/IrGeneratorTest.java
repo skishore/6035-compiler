@@ -3,6 +3,7 @@ package edu.mit.compilers.le02.ir;
 import java.io.DataInputStream;
 
 import edu.mit.compilers.le02.DecafType;
+import edu.mit.compilers.le02.ErrorReporting;
 import edu.mit.compilers.le02.SourceLocation;
 import edu.mit.compilers.le02.StreamUtil;
 import edu.mit.compilers.le02.ast.ASTNode;
@@ -33,9 +34,24 @@ import junit.framework.TestCase;
 public class IrGeneratorTest extends TestCase {
 
   /**
+   * Test that integer range checking is working correctly.
+   */
+  public void testIntegerRangeChecking() {
+    ErrorReporting.clearErrors();
+
+    AST parent = new CommonAST();
+    parent.initialize(DecafParserTokenTypes.INTEGER_LITERAL, "Int");
+    AST maxint = new CommonAST();
+    maxint.initialize(DecafParserTokenTypes.INT, "2147483647");
+    parent.addChild(maxint);
+  }
+
+  /**
    * Verifies that stripping of empty Term' nodes is happening correctly.
    */
   public void testProcessTermStripEmptyPrimes() {
+    ErrorReporting.clearErrors();
+
     AST parent = new CommonAST();
     AST firstChild = generateEmptyTerm();
     AST secondChild = generateEmptyTermF();
@@ -57,21 +73,18 @@ public class IrGeneratorTest extends TestCase {
     parent.addChild(emptyPrime);
 
     IrGenerator gen = IrGenerator.getInstance();
-    try {
-      ASTNode node = gen.processTerm(parent, new SourceLocation(parent));
-      assertNotNull(node);
-      assert(node instanceof IntNode);
-      assertEquals(42, ((IntNode)node).getValue());
-    } catch (IrException ie) {
-      // We should never get here.
-      assert(false);
-    }
+    ASTNode node = gen.processTerm(parent, new SourceLocation(parent));
+    assertNotNull(node);
+    assert(node instanceof IntNode);
+    assertEquals(42, ((IntNode)node).getValue());
+    assert(ErrorReporting.noErrors());
   }
 
   /**
    * Verifies that arithmetic order of operations is happening correctly.
    */
   public void testOrderOfOperations() {
+    ErrorReporting.clearErrors();
     DecafScanner parse_lexer =
       new DecafScanner(new DataInputStream(
         StreamUtil.createInputStream(ARITHMETIC_PROGRAM)));
@@ -161,13 +174,12 @@ public class IrGeneratorTest extends TestCase {
             BoolOp.EQ),
           BoolOp.OR),
         secondAssignment.getValue());
-    } catch (IrException ie) {
-      assert(false);
     } catch (RecognitionException e) {
       assert(false);
     } catch (TokenStreamException e) {
       assert(false);
     }
+    assert(ErrorReporting.noErrors());
   }
 
   private static String ARITHMETIC_PROGRAM = "class Program {\n" +
