@@ -14,7 +14,6 @@ public final class BoolOpNode extends BinaryOpNode {
     this.op = op;
   }
 
-
   public BoolOp getOp() {
     return op;
   }

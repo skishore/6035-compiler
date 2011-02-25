@@ -27,7 +27,6 @@ public final class SyscallArgNode extends ASTNode {
   @Override
   public List<ASTNode> getChildren() {
     List<ASTNode> children = new ArrayList<ASTNode>();
-
     if (isString) {
       children.add(str);
     } else {

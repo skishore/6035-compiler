@@ -21,7 +21,8 @@ public abstract class ASTNode {
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName() + Arrays.toString(getChildren().toArray());
+    return this.getClass().getSimpleName() 
+           + Arrays.toString(getChildren().toArray());
   }
 
   abstract public List<ASTNode> getChildren();

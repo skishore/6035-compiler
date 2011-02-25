@@ -18,7 +18,8 @@ public final class IfNode extends StatementNode {
     this.hasElse = false;
   }
 
-  public IfNode(SourceLocation sl, ExpressionNode condition, BlockNode thenBlock, BlockNode elseBlock) {
+  public IfNode(SourceLocation sl, ExpressionNode condition, 
+                BlockNode thenBlock, BlockNode elseBlock) {
     super(sl);
     this.condition = condition;
     this.thenBlock = thenBlock;
@@ -31,7 +32,7 @@ public final class IfNode extends StatementNode {
     List<ASTNode> children = new ArrayList<ASTNode>();
     children.add(condition);
     children.add(thenBlock);
-
+    
     if (hasElse) {
       children.add(elseBlock);
     }

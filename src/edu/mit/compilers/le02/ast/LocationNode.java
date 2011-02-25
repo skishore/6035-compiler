@@ -44,5 +44,4 @@ public abstract class LocationNode extends ASTNode {
   public void setDesc(TypedDescriptor desc) {
     this.desc = desc;
   }
-
 }

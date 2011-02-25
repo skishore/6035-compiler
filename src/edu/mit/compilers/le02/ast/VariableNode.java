@@ -30,7 +30,7 @@ public final class VariableNode extends ExpressionNode {
   public LocationNode getLoc() {
     return loc;
   }
-
+  
   @Override
   public boolean equals(Object o) {
     if (!(o instanceof VariableNode)) {
