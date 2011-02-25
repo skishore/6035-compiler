@@ -85,6 +85,7 @@ public class SymbolTable {
 		return table;
 	}
 
+	@Override
 	public String toString() {
 		String output = "";
 		for (String k : this.table.keySet()) {

@@ -17,7 +17,8 @@ public abstract class Descriptor {
 	public String getId(){
 		return this.id;
 	}
-	
+
+	@Override
 	public abstract String toString();
 
 	

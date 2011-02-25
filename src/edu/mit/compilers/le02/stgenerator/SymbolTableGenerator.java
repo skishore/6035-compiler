@@ -5,7 +5,6 @@ import edu.mit.compilers.le02.ast.ASTNodeVisitor;
 import edu.mit.compilers.le02.ast.ClassNode;
 import edu.mit.compilers.le02.ast.FieldDeclNode;
 import edu.mit.compilers.le02.ast.MethodDeclNode;
-import edu.mit.compilers.le02.ast.SyscallArgNode;
 import edu.mit.compilers.le02.ast.VarDeclNode;
 import edu.mit.compilers.le02.symboltable.ClassDescriptor;
 import edu.mit.compilers.le02.symboltable.Descriptor;
@@ -59,7 +58,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
   public Descriptor accept(ClassNode node) {
     SymbolTable parent = currParent;
 
-    //Create and fill fieldSymbolTable
+    // Create and fill fieldSymbolTable
     SymbolTable fieldSymbolTable = new SymbolTable(parent);
     currParent = fieldSymbolTable;
     isField = true;
@@ -68,7 +67,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
     }
     isField = false;
 
-    //Create and fill methodSymbolTable
+    // Create and fill methodSymbolTable
     SymbolTable methodSymbolTable = new SymbolTable(fieldSymbolTable);
     currParent = methodSymbolTable;
     for (MethodDeclNode m : node.getMethods()) {
@@ -83,7 +82,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
   public Descriptor accept(MethodDeclNode node) {
     SymbolTable parent = currParent;
 
-    //Create and fill paramSymbolTable
+    // Create and fill paramSymbolTable
     SymbolTable paramSymbolTable = new SymbolTable(parent);
     currParent = paramSymbolTable;
     isParam = true;
@@ -91,7 +90,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
       paramSymbolTable.put(v.getName(), this.visit(v));
     }
 
-    //Create and fill localSymbolTable
+    // Create and fill localSymbolTable
     SymbolTable localSymbolTable = new SymbolTable(paramSymbolTable);
     currParent = localSymbolTable;
     isParam = false;

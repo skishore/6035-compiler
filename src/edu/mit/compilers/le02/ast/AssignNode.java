@@ -33,5 +33,6 @@ public class AssignNode extends StatementNode {
     this.value = value;
   }
 
+  @Override
   public <T> T accept(ASTNodeVisitor<T> v) { return v.visit(this); }
 }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.mit.compilers.le02.DecafType;
-import edu.mit.compilers.le02.symboltable.MethodDescriptor;
 
 public final class SystemCallNode extends CallNode {
   private StringNode funcName;

@@ -24,6 +24,7 @@ public final class ArrayLocationNode extends LocationNode {
     return index;
   }
 
+  @Override
   public <T> T accept(ASTNodeVisitor<T> v) { return v.visit(this); }
 
   @Override

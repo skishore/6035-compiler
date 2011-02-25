@@ -58,7 +58,6 @@ public final class BoolOpNode extends BinaryOpNode {
     return v.visit(this); 
   }
 
-
   @Override
   public DecafType getType() {
     return DecafType.BOOLEAN;
