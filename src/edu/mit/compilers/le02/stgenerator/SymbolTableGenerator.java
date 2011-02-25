@@ -51,11 +51,11 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
   public SymbolTable createClassST(ClassNode root) throws SymbolTableException {
     SymbolTable st = new SymbolTable(null);
     currParent = st;
-    st.put(root.getName(), this.accept(root));
+    st.put(root.getName(), this.accept(root), root.getSourceLoc());
     return st;
   }
   
-  public Descriptor accept(ClassNode node) {
+  public Descriptor accept(ClassNode node) throws SymbolTableException {
     SymbolTable parent = currParent;
 
     // Create and fill fieldSymbolTable
@@ -63,7 +63,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
     currParent = fieldSymbolTable;
     isField = true;
     for (FieldDeclNode n : node.getFields()) {
-      fieldSymbolTable.put(n.getName(), n.accept(this));
+      fieldSymbolTable.put(n.getName(), this.accept(n), n.getSourceLoc());
     }
     isField = false;
 
@@ -71,7 +71,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
     SymbolTable methodSymbolTable = new SymbolTable(fieldSymbolTable);
     currParent = methodSymbolTable;
     for (MethodDeclNode m : node.getMethods()) {
-      methodSymbolTable.put(m.getName(), m.accept(this));
+      methodSymbolTable.put(m.getName(), this.accept(m), m.getSourceLoc());
     }
     
     currParent = parent;
@@ -79,7 +79,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
                                methodSymbolTable);
   }
 
-  public Descriptor accept(MethodDeclNode node) {
+  public Descriptor accept(MethodDeclNode node) throws SymbolTableException {
     SymbolTable parent = currParent;
 
     // Create and fill paramSymbolTable
@@ -87,7 +87,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
     currParent = paramSymbolTable;
     isParam = true;
     for (VarDeclNode v : node.getParams()) {
-      paramSymbolTable.put(v.getName(), v.accept(this));
+      paramSymbolTable.put(v.getName(), this.accept(v), v.getSourceLoc());
     }
 
     // Create and fill localSymbolTable
@@ -95,7 +95,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
     currParent = localSymbolTable;
     isParam = false;
     for (VarDeclNode v : node.getBody().getDecls()) {
-      localSymbolTable.put(v.getName(), v.accept(this));
+      localSymbolTable.put(v.getName(), this.accept(v), v.getSourceLoc());
     }
     
     currParent = parent;
@@ -104,11 +104,11 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
                                 node.getBody());
   }
   
-  public Descriptor accept(FieldDeclNode node) {
+  public Descriptor accept(FieldDeclNode node) throws SymbolTableException {
     return new FieldDescriptor(currParent, node.getName(), node.getType());
   }
 
-  public Descriptor accept(VarDeclNode node) {
+  public Descriptor accept(VarDeclNode node) throws SymbolTableException {
     if (isField) {
       return new FieldDescriptor(currParent, node.getName(), node.getType());
     }

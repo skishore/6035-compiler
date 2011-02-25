@@ -1,4 +1,4 @@
-<project name="Compiler" default="integration_tests" basedir=".">
+<project name="Compiler" default="jar" basedir=".">
 
   <property name="base_package_dir" value="edu/mit/compilers/le02" />
   <property name="base_package_name" value="edu.mit.compilers.le02" />
@@ -89,7 +89,22 @@
     </javac>
   </target>
 
-  <target name="unittests" depends="compile">
+  <target name="jar" depends="compile">
+    <jar jarfile="${dist}/Compiler.jar" basedir="${classes}">
+     <manifest>
+       <attribute name="Main-Class" value="${base_package_name}.Main" />
+       <!-- ANTLR runtime is needed for parsing! -->
+       <attribute name="Class-Path" value="antlr.jar" />
+     </manifest>
+    </jar>
+    <!-- Third party libraries can only be found by java -jar if they
+         reside in the same dir but we don't a billion copies floating around,
+         so use symlinks instead. -->
+    <symlink link="${dist}/antlr.jar" resource="${lib}/antlr.jar"
+             overwrite="true" />
+  </target>
+
+  <target name="unittests" depends="jar">
     <junit failureproperty="junit.failed">
       <classpath>
         <path refid="libraries" />
@@ -105,22 +120,7 @@
     <fail if="junit.failed" message="Unit tests failed!" />
   </target>
 
-  <target name="jar" depends="unittests">
-    <jar jarfile="${dist}/Compiler.jar" basedir="${classes}">
-     <manifest>
-       <attribute name="Main-Class" value="${base_package_name}.Main" />
-       <!-- ANTLR runtime is needed for parsing! -->
-       <attribute name="Class-Path" value="antlr.jar" />
-     </manifest>
-    </jar>
-    <!-- Third party libraries can only be found by java -jar if they
-         reside in the same dir but we don't a billion copies floating around,
-         so use symlinks instead. -->
-    <symlink link="${dist}/antlr.jar" resource="${lib}/antlr.jar"
-             overwrite="true" />
-  </target>
-
-  <target name="integration_tests" depends="jar">
+  <target name="integration_tests" depends="unittests">
     <!-- Iterate over the non-unittest test directories -->
     <exec executable="${tests}/scanner/test.sh" failonerror="true" />
     <exec executable="${tests}/parser/test.sh" failonerror="true" />

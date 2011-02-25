@@ -290,11 +290,11 @@ public class Main {
       // Don't use reportError since IrExceptions know the filename and
       // already know how to pretty-print, unlike antlr exceptions.
       System.out.println(ire);
-      ire.printStackTrace(System.out);
+      //ire.printStackTrace(System.out);
       success = false;
     } catch (SymbolTableException e){
       System.out.println(e);
-      ire.printStackTrace(System.out);
+      //e.printStackTrace(System.out);
       success = false;
     }
     return success;

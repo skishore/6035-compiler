@@ -2,6 +2,8 @@ package edu.mit.compilers.le02.symboltable;
 
 import java.util.HashMap;
 import java.util.Map;
+import edu.mit.compilers.le02.SourceLocation;
+import edu.mit.compilers.le02.stgenerator.SymbolTableException;
 
 public class SymbolTable {
 	private SymbolTable parent;
@@ -20,11 +22,9 @@ public class SymbolTable {
 	 * @param descriptor The descriptor of the new entry
 	 * @return True if entry was successful
 	 */
-	public boolean put(String id, Descriptor descriptor) {
+	public boolean put(String id, Descriptor descriptor, SourceLocation sl) throws SymbolTableException {
 		if (table.containsKey(id)) {
-			// TODO: Throw Exception Here
-			System.out.println("Duplicate identifier");
-			return false;
+            throw new SymbolTableException(sl, "Duplicate identifier");
 		} else {
 			if (descriptor != null) {
 				this.table.put(id, descriptor);
