@@ -4,7 +4,7 @@ import edu.mit.compilers.tools.CLI;
 
 public class CompilerException extends Exception {
 
-  private SourceLocation loc;
+  protected SourceLocation loc;
 
   public CompilerException(SourceLocation location) {
     loc = location;

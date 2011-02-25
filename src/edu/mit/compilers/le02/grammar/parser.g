@@ -1,4 +1,7 @@
-header {package edu.mit.compilers.le02.grammar;}
+header {
+package edu.mit.compilers.le02.grammar;
+import edu.mit.compilers.le02.ErrorReporting;
+}
 
 options
 {
@@ -57,19 +60,12 @@ tokens
 
   @Override
   public void reportError (RecognitionException ex) {
-    super.reportError(ex);
-    if (ex instanceof MismatchedTokenException) {
-      MismatchedTokenException mte = (MismatchedTokenException)ex;
-      if (mte.token.getText() == null) {
-        System.err.println(" Previous error indicates unexpected EOF found.");
-      }
-    }
-
+    ErrorReporting.reportError(new ParseException(ex));
     error = true;
   }
   @Override
   public void reportError (String s) {
-    super.reportError(s);
+    ErrorReporting.reportError(new ParseException(s));
     error = true;
   }
   public boolean getError () {

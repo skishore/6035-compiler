@@ -118,7 +118,7 @@ public class Main {
       ErrorReporting.reportErrorCompat(new NoSuchMethodException(
         "Action " + CLI.target + " not yet implemented."));
     }
-    ErrorReporting.printErrors(System.out);
+    ErrorReporting.printErrors(System.err);
     System.exit(retCode.numericCode());
   }
 
