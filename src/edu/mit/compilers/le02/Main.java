@@ -2,8 +2,8 @@
 // All rights reserved.
 
 package edu.mit.compilers.le02;
-import java.io.DataInputStream;
 
+import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,8 +11,10 @@ import java.io.InputStream;
 import antlr.ASTFactory;
 import antlr.CharStreamException;
 import antlr.DumpASTVisitor;
+import antlr.RecognitionException;
 import antlr.Token;
 import antlr.ANTLRException;
+import antlr.TokenStreamRecognitionException;
 import antlr.debug.misc.ASTFrame;
 
 import edu.mit.compilers.le02.ast.ASTNode;
@@ -21,6 +23,7 @@ import edu.mit.compilers.le02.grammar.DecafParserTokenTypes;
 import edu.mit.compilers.le02.grammar.DecafScanner;
 import edu.mit.compilers.le02.grammar.DecafScannerTokenTypes;
 import edu.mit.compilers.le02.grammar.LineNumberedAST;
+import edu.mit.compilers.le02.grammar.ScanException;
 import edu.mit.compilers.le02.ir.IrException;
 import edu.mit.compilers.le02.ir.IrGenerator;
 import edu.mit.compilers.le02.stgenerator.SymbolTableException;
@@ -88,7 +91,7 @@ public class Main {
         inputStream = new FileInputStream(CLI.infile);
       } catch (IOException e) {
         // print the error:
-        reportError(e);
+        ErrorReporting.reportErrorCompat(e);
         System.exit(ReturnCode.FILE_NOT_FOUND.numericCode());
       }
     }
@@ -112,18 +115,11 @@ public class Main {
       break;
      default:
       retCode = ReturnCode.NO_SUCH_ACTION;
-      reportError(new NoSuchMethodException(
+      ErrorReporting.reportErrorCompat(new NoSuchMethodException(
         "Action " + CLI.target + " not yet implemented."));
     }
+    ErrorReporting.printErrors(System.out);
     System.exit(retCode.numericCode());
-  }
-
-  /**
-   * Utility method to pretty-print an exception along with the corresponding
-   * file name.
-   */
-  protected static void reportError (Exception e) {
-    System.out.println(CLI.getInputFilename() + " " + e);
   }
 
   /**
@@ -139,6 +135,9 @@ public class Main {
 
     // If debug mode is set, enable tracing in the scanner.
     scanner.setTrace(CLI.debug);
+    if (!CLI.compat) { 
+      scanner.setFilename(CLI.infile);
+    }
 
     Token token;
     boolean done = false;
@@ -174,11 +173,25 @@ public class Main {
       } catch (ANTLRException e) {
         // Print the error and continue by discarding the invalid token.
         // We hope that this gets us onto the right track again.
-        reportError(e);
+        if (CLI.compat) {
+          ErrorReporting.reportErrorCompat(e);
+        } else {
+          System.out.println(e);
+          if (e instanceof TokenStreamRecognitionException) {
+            ErrorReporting.reportError(
+              new ScanException((TokenStreamRecognitionException)e));
+          } else {
+            ErrorReporting.reportError(new ScanException(e.getMessage()));
+          }
+        }
         try {
           scanner.consume();
         } catch (CharStreamException cse) {
-          reportError(cse);
+          if (CLI.compat) {
+            ErrorReporting.reportErrorCompat(cse);
+          } else {
+            ErrorReporting.reportError(new ScanException(cse.getMessage()));
+          }
         }
         success = false;
       }
@@ -242,7 +255,7 @@ public class Main {
         success = false;
       }
     } catch (ANTLRException e) {
-      reportError(e);
+      ErrorReporting.reportErrorCompat(e);
       success = false;
     }
     return success;
@@ -284,7 +297,7 @@ public class Main {
         System.out.println(parent);
       }
     } catch (ANTLRException e) {
-      reportError(e);
+      ErrorReporting.reportErrorCompat(e);
       success = false;
     } catch (IrException ire) {
       // Don't use reportError since IrExceptions know the filename and
@@ -297,4 +310,5 @@ public class Main {
     }
     return success;
   }
+
 }
