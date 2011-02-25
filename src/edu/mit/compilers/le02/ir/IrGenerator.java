@@ -617,7 +617,7 @@ public class IrGenerator {
     if (raw_int.startsWith(HEX_PREFIX)) {
       try {
         return new IntNode(sl, Integer.parseInt(
-          "-" + raw_int.substring(HEX_PREFIX.length()), HEX_RADIX));
+          "-" + raw_int.substring(HEX_PREFIX.length()), HEX_RADIX), true);
       } catch (NumberFormatException nfe) {
         // Since 0x[a-fA-F0-9]+ must parse, this means we were out of range.
         ErrorReporting.reportError(
@@ -626,7 +626,7 @@ public class IrGenerator {
       }
     } else {
       try {
-        return new IntNode(sl, Integer.parseInt(raw_int));
+        return new IntNode(sl, Integer.parseInt("-" + raw_int), true);
       } catch (NumberFormatException nfe) {
         // Since [0-9]+ must parse, this means we were out of range.
         ErrorReporting.reportError(

@@ -15,8 +15,8 @@ public final class IntNode extends ExpressionNode {
   private int value;
   private boolean invert;
 
-  public IntNode(SourceLocation sl, int valueInverse) {
-    this(sl, valueInverse, true);
+  public IntNode(SourceLocation sl, int value) {
+    this(sl, value, false);
   }
   public IntNode(SourceLocation sl, int value, boolean invert) {
     super(sl);

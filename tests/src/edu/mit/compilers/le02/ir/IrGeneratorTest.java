@@ -16,7 +16,6 @@ import edu.mit.compilers.le02.ast.BooleanNode;
 import edu.mit.compilers.le02.ast.ClassNode;
 import edu.mit.compilers.le02.ast.IntNode;
 import edu.mit.compilers.le02.ast.MathOpNode;
-import edu.mit.compilers.le02.ast.MinusNode;
 import edu.mit.compilers.le02.ast.NotNode;
 import edu.mit.compilers.le02.ast.ScalarLocationNode;
 import edu.mit.compilers.le02.ast.BoolOpNode.BoolOp;
@@ -34,16 +33,121 @@ import junit.framework.TestCase;
 public class IrGeneratorTest extends TestCase {
 
   /**
-   * Test that integer range checking is working correctly.
+   * Test that integer range checking is working correctly. (max)
    */
-  public void testIntegerRangeChecking() {
+  public void testIntegerRangeCheckingMaxInt() {
     ErrorReporting.clearErrors();
 
-    AST parent = new CommonAST();
-    parent.initialize(DecafParserTokenTypes.INTEGER_LITERAL, "Int");
+    AST termf = generateEmptyTermF();
+    AST literal = new CommonAST();
+    literal.initialize(DecafParserTokenTypes.INTEGER_LITERAL, "Int");
     AST maxint = new CommonAST();
     maxint.initialize(DecafParserTokenTypes.INT, "2147483647");
-    parent.addChild(maxint);
+    literal.addChild(maxint);
+    termf.addChild(literal);
+
+    IrGenerator gen = IrGenerator.getInstance();
+    ASTNode node = gen.processTermF(termf, new SourceLocation(termf));
+    assertNotNull(node);
+    assertTrue(node instanceof IntNode);
+    assertEquals(2147483647, ((IntNode)node).getValue());
+    assertTrue(ErrorReporting.noErrors());
+  }
+
+  /**
+   * Test that integer range checking is working correctly. (min)
+   */
+  public void testIntegerRangeCheckingMinInt() {
+    ErrorReporting.clearErrors();
+
+    AST termf = generateEmptyTermF();
+    AST minus = new CommonAST();
+    minus.initialize(DecafParserTokenTypes.MINUS, "Int");
+    AST literal = new CommonAST();
+    literal.initialize(DecafParserTokenTypes.INTEGER_LITERAL, "Int");
+    AST minint = new CommonAST();
+    minint.initialize(DecafParserTokenTypes.INT, "2147483648");
+    literal.addChild(minint);
+    minus.addChild(literal);
+    termf.addChild(minus);
+
+    IrGenerator gen = IrGenerator.getInstance();
+    ASTNode node = gen.processTermF(termf, new SourceLocation(minus));
+    assertNotNull(node);
+    assertTrue(node instanceof IntNode);
+    assertEquals(-2147483648, ((IntNode)node).getValue());
+    assertTrue(ErrorReporting.noErrors());
+  }
+
+  /**
+   * Test that integer range checking is working correctly. (one above max)
+   */
+  public void testIntegerRangeCheckingOneAboveMaxInt() {
+    ErrorReporting.clearErrors();
+
+    AST termf = generateEmptyTermF();
+    AST literal = new CommonAST();
+    literal.initialize(DecafParserTokenTypes.INTEGER_LITERAL, "Int");
+    AST maxint = new CommonAST();
+    maxint.initialize(DecafParserTokenTypes.INT, "2147483648");
+    literal.addChild(maxint);
+    termf.addChild(literal);
+
+    IrGenerator gen = IrGenerator.getInstance();
+    ASTNode node = gen.processTermF(termf, new SourceLocation(termf));
+    assertNotNull(node);
+    assertTrue(node instanceof IntNode);
+    // We cannot catch this case here; we rely upon catching it downstream
+    // by looking for positive getValue() results from inverted nodes.
+    assertEquals(-(-2147483648), ((IntNode)node).getValue());
+    assertTrue(ErrorReporting.noErrors());
+  }
+
+  /**
+   * Test that integer range checking is working correctly. (far above max)
+   */
+  public void testIntegerRangeCheckingFarAboveMaxInt() {
+    ErrorReporting.clearErrors();
+
+    AST termf = generateEmptyTermF();
+    AST literal = new CommonAST();
+    literal.initialize(DecafParserTokenTypes.INTEGER_LITERAL, "Int");
+    AST maxint = new CommonAST();
+    maxint.initialize(DecafParserTokenTypes.INT, "9147483648");
+    literal.addChild(maxint);
+    termf.addChild(literal);
+
+    IrGenerator gen = IrGenerator.getInstance();
+    ASTNode node = gen.processTermF(termf, new SourceLocation(termf));
+    assertNotNull(node);
+    assertTrue(node instanceof IntNode);
+    assertEquals(Integer.MAX_VALUE, ((IntNode)node).getValue());
+    assertFalse(ErrorReporting.noErrors());
+  }
+
+  /**
+   * Test that integer range checking is working correctly. (far below min)
+   */
+  public void testIntegerRangeCheckingFarBelowMinInt() {
+    ErrorReporting.clearErrors();
+
+    AST termf = generateEmptyTermF();
+    AST minus = new CommonAST();
+    minus.initialize(DecafParserTokenTypes.MINUS, "Int");
+    AST literal = new CommonAST();
+    literal.initialize(DecafParserTokenTypes.INTEGER_LITERAL, "Int");
+    AST minint = new CommonAST();
+    minint.initialize(DecafParserTokenTypes.INT, "9147483648");
+    literal.addChild(minint);
+    minus.addChild(literal);
+    termf.addChild(minus);
+
+    IrGenerator gen = IrGenerator.getInstance();
+    ASTNode node = gen.processTermF(termf, new SourceLocation(minus));
+    assertNotNull(node);
+    assertTrue(node instanceof IntNode);
+    assertEquals(-Integer.MAX_VALUE, ((IntNode)node).getValue());
+    assertFalse(ErrorReporting.noErrors());
   }
 
   /**
@@ -167,8 +271,7 @@ public class IrGeneratorTest extends TestCase {
                 MathOp.DIVIDE),
               MathOp.ADD),
             new MathOpNode(null,
-              new MinusNode(null,
-                new IntNode(null, 2)),
+              new IntNode(null, -2),
               new IntNode(null, 3),
               MathOp.MODULO),
             BoolOp.EQ),
