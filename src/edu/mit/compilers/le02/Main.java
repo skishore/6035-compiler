@@ -293,7 +293,9 @@ public class Main {
       ire.printStackTrace(System.out);
       success = false;
     } catch (SymbolTableException e){
-    	//TODO
+      System.out.println(e);
+      ire.printStackTrace(System.out);
+      success = false;
     }
     return success;
   }
