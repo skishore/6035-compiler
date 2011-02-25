@@ -3,6 +3,7 @@ package edu.mit.compilers.le02.ir;
 import java.io.DataInputStream;
 
 import edu.mit.compilers.le02.DecafType;
+import edu.mit.compilers.le02.SourceLocation;
 import edu.mit.compilers.le02.StreamUtil;
 import edu.mit.compilers.le02.ast.ASTNode;
 import edu.mit.compilers.le02.ast.ArrayDeclNode;
@@ -17,7 +18,6 @@ import edu.mit.compilers.le02.ast.MathOpNode;
 import edu.mit.compilers.le02.ast.MinusNode;
 import edu.mit.compilers.le02.ast.NotNode;
 import edu.mit.compilers.le02.ast.ScalarLocationNode;
-import edu.mit.compilers.le02.ast.SourceLocation;
 import edu.mit.compilers.le02.ast.BoolOpNode.BoolOp;
 import edu.mit.compilers.le02.ast.MathOpNode.MathOp;
 import edu.mit.compilers.le02.grammar.DecafParser;

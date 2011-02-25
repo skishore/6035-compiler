@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.mit.compilers.le02.DecafType;
+import edu.mit.compilers.le02.SourceLocation;
+
 
 public final class IntNode extends ExpressionNode {
   private int value;

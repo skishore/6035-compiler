@@ -1,6 +1,6 @@
 package edu.mit.compilers.le02.stgenerator;
 
-import edu.mit.compilers.le02.ast.SourceLocation;
+import edu.mit.compilers.le02.SourceLocation;
 
 public class SymbolTableException extends Exception {
 

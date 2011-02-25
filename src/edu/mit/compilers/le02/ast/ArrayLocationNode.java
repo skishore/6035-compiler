@@ -2,6 +2,8 @@ package edu.mit.compilers.le02.ast;
 
 import java.util.List;
 
+import edu.mit.compilers.le02.SourceLocation;
+
 
 public final class ArrayLocationNode extends LocationNode {
   private ExpressionNode index;

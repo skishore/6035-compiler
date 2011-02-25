@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import edu.mit.compilers.le02.SourceLocation;
+
 /**
  * A shallow wrapper around an {@link ArrayList} that allows passing of a list
  * of {@link ASTNode}s as a {@link ASTNode}.

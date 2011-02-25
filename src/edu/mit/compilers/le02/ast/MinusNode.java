@@ -1,6 +1,7 @@
 package edu.mit.compilers.le02.ast;
 
 import edu.mit.compilers.le02.DecafType;
+import edu.mit.compilers.le02.SourceLocation;
 
 
 public final class MinusNode extends UnaryOpNode {

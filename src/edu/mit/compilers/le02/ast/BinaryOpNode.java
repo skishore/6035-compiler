@@ -2,6 +2,8 @@ package edu.mit.compilers.le02.ast;
 
 import java.util.List;
 
+import edu.mit.compilers.le02.SourceLocation;
+
 public abstract class BinaryOpNode extends ExpressionNode {
   protected ExpressionNode left, right;
 

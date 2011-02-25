@@ -3,7 +3,9 @@ package edu.mit.compilers.le02.ast;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.mit.compilers.le02.SourceLocation;
 import edu.mit.compilers.le02.symboltable.ClassDescriptor;
+
 
 public final class ClassNode extends ASTNode {
   private String name;
