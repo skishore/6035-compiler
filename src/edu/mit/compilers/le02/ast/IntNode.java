@@ -8,8 +8,9 @@ import edu.mit.compilers.le02.SourceLocation;
 
 /**
  * Stores an integer. We initially store the inverse of the value since we
- * need to store input values of [0,2^31]. We then later verify that the
+ * need to store input values of [0,2^31]. We then later verify that any
  * values of 2^31 (outside the range) were in fact inverted to -2^31.
+ * Any values of 2^31 that are left outstanding need to be marked invalid.
  */
 public final class IntNode extends ExpressionNode {
   private int value;
@@ -48,6 +49,10 @@ public final class IntNode extends ExpressionNode {
       return false;
     }
     return getValue() == ((IntNode)o).getValue();
+  }
+
+  public boolean isInverted() {
+    return invert;
   }
 
   @Override

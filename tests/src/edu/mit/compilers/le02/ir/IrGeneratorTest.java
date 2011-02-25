@@ -62,18 +62,19 @@ public class IrGeneratorTest extends TestCase {
 
     AST termf = generateEmptyTermF();
     AST minus = new CommonAST();
-    minus.initialize(DecafParserTokenTypes.MINUS, "Int");
+    minus.initialize(DecafParserTokenTypes.MINUS, "-");
+    AST subtermf = generateEmptyTermF();
     AST literal = new CommonAST();
     literal.initialize(DecafParserTokenTypes.INTEGER_LITERAL, "Int");
     AST minint = new CommonAST();
     minint.initialize(DecafParserTokenTypes.INT, "2147483648");
     literal.addChild(minint);
-    minus.addChild(literal);
+    subtermf.addChild(literal);
     termf.addChild(minus);
+    termf.addChild(subtermf);
 
     IrGenerator gen = IrGenerator.getInstance();
     ASTNode node = gen.processTermF(termf, new SourceLocation(minus));
-    assertNotNull(node);
     assertTrue(node instanceof IntNode);
     assertEquals(-2147483648, ((IntNode)node).getValue());
     assertTrue(ErrorReporting.noErrors());
@@ -101,6 +102,8 @@ public class IrGeneratorTest extends TestCase {
     // by looking for positive getValue() results from inverted nodes.
     assertEquals(-(-2147483648), ((IntNode)node).getValue());
     assertTrue(ErrorReporting.noErrors());
+    new IntRangeChecker().visit(node);
+    assertFalse(ErrorReporting.noErrors());
   }
 
   /**
@@ -133,14 +136,16 @@ public class IrGeneratorTest extends TestCase {
 
     AST termf = generateEmptyTermF();
     AST minus = new CommonAST();
-    minus.initialize(DecafParserTokenTypes.MINUS, "Int");
+    minus.initialize(DecafParserTokenTypes.MINUS, "-");
+    AST subtermf = generateEmptyTermF();
     AST literal = new CommonAST();
     literal.initialize(DecafParserTokenTypes.INTEGER_LITERAL, "Int");
     AST minint = new CommonAST();
     minint.initialize(DecafParserTokenTypes.INT, "9147483648");
     literal.addChild(minint);
-    minus.addChild(literal);
+    subtermf.addChild(literal);
     termf.addChild(minus);
+    termf.addChild(subtermf);
 
     IrGenerator gen = IrGenerator.getInstance();
     ASTNode node = gen.processTermF(termf, new SourceLocation(minus));
