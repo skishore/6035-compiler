@@ -3,6 +3,7 @@ package edu.mit.compilers.le02.ir;
 import java.io.DataInputStream;
 
 import edu.mit.compilers.le02.DecafType;
+import edu.mit.compilers.le02.ErrorReporting;
 import edu.mit.compilers.le02.SourceLocation;
 import edu.mit.compilers.le02.StreamUtil;
 import edu.mit.compilers.le02.ast.ASTNode;
@@ -15,7 +16,6 @@ import edu.mit.compilers.le02.ast.BooleanNode;
 import edu.mit.compilers.le02.ast.ClassNode;
 import edu.mit.compilers.le02.ast.IntNode;
 import edu.mit.compilers.le02.ast.MathOpNode;
-import edu.mit.compilers.le02.ast.MinusNode;
 import edu.mit.compilers.le02.ast.NotNode;
 import edu.mit.compilers.le02.ast.ScalarLocationNode;
 import edu.mit.compilers.le02.ast.BoolOpNode.BoolOp;
@@ -33,9 +33,142 @@ import junit.framework.TestCase;
 public class IrGeneratorTest extends TestCase {
 
   /**
+   * Test that integer range checking is working correctly. (max)
+   */
+  public void testIntegerRangeCheckingMaxInt() {
+    ErrorReporting.clearErrors();
+
+    AST termf = generateEmptyTermF();
+    AST literal = new CommonAST();
+    literal.initialize(DecafParserTokenTypes.INTEGER_LITERAL, "Int");
+    AST maxint = new CommonAST();
+    maxint.initialize(DecafParserTokenTypes.INT, "2147483647");
+    literal.addChild(maxint);
+    termf.addChild(literal);
+
+    IrGenerator gen = IrGenerator.getInstance();
+    ASTNode node = gen.processTermF(termf, new SourceLocation(termf));
+    assertNotNull(node);
+    assertTrue(node instanceof IntNode);
+    assertEquals(2147483647, ((IntNode)node).getValue());
+    node.accept(new IntRangeChecker());
+    assertTrue(ErrorReporting.noErrors());
+  }
+
+  /**
+   * Test that integer range checking is working correctly. (min)
+   */
+  public void testIntegerRangeCheckingMinInt() {
+    ErrorReporting.clearErrors();
+
+    AST termf = generateEmptyTermF();
+    AST minus = new CommonAST();
+    minus.initialize(DecafParserTokenTypes.MINUS, "-");
+    AST subtermf = generateEmptyTermF();
+    AST literal = new CommonAST();
+    literal.initialize(DecafParserTokenTypes.INTEGER_LITERAL, "Int");
+    AST minint = new CommonAST();
+    minint.initialize(DecafParserTokenTypes.INT, "2147483648");
+    literal.addChild(minint);
+    subtermf.addChild(literal);
+    termf.addChild(minus);
+    termf.addChild(subtermf);
+
+    IrGenerator gen = IrGenerator.getInstance();
+    ASTNode node = gen.processTermF(termf, new SourceLocation(minus));
+    assertTrue(node instanceof IntNode);
+    assertEquals(-2147483648, ((IntNode)node).getValue());
+    node.accept(new IntRangeChecker());
+    assertTrue(ErrorReporting.noErrors());
+  }
+
+  /**
+   * Test that integer range checking is working correctly. (one above max)
+   */
+  public void testIntegerRangeCheckingOneAboveMaxInt() {
+    ErrorReporting.clearErrors();
+
+    AST termf = generateEmptyTermF();
+    AST literal = new CommonAST();
+    literal.initialize(DecafParserTokenTypes.INTEGER_LITERAL, "Int");
+    AST maxint = new CommonAST();
+    maxint.initialize(DecafParserTokenTypes.INT, "2147483648");
+    literal.addChild(maxint);
+    termf.addChild(literal);
+
+    IrGenerator gen = IrGenerator.getInstance();
+    ASTNode node = gen.processTermF(termf, new SourceLocation(termf));
+    assertNotNull(node);
+    assertTrue(node instanceof IntNode);
+    // We cannot catch this case here; we rely upon catching it downstream
+    // by looking for positive getValue() results from inverted nodes.
+    assertEquals(-(-2147483648), ((IntNode)node).getValue());
+    assertTrue(ErrorReporting.noErrors());
+    node.accept(new IntRangeChecker());
+    assertFalse(ErrorReporting.noErrors());
+  }
+
+  /**
+   * Test that integer range checking is working correctly. (far above max)
+   */
+  public void testIntegerRangeCheckingFarAboveMaxInt() {
+    ErrorReporting.clearErrors();
+
+    AST termf = generateEmptyTermF();
+    AST literal = new CommonAST();
+    literal.initialize(DecafParserTokenTypes.INTEGER_LITERAL, "Int");
+    AST maxint = new CommonAST();
+    maxint.initialize(DecafParserTokenTypes.INT, "9147483648");
+    literal.addChild(maxint);
+    termf.addChild(literal);
+
+    IrGenerator gen = IrGenerator.getInstance();
+    ASTNode node = gen.processTermF(termf, new SourceLocation(termf));
+    assertNotNull(node);
+    assertTrue(node instanceof IntNode);
+    assertEquals(Integer.MAX_VALUE, ((IntNode)node).getValue());
+    assertFalse(ErrorReporting.noErrors());
+    ErrorReporting.clearErrors();
+    node.accept(new IntRangeChecker());
+    assertTrue(ErrorReporting.noErrors());
+  }
+
+  /**
+   * Test that integer range checking is working correctly. (far below min)
+   */
+  public void testIntegerRangeCheckingFarBelowMinInt() {
+    ErrorReporting.clearErrors();
+
+    AST termf = generateEmptyTermF();
+    AST minus = new CommonAST();
+    minus.initialize(DecafParserTokenTypes.MINUS, "-");
+    AST subtermf = generateEmptyTermF();
+    AST literal = new CommonAST();
+    literal.initialize(DecafParserTokenTypes.INTEGER_LITERAL, "Int");
+    AST minint = new CommonAST();
+    minint.initialize(DecafParserTokenTypes.INT, "9147483648");
+    literal.addChild(minint);
+    subtermf.addChild(literal);
+    termf.addChild(minus);
+    termf.addChild(subtermf);
+
+    IrGenerator gen = IrGenerator.getInstance();
+    ASTNode node = gen.processTermF(termf, new SourceLocation(minus));
+    assertNotNull(node);
+    assertTrue(node instanceof IntNode);
+    assertEquals(-Integer.MAX_VALUE, ((IntNode)node).getValue());
+    assertFalse(ErrorReporting.noErrors());
+    ErrorReporting.clearErrors();
+    node.accept(new IntRangeChecker());
+    assertTrue(ErrorReporting.noErrors());
+  }
+
+  /**
    * Verifies that stripping of empty Term' nodes is happening correctly.
    */
   public void testProcessTermStripEmptyPrimes() {
+    ErrorReporting.clearErrors();
+
     AST parent = new CommonAST();
     AST firstChild = generateEmptyTerm();
     AST secondChild = generateEmptyTermF();
@@ -57,21 +190,18 @@ public class IrGeneratorTest extends TestCase {
     parent.addChild(emptyPrime);
 
     IrGenerator gen = IrGenerator.getInstance();
-    try {
-      ASTNode node = gen.processTerm(parent, new SourceLocation(parent));
-      assertNotNull(node);
-      assert(node instanceof IntNode);
-      assertEquals(42, ((IntNode)node).getValue());
-    } catch (IrException ie) {
-      // We should never get here.
-      assert(false);
-    }
+    ASTNode node = gen.processTerm(parent, new SourceLocation(parent));
+    assertNotNull(node);
+    assert(node instanceof IntNode);
+    assertEquals(42, ((IntNode)node).getValue());
+    assert(ErrorReporting.noErrors());
   }
 
   /**
    * Verifies that arithmetic order of operations is happening correctly.
    */
   public void testOrderOfOperations() {
+    ErrorReporting.clearErrors();
     DecafScanner parse_lexer =
       new DecafScanner(new DataInputStream(
         StreamUtil.createInputStream(ARITHMETIC_PROGRAM)));
@@ -154,20 +284,18 @@ public class IrGeneratorTest extends TestCase {
                 MathOp.DIVIDE),
               MathOp.ADD),
             new MathOpNode(null,
-              new MinusNode(null,
-                new IntNode(null, 2)),
+              new IntNode(null, -2),
               new IntNode(null, 3),
               MathOp.MODULO),
             BoolOp.EQ),
           BoolOp.OR),
         secondAssignment.getValue());
-    } catch (IrException ie) {
-      assert(false);
     } catch (RecognitionException e) {
       assert(false);
     } catch (TokenStreamException e) {
       assert(false);
     }
+    assert(ErrorReporting.noErrors());
   }
 
   private static String ARITHMETIC_PROGRAM = "class Program {\n" +

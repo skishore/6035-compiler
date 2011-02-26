@@ -1,7 +1,6 @@
 package edu.mit.compilers.le02.symboltable;
 
 import edu.mit.compilers.le02.DecafType;
-import edu.mit.compilers.le02.ast.ASTNode;
 import edu.mit.compilers.le02.ast.BlockNode;
 
 public class MethodDescriptor extends TypedDescriptor {

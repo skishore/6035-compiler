@@ -1,6 +1,8 @@
 package edu.mit.compilers.le02.stgenerator;
 
 import edu.mit.compilers.le02.DecafType;
+import edu.mit.compilers.le02.ErrorReporting;
+
 import edu.mit.compilers.le02.ast.ASTNode;
 import edu.mit.compilers.le02.ast.ASTNodeVisitor;
 import edu.mit.compilers.le02.ast.ArrayDeclNode;
@@ -40,8 +42,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
   /**
    * Generates an symbol table based on an input IR.
    */
-  public static SymbolTable generateSymbolTable(ASTNode root)
-      throws SymbolTableException {
+  public static SymbolTable generateSymbolTable(ASTNode root) {
     assert(root instanceof ClassNode);
     return getInstance().createClassST((ClassNode)root);
   }
@@ -53,11 +54,11 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
    * @param root The root of our AST tree
    * @return SymbolTable The expanded SymbolTable
    */
-  public SymbolTable createClassST(ClassNode root) throws SymbolTableException {
+  public SymbolTable createClassST(ClassNode root) {
     SymbolTable st = new SymbolTable(null);
     currParent = st;
     ClassDescriptor desc = (ClassDescriptor) root.accept(this);
-    st.put(root.getName(), desc);
+    st.put(root.getName(), desc, root.getSourceLoc());
     
     // Set the descriptors for the AST
     ASTDescriptorVisitor v = new ASTDescriptorVisitor();
@@ -74,7 +75,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
     currParent = fieldSymbolTable;
     isField = true;
     for (FieldDeclNode n : node.getFields()) {
-      fieldSymbolTable.put(n.getName(), n.accept(this));
+      fieldSymbolTable.put(n.getName(), n.accept(this), n.getSourceLoc());
     }
     isField = false;
 
@@ -82,7 +83,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
     SymbolTable methodSymbolTable = new SymbolTable(fieldSymbolTable);
     currParent = methodSymbolTable;
     for (MethodDeclNode m : node.getMethods()) {
-      methodSymbolTable.put(m.getName(), m.accept(this));
+      methodSymbolTable.put(m.getName(), m.accept(this), m.getSourceLoc());
     }
     
     currParent = parent;
@@ -99,7 +100,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
     currParent = paramSymbolTable;
     isParam = true;
     for (VarDeclNode v : node.getParams()) {
-      paramSymbolTable.put(v.getName(), v.accept(this));
+      paramSymbolTable.put(v.getName(), v.accept(this), v.getSourceLoc());
     }
     isParam = false;
     
@@ -119,9 +120,9 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
     String name = node.getInit().getLoc().getName();
     
     body.accept(this);
-    body.getLocalSymbolTable().put(name, new LocalDescriptor(currParent, 
-                                                             name, 
-                                                             DecafType.INT));
+    body.getLocalSymbolTable().put(
+      name, new LocalDescriptor(currParent, name, DecafType.INT),
+      node.getInit().getLoc().getSourceLoc());
     return null;
   }
 
@@ -134,7 +135,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
     SymbolTable localSymbolTable = new SymbolTable(parent);
     currParent = localSymbolTable;
     for (VarDeclNode v : node.getDecls()) {
-      localSymbolTable.put(v.getName(), v.accept(this));
+      localSymbolTable.put(v.getName(), v.accept(this), v.getSourceLoc());
     }
 
     // Create the local symbol table for any nested blocks

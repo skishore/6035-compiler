@@ -4,6 +4,7 @@ import java.util.List;
 
 import antlr.collections.AST;
 import edu.mit.compilers.le02.DecafType;
+import edu.mit.compilers.le02.ErrorReporting;
 import edu.mit.compilers.le02.SourceLocation;
 import edu.mit.compilers.le02.ast.ASTNode;
 import edu.mit.compilers.le02.ast.ArrayDeclNode;
@@ -66,20 +67,24 @@ public class IrGenerator {
   /**
    * Generates an intermediate representation based on an input AST.
    */
-  public static ASTNode generateIR(AST root) throws IrException {
-    return getInstance().visit(root);
+  public static ASTNode generateIR(AST rootAst) {
+    ASTNode rootNode = getInstance().visit(rootAst);
+    rootNode.accept(new IntRangeChecker());
+    return rootNode;
   }
 
   /**
    * Converts a single node into our type structure.
    * @param node The raw antlr AST node.
    * @return ast_node The parsed ASTNode.
-   * @throws IrException if any errors were encountered.
    */
-  public ASTNode visit(AST node) throws IrException {
+  public ASTNode visit(AST node) {
     if (node == null) {
-      throw new IrException(new SourceLocation("<unknown>", -1, -1),
-        "Attempted to visit null node. Check if parse tree is malformed.");
+      ErrorReporting.reportError(
+        new IrException(SourceLocation.getSourceLocationWithoutDetails(),
+          "Attempted to visit null node. Check if parse tree is malformed."));
+      return new BooleanNode(
+        SourceLocation.getSourceLocationWithoutDetails(), false);
     }
 
     final SourceLocation sl = new SourceLocation(node);
@@ -234,23 +239,20 @@ public class IrGenerator {
       return new StringNode(sl, node.getFirstChild().getText());
 
      default:
-      throw new IrException(sl, "Unexpected token: " + node.getText());
+      ErrorReporting.reportError(
+        new IrException(sl, "Unexpected token: " + node.getText()));
+      return new BooleanNode(sl, false);
     }
   }
 
   /**
    * Processes a {@link DecafParserTokenTypes.PROGRAM} token.
    */
-  protected ClassNode processProgram(AST node, SourceLocation sl)
-      throws IrException {
+  protected ClassNode processProgram(AST node, SourceLocation sl) {
     // #([PROGRAM,"Prog"], n, f_accum, m_accum);
     AST name_ast = node.getFirstChild();
-    assert(name_ast != null);
-    assert(name_ast.getType() == DecafParserTokenTypes.ID);
-
     AST fields_ast = name_ast.getNextSibling();
     AST methods_ast = fields_ast.getNextSibling();
-    assert(methods_ast.getNextSibling() == null);
 
     String name = name_ast.getText();
     @SuppressWarnings("unchecked")
@@ -265,8 +267,7 @@ public class IrGenerator {
   /**
    * Processes an {@link DecafParserTokenTypes.TK_callout} token.
    */
-  protected SystemCallNode processSyscall(AST node, SourceLocation sl)
-      throws IrException {
+  protected SystemCallNode processSyscall(AST node, SourceLocation sl) {
     // #([TK_callout], cf, carg_accum);
     AST callout_target_ast = node.getFirstChild();
     AST callout_args_ast = callout_target_ast.getNextSibling();
@@ -280,8 +281,7 @@ public class IrGenerator {
   /**
    * Processes an {@link DecafParserTokenTypes.CALL_ARG} token.
    */
-  protected SyscallArgNode processSyscallArg(AST node, SourceLocation sl)
-      throws IrException {
+  protected SyscallArgNode processSyscallArg(AST node, SourceLocation sl) {
     AST call_arg = node.getFirstChild();
     SourceLocation call_arg_loc = new SourceLocation(call_arg);
     switch (call_arg.getType()) {
@@ -292,15 +292,17 @@ public class IrGenerator {
       return new SyscallArgNode(call_arg_loc,
                                  (StringNode)visit(call_arg));
      default:
-       throw new IrException(call_arg_loc, "Invalid syscall argument type");
+       ErrorReporting.reportError(
+         new IrException(call_arg_loc, "Invalid syscall argument type"));
+       return new SyscallArgNode(call_arg_loc,
+         new StringNode(call_arg_loc, "<bad>"));
     }
   }
 
   /**
    * Processes an {@link DecafParserTokenTypes.CALL} token.
    */
-  protected MethodCallNode processMethodCall(AST node, SourceLocation sl)
-      throws IrException {
+  protected MethodCallNode processMethodCall(AST node, SourceLocation sl) {
     // #([CALL,"Call"], f, carg_accum);
     AST call_target_ast = node.getFirstChild();
     AST call_args_ast = call_target_ast.getNextSibling();
@@ -322,8 +324,7 @@ public class IrGenerator {
    * the left node into the empty space reserved for it in the right node.
    * If the right node is null, composite simply returns the left node.
    */
-  protected ExpressionNode processTerm(AST node, SourceLocation sl)
-      throws IrException {
+  protected ExpressionNode processTerm(AST node, SourceLocation sl) {
     AST termChild = node.getFirstChild();
     ExpressionNode left = (ExpressionNode)visit(termChild);
     BinaryOpNode right = (BinaryOpNode)visit(termChild.getNextSibling());
@@ -339,13 +340,11 @@ public class IrGenerator {
    * We evaluate the unary expression if present, and otherwise just return
    * the recursively evaluated base literal contained within.
    */
-  protected ExpressionNode processTermF(AST node, SourceLocation sl)
-      throws IrException {
+  protected ExpressionNode processTermF(AST node, SourceLocation sl) {
     AST termChild = node.getFirstChild();
     switch (termChild.getType()) {
      case DecafParserTokenTypes.MINUS:
-      return new MinusNode(sl,
-        (ExpressionNode)visit(termChild.getNextSibling()));
+      return processMinus(termChild.getNextSibling(), sl);
      case DecafParserTokenTypes.NOT:
       return new NotNode(sl,
         (ExpressionNode)visit(termChild.getNextSibling()));
@@ -362,8 +361,9 @@ public class IrGenerator {
        // Use general parsing routines.
        return (ExpressionNode)visit(termChild);
      default:
-      throw new IrException(new SourceLocation(termChild),
-        "Unknown expression terminal " + termChild.getType());
+      ErrorReporting.reportError(new IrException(new SourceLocation(termChild),
+        "Unknown expression terminal " + termChild.getType()));
+      return new BooleanNode(sl, false);
     }
   }
 
@@ -380,8 +380,7 @@ public class IrGenerator {
    * the right operand and place it in the BinaryOpNode, and possibly
    * composite the BinaryOpNode with the chained Term' node to its right.
    */
-  protected ExpressionNode processTermPrime(AST node, SourceLocation sl)
-      throws IrException {
+  protected ExpressionNode processTermPrime(AST node, SourceLocation sl) {
     AST primeChild = node.getFirstChild();
     if (primeChild == null) {
       return null;
@@ -432,8 +431,10 @@ public class IrGenerator {
       left = new MathOpNode(sl, null, rightExpr, MathOp.MODULO);
       break;
      default:
-      throw new IrException(new SourceLocation(primeChild),
-        "Unknown binary operation " + primeChild.getText());
+      ErrorReporting.reportError(
+        new IrException(new SourceLocation(primeChild),
+          "Unknown binary operation " + primeChild.getText()));
+      return new BooleanNode(sl, false);
     }
     if (nextExpr != null && nextExpr instanceof BinaryOpNode) {
       BinaryOpNode right = (BinaryOpNode)nextExpr;
@@ -446,8 +447,7 @@ public class IrGenerator {
   /**
    * Processes a {@link DecafParserTokenTypes.ASSIGNMENT} token.
    */
-  protected AssignNode processAssignment(AST node, SourceLocation sl)
-      throws IrException {
+  protected AssignNode processAssignment(AST node, SourceLocation sl) {
     // #assignment = #([ASSIGNMENT,"Assignment"], loc, op, value)
     AST loc_ast = node.getFirstChild();
     AST op_ast = loc_ast.getNextSibling();
@@ -471,16 +471,16 @@ public class IrGenerator {
         loc_var, value, MathOp.SUBTRACT);
       return new AssignNode(sl, loc, dec_result);
      default:
-      throw new IrException(op_ast_location,
-        "Invalid assignment operation " + op_ast.getText());
+      ErrorReporting.reportError(new IrException(op_ast_location,
+        "Invalid assignment operation " + op_ast.getText()));
+      return new AssignNode(sl, loc, value);
     }
   }
 
   /**
    * Processes a {@link DecafParserTokenTypes.METHOD_DECL} token.
    */
-  protected MethodDeclNode processMethodDecl(AST node, SourceLocation sl)
-      throws IrException {
+  protected MethodDeclNode processMethodDecl(AST node, SourceLocation sl) {
     // #([METHOD_DECL,"MethodDecl"], ty, vo, name, darg_accum, body);
     // Either void or a type will be present, but not both.
     AST method_return_type_ast = node.getFirstChild();
@@ -502,8 +502,9 @@ public class IrGenerator {
       method_return_type = DecafType.VOID;
       break;
      default:
-      throw new IrException(method_return_type_loc,
-        "Invalid method return type");
+      ErrorReporting.reportError(new IrException(method_return_type_loc,
+        "Invalid method return type"));
+      method_return_type = DecafType.VOID;
     }
     String method_name = method_name_ast.getText();
     @SuppressWarnings("unchecked")
@@ -517,8 +518,7 @@ public class IrGenerator {
    * Processes a {@link DecafParserTokenTypes.LOCAL_VAR_DECL} or a
    * {@link DecafParserTokenTypes.DECLARATION_ARG} token.
    */
-  protected VarDeclNode processArgOrLocal(AST node, SourceLocation sl)
-      throws IrException {
+  protected VarDeclNode processArgOrLocal(AST node, SourceLocation sl) {
     // #([LOCAL_VAR_DECL,"VarDecl"], t, n)
     // #([DECLARATION_ARG,"Arg"], arg1t, arg1n)
     AST local_type_ast = node.getFirstChild();
@@ -535,7 +535,9 @@ public class IrGenerator {
       local_type = DecafType.INT;
       break;
      default:
-      throw new IrException(local_type_location, "Invalid array type");
+      ErrorReporting.reportError(
+        new IrException(local_type_location, "Invalid array type"));
+      local_type = DecafType.VOID;
     }
     return new VarDeclNode(sl, local_type, local_name);
   }
@@ -543,8 +545,7 @@ public class IrGenerator {
   /**
    * Processes a {@link DecafParserTokenTypes.FIELD_DECL} token.
    */
-  protected FieldDeclNode processFieldDec(AST node, SourceLocation sl)
-      throws IrException {
+  protected FieldDeclNode processFieldDec(AST node, SourceLocation sl) {
     // #([FIELD_DECL,"FieldDecl"], type, name, size)
     AST field_type_ast = node.getFirstChild();
     AST field_name_ast = field_type_ast.getNextSibling();
@@ -562,7 +563,9 @@ public class IrGenerator {
         field_type = DecafType.INT_ARRAY;
         break;
        default:
-        throw new IrException(field_type_location, "Invalid scalar type");
+        ErrorReporting.reportError(
+          new IrException(field_type_location, "Invalid scalar type"));
+        field_type = DecafType.VOID;
       }
       int array_size = ((IntNode)visit(field_size_ast)).getValue();
       return new ArrayDeclNode(
@@ -576,7 +579,9 @@ public class IrGenerator {
         field_type = DecafType.INT;
         break;
        default:
-        throw new IrException(field_type_location, "Invalid array type");
+        ErrorReporting.reportError(
+          new IrException(field_type_location, "Invalid array type"));
+        field_type = DecafType.VOID;
       }
       return new VarDeclNode(sl, field_type, field_name);
     }
@@ -585,8 +590,7 @@ public class IrGenerator {
   /**
    * Processes a {@link DecafParserTokenTypes.LOCATION} token.
    */
-  protected LocationNode processLocation(AST node, SourceLocation sl)
-      throws IrException {
+  protected LocationNode processLocation(AST node, SourceLocation sl) {
     // #([LOCATION,"Location"], n, i)
     AST location_name_ast = node.getFirstChild();
     AST location_index_ast = location_name_ast.getNextSibling();
@@ -604,36 +608,50 @@ public class IrGenerator {
   /**
    * Processes an {@link DecafParserTokenTypes.INTEGER_LITERAL} token.
    */
-  protected IntNode processInt(AST node, SourceLocation sl)
-      throws IrException {
+  protected IntNode processInt(AST node, SourceLocation sl) {
     String raw_int = node.getFirstChild().getText();
     String HEX_PREFIX = "0x";
     int HEX_RADIX = 16;
     if (raw_int.startsWith(HEX_PREFIX)) {
       try {
         return new IntNode(sl, Integer.parseInt(
-          raw_int.substring(HEX_PREFIX.length()), HEX_RADIX));
+          "-" + raw_int.substring(HEX_PREFIX.length()), HEX_RADIX), true);
       } catch (NumberFormatException nfe) {
         // Since 0x[a-fA-F0-9]+ must parse, this means we were out of range.
-        throw new IrException(sl, "Out of range");
+        ErrorReporting.reportError(
+          new IrException(sl, "Hex integer literal out of range"));
+        return new IntNode(sl, Integer.MAX_VALUE);
       }
     } else {
       try {
-        return new IntNode(sl, Integer.parseInt(raw_int));
+        return new IntNode(sl, Integer.parseInt("-" + raw_int), true);
       } catch (NumberFormatException nfe) {
         // Since [0-9]+ must parse, this means we were out of range.
-        throw new IrException(sl, "Out of range value: " + raw_int);
+        ErrorReporting.reportError(
+          new IrException(sl, "Decimal integer literal out of range"));
+        return new IntNode(sl, Integer.MAX_VALUE);
       }
     }
   }
 
   /**
+   * Processes an unary {@link DecafParserTokenTypes.MINUS} token.
+   */
+  protected ExpressionNode processMinus(AST childAst, SourceLocation sl) {
+    ExpressionNode child = (ExpressionNode)visit(childAst);
+    if (child instanceof IntNode) {
+      IntNode intChild = (IntNode)child;
+      return new IntNode(sl, -intChild.getValue());
+    } else {
+      return new MinusNode(sl, child);
+    }
+  }
+  /**
    * Converts a subtree containing {@link ASTNode} children of type T to a
    * {@link NodeList} of those children.
    */
   @SuppressWarnings("unchecked")
-  protected <T extends ASTNode> NodeList<T> convertToList(AST parent)
-      throws IrException {
+  protected <T extends ASTNode> NodeList<T> convertToList(AST parent) {
     SourceLocation sl = new SourceLocation(parent);
     NodeList<T> list = new NodeList<T>(sl);
 
@@ -647,8 +665,7 @@ public class IrGenerator {
   /**
    * Transforms ([expr]) ([null] [op] [expr]) into ([expr] [op] [expr]).
    */
-  protected ExpressionNode composite(ExpressionNode left, BinaryOpNode right)
-      throws IrException {
+  protected ExpressionNode composite(ExpressionNode left, BinaryOpNode right) {
     if (right == null) {
       return left;
     }
@@ -658,13 +675,15 @@ public class IrGenerator {
       if (prospective instanceof BinaryOpNode) {
         inner = (BinaryOpNode)prospective;
       } else {
-        throw new IrException(prospective.getSourceLoc(),
-          "Unable to composite expression into a full BinaryOpNode.");
+        ErrorReporting.reportError(new IrException(prospective.getSourceLoc(),
+          "Unable to composite expression into a full BinaryOpNode."));
+        return right;
       }
     }
     if (inner == null) {
-      throw new IrException(right.getSourceLoc(),
-        "Unable to composite expression into a full BinaryOpNode.");
+      ErrorReporting.reportError(new IrException(right.getSourceLoc(),
+        "Unable to composite expression into a full BinaryOpNode."));
+      return right;
     }
     inner.setLeft(left);
     return right;
