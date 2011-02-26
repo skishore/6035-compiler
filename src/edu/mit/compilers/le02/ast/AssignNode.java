@@ -3,6 +3,7 @@ package edu.mit.compilers.le02.ast;
 import java.util.List;
 
 import edu.mit.compilers.le02.SourceLocation;
+import edu.mit.compilers.le02.Util;
 
 public class AssignNode extends StatementNode {
   protected LocationNode loc;
@@ -17,7 +18,7 @@ public class AssignNode extends StatementNode {
 
   @Override
   public List<ASTNode> getChildren() {
-    return NodeUtil.makeChildren(loc, value);
+    return Util.makeList(loc, value);
   }
 
   public LocationNode getLoc() {

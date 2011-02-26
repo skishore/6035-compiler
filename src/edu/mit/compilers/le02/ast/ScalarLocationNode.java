@@ -28,6 +28,11 @@ public final class ScalarLocationNode extends LocationNode {
   }
 
   @Override
+  public String toString() {
+    return super.toString() + " " + type + " " + name;
+  }
+
+  @Override
   public <T> T accept(ASTNodeVisitor<T> v) { 
     return v.visit(this); 
   }

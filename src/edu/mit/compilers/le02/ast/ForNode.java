@@ -3,6 +3,7 @@ package edu.mit.compilers.le02.ast;
 import java.util.List;
 
 import edu.mit.compilers.le02.SourceLocation;
+import edu.mit.compilers.le02.Util;
 
 public final class ForNode extends StatementNode {
   private AssignNode init;
@@ -19,7 +20,7 @@ public final class ForNode extends StatementNode {
 
   @Override
   public List<ASTNode> getChildren() {
-    return NodeUtil.makeChildren(init, end, body);
+    return Util.makeList(init, end, body);
   }
 
   public AssignNode getInit() {

@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.mit.compilers.le02.SourceLocation;
+import edu.mit.compilers.le02.Util;
 
 public final class ReturnNode extends StatementNode {
   private ExpressionNode retValue;
@@ -25,7 +26,7 @@ public final class ReturnNode extends StatementNode {
     if (!hasValue) {
       return Collections.emptyList();
     }
-    return NodeUtil.makeChildren(retValue);
+    return Util.makeList((ASTNode)retValue);
   }
 
   public boolean hasValue() {

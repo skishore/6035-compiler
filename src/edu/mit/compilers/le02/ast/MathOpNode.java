@@ -1,7 +1,5 @@
 package edu.mit.compilers.le02.ast;
 
-import java.util.Arrays;
-
 import edu.mit.compilers.le02.DecafType;
 import edu.mit.compilers.le02.SourceLocation;
 
@@ -21,7 +19,7 @@ public final class MathOpNode extends BinaryOpNode {
 
   @Override
   public String toString() {
-    return op + " " + Arrays.toString(getChildren().toArray());
+    return "" + op;
   }
 
   @Override

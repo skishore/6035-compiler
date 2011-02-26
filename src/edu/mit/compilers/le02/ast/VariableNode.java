@@ -4,6 +4,7 @@ import java.util.List;
 
 import edu.mit.compilers.le02.DecafType;
 import edu.mit.compilers.le02.SourceLocation;
+import edu.mit.compilers.le02.Util;
 
 
 public final class VariableNode extends ExpressionNode {
@@ -16,7 +17,7 @@ public final class VariableNode extends ExpressionNode {
 
   @Override
   public List<ASTNode> getChildren() {
-    return NodeUtil.makeChildren(loc);
+    return Util.makeList((ASTNode)loc);
   }
 
   public void setLoc(LocationNode loc) {
