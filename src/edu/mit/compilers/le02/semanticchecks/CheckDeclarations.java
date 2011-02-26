@@ -8,6 +8,7 @@ import edu.mit.compilers.le02.ast.ASTNodeVisitor;
 import edu.mit.compilers.le02.ast.BlockNode;
 import edu.mit.compilers.le02.ast.BlockNode;
 import edu.mit.compilers.le02.ast.ClassNode;
+import edu.mit.compilers.le02.ast.ForNode;
 import edu.mit.compilers.le02.ast.MethodCallNode;
 import edu.mit.compilers.le02.ast.MethodDeclNode;
 import edu.mit.compilers.le02.ast.ScalarLocationNode;
@@ -58,6 +59,12 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
         node.getBody().accept(this);
 
         varTable = parent;
+        return true;
+    }
+
+    @Override
+    public Boolean visit(ForNode node) {
+        node.getBody().accept(this);
         return true;
     }
 
