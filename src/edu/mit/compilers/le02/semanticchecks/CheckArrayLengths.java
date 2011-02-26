@@ -32,7 +32,9 @@ public class CheckArrayLengths extends ASTNodeVisitor<Boolean> {
     @Override
     public Boolean visit(ArrayDeclNode node) {
         if (node.getLength() <= 0) {
-            ErrorReporting.reportError(new SymbolTableException(node.getSourceLoc(), "Non-positive array size"));
+            ErrorReporting.reportError(
+                new SymbolTableException(node.getSourceLoc(), 
+                "Array " + node.getName() + " has non-positive size " + node.getLength()));
         }
         return true;
     }

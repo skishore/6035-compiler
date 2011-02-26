@@ -47,7 +47,7 @@ public class CheckMain {
                         break;
                     }    
                 }
-                ErrorReporting.reportError(new SymbolTableException(sl, method));
+                ErrorReporting.reportError(new SymbolTableException(sl, message));
             }
         }
     }
