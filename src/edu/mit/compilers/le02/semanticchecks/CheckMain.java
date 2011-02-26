@@ -41,7 +41,8 @@ public class CheckMain {
                 SourceLocation sl = root.getSourceLoc();
                 for (MethodDeclNode method : ((ClassNode)root).getMethods()) {
                     if (method.getName().equals("main")) {
-                        sl = method.getSourceLoc();
+                        sl = method.getParams().get(0).getSourceLoc();
+                        break;
                     }    
                 }
                 ErrorReporting.reportError(new SymbolTableException(sl, "Main method takes parameters"));
