@@ -1,4 +1,4 @@
-<project name="Compiler" default="integration_tests" basedir=".">
+<project name="Compiler" default="jar" basedir=".">
 
   <property name="base_package_dir" value="edu/mit/compilers/le02" />
   <property name="base_package_name" value="edu.mit.compilers.le02" />
