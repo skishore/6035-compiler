@@ -1,11 +1,13 @@
 package edu.mit.compilers.le02.stgenerator;
 
+import edu.mit.compilers.le02.DecafType;
 import edu.mit.compilers.le02.ast.ASTNode;
 import edu.mit.compilers.le02.ast.ASTNodeVisitor;
 import edu.mit.compilers.le02.ast.ArrayDeclNode;
 import edu.mit.compilers.le02.ast.BlockNode;
 import edu.mit.compilers.le02.ast.ClassNode;
 import edu.mit.compilers.le02.ast.FieldDeclNode;
+import edu.mit.compilers.le02.ast.ForNode;
 import edu.mit.compilers.le02.ast.MethodDeclNode;
 import edu.mit.compilers.le02.ast.StatementNode;
 import edu.mit.compilers.le02.ast.VarDeclNode;
@@ -109,6 +111,20 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
                                 paramSymbolTable, 
                                 node.getBody());
   }
+  
+
+  @Override
+  public Descriptor visit(ForNode node) {
+    BlockNode body = node.getBody();
+    String name = node.getInit().getLoc().getName();
+    
+    body.accept(this);
+    body.getLocalSymbolTable().put(name, new LocalDescriptor(currParent, 
+                                                             name, 
+                                                             DecafType.INT));
+    return null;
+  }
+
   
   @Override
   public Descriptor visit(BlockNode node) {

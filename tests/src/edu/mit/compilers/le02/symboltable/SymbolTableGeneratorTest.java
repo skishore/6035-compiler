@@ -1,4 +1,4 @@
-package edu.mit.compliers.le02.symboltable;
+package edu.mit.compilers.le02.symboltable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,22 +7,20 @@ import java.util.List;
 import junit.framework.TestCase;
 import edu.mit.compilers.le02.DecafType;
 import edu.mit.compilers.le02.ast.ArrayDeclNode;
+import edu.mit.compilers.le02.ast.AssignNode;
 import edu.mit.compilers.le02.ast.BlockNode;
 import edu.mit.compilers.le02.ast.BreakNode;
 import edu.mit.compilers.le02.ast.ClassNode;
 import edu.mit.compilers.le02.ast.FieldDeclNode;
+import edu.mit.compilers.le02.ast.ForNode;
+import edu.mit.compilers.le02.ast.IntNode;
+import edu.mit.compilers.le02.ast.LocationNode;
 import edu.mit.compilers.le02.ast.MethodDeclNode;
+import edu.mit.compilers.le02.ast.ScalarLocationNode;
 import edu.mit.compilers.le02.ast.StatementNode;
 import edu.mit.compilers.le02.ast.VarDeclNode;
 import edu.mit.compilers.le02.stgenerator.SymbolTableException;
 import edu.mit.compilers.le02.stgenerator.SymbolTableGenerator;
-import edu.mit.compilers.le02.symboltable.ClassDescriptor;
-import edu.mit.compilers.le02.symboltable.FieldDescriptor;
-import edu.mit.compilers.le02.symboltable.LocalDescriptor;
-import edu.mit.compilers.le02.symboltable.MethodDescriptor;
-import edu.mit.compilers.le02.symboltable.ParamDescriptor;
-import edu.mit.compilers.le02.symboltable.SymbolTable;
-import edu.mit.compilers.le02.symboltable.TypedDescriptor;
 
 
 public class SymbolTableGeneratorTest extends TestCase {
@@ -153,6 +151,17 @@ public class SymbolTableGeneratorTest extends TestCase {
                     new VarDeclNode(null, DecafType.INT, "local4")
                   ),
                   emptyList(StatementNode.class)
+                ),
+                new ForNode(null,
+                  new AssignNode(null,
+                    new ScalarLocationNode(null, "forVar"),
+                    new IntNode(null, 1)
+                  ),
+                  new IntNode(null, 2),
+                  new BlockNode(null,
+                    emptyList(VarDeclNode.class),
+                    emptyList(StatementNode.class)
+                  )
                 )
               )
             )
@@ -187,6 +196,13 @@ public class SymbolTableGeneratorTest extends TestCase {
     checkTypedDesc(ld, "local3", DecafType.BOOLEAN);
     ld = (LocalDescriptor) lst.get("local4", null);
     checkTypedDesc(ld, "local4", DecafType.INT);
+
+    ForNode f = (ForNode) md.getCode().getStatements().get(2);
+    lst = f.getBody().getLocalSymbolTable();
+    assertNotNull(lst);
+    ld = (LocalDescriptor) lst.get("forVar", null);
+    checkTypedDesc(ld, "forVar", DecafType.INT);
+    
   }
   
   private void checkTypedDesc(TypedDescriptor td, String id, DecafType type) {
