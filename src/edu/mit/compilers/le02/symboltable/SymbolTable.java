@@ -37,12 +37,13 @@ public class SymbolTable {
 		}
 	}
 
-    /**
-     * Finds a descriptor and recurses upwards until found or at top
-     * @param id The id of the descriptor
-     * @param primitive Whether the string is a primitive or a method, null for either
-     * @return Returns the requested descriptor, or null if not found
-     */
+/**
+ * Finds a descriptor and recurses upwards until found or at top
+ * 
+ * @param id The id of the descriptor
+ * @param primitive Whether the string is a primitive or a method, null for either
+ * @return Returns the requested descriptor, or null if not found
+ */
 	public Descriptor get(String id, Boolean primitive) {
 		Descriptor d;
 		SymbolTable st = this;
