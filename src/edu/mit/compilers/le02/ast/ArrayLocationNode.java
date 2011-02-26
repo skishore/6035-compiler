@@ -3,6 +3,7 @@ package edu.mit.compilers.le02.ast;
 import java.util.List;
 
 import edu.mit.compilers.le02.SourceLocation;
+import edu.mit.compilers.le02.Util;
 
 public final class ArrayLocationNode extends LocationNode {
   private ExpressionNode index;
@@ -15,7 +16,7 @@ public final class ArrayLocationNode extends LocationNode {
 
   @Override
   public List<ASTNode> getChildren() {
-    return NodeUtil.makeChildren(index);
+    return Util.makeList((ASTNode)index);
   }
 
   public void setIndex(ExpressionNode index) {

@@ -3,6 +3,7 @@ package edu.mit.compilers.le02.ast;
 import java.util.List;
 
 import edu.mit.compilers.le02.SourceLocation;
+import edu.mit.compilers.le02.Util;
 
 public abstract class BinaryOpNode extends ExpressionNode {
   protected ExpressionNode left, right;
@@ -20,7 +21,7 @@ public abstract class BinaryOpNode extends ExpressionNode {
 
   @Override
   public List<ASTNode> getChildren() {
-    return NodeUtil.makeChildren(left, right);
+    return Util.makeList((ASTNode)left, right);
   }
 
   public ExpressionNode getLeft() {
