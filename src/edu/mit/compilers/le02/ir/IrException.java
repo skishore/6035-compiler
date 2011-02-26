@@ -1,21 +1,19 @@
 package edu.mit.compilers.le02.ir;
 
+import edu.mit.compilers.le02.CompilerException;
 import edu.mit.compilers.le02.SourceLocation;
 
-public class IrException extends Exception {
-
-  private SourceLocation loc;
-
-  public IrException(SourceLocation location) {
-    loc = location;
+public class IrException extends CompilerException {
+  public IrException(SourceLocation loc) {
+    super(loc);
   }
-  public IrException(SourceLocation location, String msg) {
-    super(msg);
-    loc = location;
+  public IrException(SourceLocation loc, String text) {
+    super(loc, text);
   }
-
-  @Override
-  public String getMessage() {
-    return super.getMessage() + " at " + loc;
+  public IrException(int line, int col, String msg) {
+    super(line, col, msg);
+  }
+  public IrException(int line, int col) {
+    super(line, col);
   }
 }

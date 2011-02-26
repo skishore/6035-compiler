@@ -2,7 +2,8 @@
 
 runscanner() {
   cd `dirname $1`;
-  java -jar `dirname $0`/../../dist/Compiler.jar -target scan `basename $1`
+  java -jar `dirname $0`/../../dist/Compiler.jar \
+    -target scan -compat `basename $1`
 }
 
 fail=0

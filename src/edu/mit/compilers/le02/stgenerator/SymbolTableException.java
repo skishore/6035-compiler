@@ -1,21 +1,21 @@
 package edu.mit.compilers.le02.stgenerator;
 
+import edu.mit.compilers.le02.CompilerException;
 import edu.mit.compilers.le02.SourceLocation;
 
-public class SymbolTableException extends Exception {
+public class SymbolTableException extends CompilerException {
 
-  private SourceLocation loc;
-
-  public SymbolTableException(SourceLocation location) {
-    loc = location;
+  public SymbolTableException(int line, int col, String msg) {
+    super(line, col, msg);
+  }
+  public SymbolTableException(int line, int col) {
+    super(line, col);
   }
   public SymbolTableException(SourceLocation location, String msg) {
-    super(msg);
-    loc = location;
+    super(location, msg);
+  }
+  public SymbolTableException(SourceLocation location) {
+    super(location);
   }
 
-  @Override
-  public String getMessage() {
-    return super.getMessage() + " at " + loc;
-  }
 }

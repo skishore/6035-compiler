@@ -13,6 +13,7 @@ import antlr.ASTFactory;
 import antlr.CharStreamException;
 import antlr.DumpASTVisitor;
 import antlr.Token;
+import antlr.TokenStreamRecognitionException;
 import antlr.debug.misc.ASTFrame;
 import edu.mit.compilers.le02.ast.ASTNode;
 import edu.mit.compilers.le02.grammar.DecafParser;
@@ -20,11 +21,11 @@ import edu.mit.compilers.le02.grammar.DecafParserTokenTypes;
 import edu.mit.compilers.le02.grammar.DecafScanner;
 import edu.mit.compilers.le02.grammar.DecafScannerTokenTypes;
 import edu.mit.compilers.le02.grammar.LineNumberedAST;
-import edu.mit.compilers.le02.ir.IrException;
+import edu.mit.compilers.le02.grammar.ScanException;
 import edu.mit.compilers.le02.ir.IrGenerator;
-import edu.mit.compilers.le02.stgenerator.SymbolTableException;
 import edu.mit.compilers.le02.stgenerator.SymbolTableGenerator;
 import edu.mit.compilers.le02.symboltable.SymbolTable;
+import edu.mit.compilers.le02.semanticchecks.MasterChecker;
 import edu.mit.compilers.tools.CLI;
 
 /**
@@ -85,42 +86,35 @@ public class Main {
         inputStream = new FileInputStream(CLI.infile);
       } catch (IOException e) {
         // print the error:
-        reportError(e);
+        ErrorReporting.reportErrorCompat(e);
         System.exit(ReturnCode.FILE_NOT_FOUND.numericCode());
       }
     }
 
     switch (CLI.target) {
      case SCAN:
-      if (!runScanner(inputStream)) {
+      if (!runScanner(inputStream) || !ErrorReporting.noErrors()) {
         retCode = ReturnCode.SCAN_FAILED;
       }
       break;
      case PARSE:
-      if (!runParser(inputStream)) {
+      if (!runParser(inputStream) || !ErrorReporting.noErrors()) {
         retCode = ReturnCode.PARSE_FAILED;
       }
       break;
      case INTER:
      case DEFAULT:
-      if (!generateIR(inputStream)) {
+      if (!generateIR(inputStream) || !ErrorReporting.noErrors()) {
         retCode = ReturnCode.SEMANTICS_FAILED;
       }
       break;
      default:
       retCode = ReturnCode.NO_SUCH_ACTION;
-      reportError(new NoSuchMethodException(
+      ErrorReporting.reportErrorCompat(new NoSuchMethodException(
         "Action " + CLI.target + " not yet implemented."));
     }
+    ErrorReporting.printErrors(System.err);
     System.exit(retCode.numericCode());
-  }
-
-  /**
-   * Utility method to pretty-print an exception along with the corresponding
-   * file name.
-   */
-  protected static void reportError (Exception e) {
-    System.out.println(CLI.getInputFilename() + " " + e);
   }
 
   /**
@@ -136,6 +130,9 @@ public class Main {
 
     // If debug mode is set, enable tracing in the scanner.
     scanner.setTrace(CLI.debug);
+    if (!CLI.compat) { 
+      scanner.setFilename(CLI.infile);
+    }
 
     Token token;
     boolean done = false;
@@ -171,11 +168,25 @@ public class Main {
       } catch (ANTLRException e) {
         // Print the error and continue by discarding the invalid token.
         // We hope that this gets us onto the right track again.
-        reportError(e);
+        if (CLI.compat) {
+          ErrorReporting.reportErrorCompat(e);
+        } else {
+          System.out.println(e);
+          if (e instanceof TokenStreamRecognitionException) {
+            ErrorReporting.reportError(
+              new ScanException((TokenStreamRecognitionException)e));
+          } else {
+            ErrorReporting.reportError(new ScanException(e.getMessage()));
+          }
+        }
         try {
           scanner.consume();
         } catch (CharStreamException cse) {
-          reportError(cse);
+          if (CLI.compat) {
+            ErrorReporting.reportErrorCompat(cse);
+          } else {
+            ErrorReporting.reportError(new ScanException(cse.getMessage()));
+          }
         }
         success = false;
       }
@@ -239,7 +250,7 @@ public class Main {
         success = false;
       }
     } catch (ANTLRException e) {
-      reportError(e);
+      ErrorReporting.reportErrorCompat(e);
       success = false;
     }
     return success;
@@ -276,24 +287,16 @@ public class Main {
 
       ASTNode parent = IrGenerator.generateIR(parser.getAST());
       SymbolTable st = SymbolTableGenerator.generateSymbolTable(parent);
-      
+      MasterChecker.checkAll(parent);
+
       if (CLI.debug) {
         System.out.println(parent);
       }
     } catch (ANTLRException e) {
-      reportError(e);
-      success = false;
-    } catch (IrException ire) {
-      // Don't use reportError since IrExceptions know the filename and
-      // already know how to pretty-print, unlike antlr exceptions.
-      System.out.println(ire);
-      ire.printStackTrace(System.out);
-      success = false;
-    } catch (SymbolTableException ste) {
-      System.out.println(ste);
-      ste.printStackTrace(System.out);
+      ErrorReporting.reportErrorCompat(e);
       success = false;
     }
     return success;
   }
+
 }

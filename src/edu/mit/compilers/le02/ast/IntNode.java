@@ -6,13 +6,23 @@ import java.util.List;
 import edu.mit.compilers.le02.DecafType;
 import edu.mit.compilers.le02.SourceLocation;
 
-
+/**
+ * Stores an integer. We initially store the inverse of the value since we
+ * need to store input values of [0,2^31]. We then later verify that any
+ * values of 2^31 (outside the range) were in fact inverted to -2^31.
+ * Any values of 2^31 that are left outstanding need to be marked invalid.
+ */
 public final class IntNode extends ExpressionNode {
   private int value;
+  private boolean invert;
 
   public IntNode(SourceLocation sl, int value) {
+    this(sl, value, false);
+  }
+  public IntNode(SourceLocation sl, int value, boolean invert) {
     super(sl);
     this.value = value;
+    this.invert = invert;
   }
 
   @Override
@@ -21,12 +31,16 @@ public final class IntNode extends ExpressionNode {
   }
 
   public int getValue() {
-    return value;
+    if (invert == true) {
+      return -value;
+    } else {
+      return value;
+    }
   }
 
   @Override
   public String toString() {
-    return "" + value;
+    return "" + getValue();
   }
 
   @Override
@@ -34,7 +48,11 @@ public final class IntNode extends ExpressionNode {
     if (!(o instanceof IntNode)) {
       return false;
     }
-    return value == ((IntNode)o).getValue();
+    return getValue() == ((IntNode)o).getValue();
+  }
+
+  public boolean isInverted() {
+    return invert;
   }
 
   @Override

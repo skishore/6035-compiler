@@ -77,6 +77,17 @@ public class CLI {
   public static boolean graphics;
 
   /**
+   * Whether to return behavior compatible with the provided scanner testcases
+   * rather than the friendlier format from the new error reporting system. 
+   */
+  public static boolean compat;
+
+  /**
+   * The static constant string displayed for stdin as a file.
+   */
+  public static String STDIN = "<stdin>";
+
+  /**
    * Sets up default values for all of the
    * result fields.  Specifically, sets the input and output files
    * to null, the target to DEFAULT, and the extras and extraopts
@@ -97,7 +108,7 @@ public class CLI {
     if (infile != null) {
       return infile;
     } else {
-      return "<stdin>";
+      return STDIN;
     }
   }
 
@@ -133,10 +144,13 @@ public class CLI {
         context = 0;
         debug = true;
         continue;
-      }
-      if (args[i].equals("-graphics")) {
+      } else if (args[i].equals("-graphics")) {
         context = 0;
         graphics = true;
+        continue;
+      } else if (args[i].equals("-compat")) {
+        context = 0;
+        compat = true;
         continue;
       } else if (args[i].equals("-opt")) {
         context = 1;

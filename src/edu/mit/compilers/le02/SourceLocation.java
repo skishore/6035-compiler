@@ -27,6 +27,10 @@ public final class SourceLocation {
     this.col = col;
   }
 
+  public static SourceLocation getSourceLocationWithoutDetails() {
+    return new SourceLocation(CLI.getInputFilename(), -1, -1);
+  }
+
   /**
    * Utility method used to create a SourceLocation from an Antlr AST node.
    */

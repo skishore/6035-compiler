@@ -1,4 +1,7 @@
-header {package edu.mit.compilers.le02.grammar;}
+header {
+package edu.mit.compilers.le02.grammar;
+import edu.mit.compilers.le02.ErrorReporting;
+}
 
 options
 {
@@ -47,29 +50,17 @@ tokens
 {
   // Do our own reporting of errors so the parser can return a non-zero status
   // if any errors are detected.
-  // TODO(lizfong): don't use native error reporting, and instead collect the
-  // errors into an ArrayList so they can be pretty-printed along the lines of
-  // the clang/llvm frontend or
-  // http://www.milk.com/kodebase/antlr-tutorial/ErrorFormatter.java
-
   /** Reports if any errors were reported during parse. */
   private boolean error;
 
   @Override
   public void reportError (RecognitionException ex) {
-    super.reportError(ex);
-    if (ex instanceof MismatchedTokenException) {
-      MismatchedTokenException mte = (MismatchedTokenException)ex;
-      if (mte.token.getText() == null) {
-        System.err.println(" Previous error indicates unexpected EOF found.");
-      }
-    }
-
+    ErrorReporting.reportError(new ParseException(ex));
     error = true;
   }
   @Override
   public void reportError (String s) {
-    super.reportError(s);
+    ErrorReporting.reportError(new ParseException(s));
     error = true;
   }
   public boolean getError () {
