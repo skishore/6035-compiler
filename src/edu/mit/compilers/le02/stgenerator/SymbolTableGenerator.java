@@ -2,9 +2,12 @@ package edu.mit.compilers.le02.stgenerator;
 
 import edu.mit.compilers.le02.ast.ASTNode;
 import edu.mit.compilers.le02.ast.ASTNodeVisitor;
+import edu.mit.compilers.le02.ast.ArrayDeclNode;
+import edu.mit.compilers.le02.ast.BlockNode;
 import edu.mit.compilers.le02.ast.ClassNode;
 import edu.mit.compilers.le02.ast.FieldDeclNode;
 import edu.mit.compilers.le02.ast.MethodDeclNode;
+import edu.mit.compilers.le02.ast.StatementNode;
 import edu.mit.compilers.le02.ast.VarDeclNode;
 import edu.mit.compilers.le02.symboltable.ClassDescriptor;
 import edu.mit.compilers.le02.symboltable.Descriptor;
@@ -51,11 +54,17 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
   public SymbolTable createClassST(ClassNode root) throws SymbolTableException {
     SymbolTable st = new SymbolTable(null);
     currParent = st;
-    st.put(root.getName(), this.accept(root), root.getSourceLoc());
+    ClassDescriptor desc = (ClassDescriptor) root.accept(this);
+    st.put(root.getName(), desc);
+    
+    // Set the descriptors for the AST
+    ASTDescriptorVisitor v = new ASTDescriptorVisitor();
+    v.setASTDescriptors(root, desc);
     return st;
   }
   
-  public Descriptor accept(ClassNode node) throws SymbolTableException {
+  @Override
+  public Descriptor visit(ClassNode node) throws SymbolTableException {
     SymbolTable parent = currParent;
 
     // Create and fill fieldSymbolTable
@@ -79,7 +88,8 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
                                methodSymbolTable);
   }
 
-  public Descriptor accept(MethodDeclNode node) throws SymbolTableException {
+  @Override
+  public Descriptor visit(MethodDeclNode node) throws SymbolTableException {
     SymbolTable parent = currParent;
 
     // Create and fill paramSymbolTable
@@ -89,26 +99,45 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
     for (VarDeclNode v : node.getParams()) {
       paramSymbolTable.put(v.getName(), this.accept(v), v.getSourceLoc());
     }
-
-    // Create and fill localSymbolTable
-    SymbolTable localSymbolTable = new SymbolTable(paramSymbolTable);
-    currParent = localSymbolTable;
     isParam = false;
-    for (VarDeclNode v : node.getBody().getDecls()) {
-      localSymbolTable.put(v.getName(), this.accept(v), v.getSourceLoc());
-    }
+    
+    // Create the local table for this block (and any nested blocks)
+    node.getBody().accept(this);
     
     currParent = parent;
     return new MethodDescriptor(parent, node.getName(), node.getType(),
-                                localSymbolTable, paramSymbolTable, 
+                                paramSymbolTable, 
                                 node.getBody());
   }
   
-  public Descriptor accept(FieldDeclNode node) throws SymbolTableException {
+  @Override
+  public Descriptor visit(BlockNode node) throws SymbolTableException {
+    SymbolTable parent = new SymbolTable(currParent);
+    
+    // Create and fill localSymbolTable
+    SymbolTable localSymbolTable = new SymbolTable(parent);
+    currParent = localSymbolTable;
+    for (VarDeclNode v : node.getDecls()) {
+      localSymbolTable.put(v.getName(), v.accept(this));
+    }
+
+    // Create the local symbol table for any nested blocks
+    for (StatementNode s : node.getStatements()) {
+      s.accept(this);
+    }
+    
+    currParent = parent;
+    node.setLocalSymbolTable(localSymbolTable);
+    return null;
+  }
+  
+  @Override
+  public Descriptor visit(ArrayDeclNode node) {
     return new FieldDescriptor(currParent, node.getName(), node.getType());
   }
 
-  public Descriptor accept(VarDeclNode node) throws SymbolTableException {
+  @Override
+  public Descriptor visit(VarDeclNode node) {
     if (isField) {
       return new FieldDescriptor(currParent, node.getName(), node.getType());
     }

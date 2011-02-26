@@ -2,8 +2,10 @@ package edu.mit.compilers.le02.ir;
 
 import java.util.List;
 
+import antlr.collections.AST;
 import edu.mit.compilers.le02.DecafType;
 import edu.mit.compilers.le02.SourceLocation;
+import edu.mit.compilers.le02.ast.ASTNode;
 import edu.mit.compilers.le02.ast.ArrayDeclNode;
 import edu.mit.compilers.le02.ast.ArrayLocationNode;
 import edu.mit.compilers.le02.ast.AssignNode;
@@ -37,12 +39,10 @@ import edu.mit.compilers.le02.ast.SyscallArgNode;
 import edu.mit.compilers.le02.ast.SystemCallNode;
 import edu.mit.compilers.le02.ast.VarDeclNode;
 import edu.mit.compilers.le02.ast.VariableNode;
-import edu.mit.compilers.le02.grammar.DecafParserTokenTypes;
-import edu.mit.compilers.le02.ast.ASTNode;
 import edu.mit.compilers.le02.ast.BoolOpNode.BoolOp;
 import edu.mit.compilers.le02.ast.MathOpNode.MathOp;
+import edu.mit.compilers.le02.grammar.DecafParserTokenTypes;
 import edu.mit.compilers.tools.CLI;
-import antlr.collections.AST;
 
 /**
  * Populates an {@link ASTNode} structure from an antlr AST tree.

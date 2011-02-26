@@ -1,7 +1,6 @@
 package edu.mit.compilers.le02.ast;
 
 import java.util.ArrayList;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -21,6 +20,7 @@ public class NodeList<T extends ASTNode> extends ASTNode implements List<T> {
     super(loc);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public List<ASTNode> getChildren() {
     return (List<ASTNode>)this;
