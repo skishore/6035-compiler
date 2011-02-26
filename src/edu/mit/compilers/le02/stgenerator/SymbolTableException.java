@@ -1,9 +1,9 @@
 package edu.mit.compilers.le02.stgenerator;
 
-import edu.mit.compilers.le02.CompilerException;
+import edu.mit.compilers.le02.semanticchecks.SemanticException;
 import edu.mit.compilers.le02.SourceLocation;
 
-public class SymbolTableException extends CompilerException {
+public class SymbolTableException extends SemanticException {
 
   public SymbolTableException(int line, int col, String msg) {
     super(line, col, msg);

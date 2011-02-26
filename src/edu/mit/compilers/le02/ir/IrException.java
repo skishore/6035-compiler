@@ -1,9 +1,9 @@
 package edu.mit.compilers.le02.ir;
 
-import edu.mit.compilers.le02.CompilerException;
+import edu.mit.compilers.le02.semanticchecks.SemanticException;
 import edu.mit.compilers.le02.SourceLocation;
 
-public class IrException extends CompilerException {
+public class IrException extends SemanticException {
   public IrException(SourceLocation loc) {
     super(loc);
   }
