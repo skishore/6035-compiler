@@ -22,5 +22,6 @@ public class MasterChecker {
     public static void checkAll(ASTNode root) {
         CheckDeclarations.check(root);
         CheckMain.check(root);
+        CheckArrayLengths.check(root);
     }
 }

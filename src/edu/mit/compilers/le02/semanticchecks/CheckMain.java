@@ -2,15 +2,12 @@ package edu.mit.compilers.le02.semanticchecks;
 
 import edu.mit.compilers.le02.DecafType;
 import edu.mit.compilers.le02.ErrorReporting;
+import edu.mit.compilers.le02.SourceLocation;
 import edu.mit.compilers.le02.ast.ArrayLocationNode;
 import edu.mit.compilers.le02.ast.ASTNode;
 import edu.mit.compilers.le02.ast.ASTNodeVisitor;
-import edu.mit.compilers.le02.ast.BlockNode;
-import edu.mit.compilers.le02.ast.BlockNode;
 import edu.mit.compilers.le02.ast.ClassNode;
-import edu.mit.compilers.le02.ast.MethodCallNode;
 import edu.mit.compilers.le02.ast.MethodDeclNode;
-import edu.mit.compilers.le02.ast.ScalarLocationNode;
 import edu.mit.compilers.le02.stgenerator.SymbolTableException;
 import edu.mit.compilers.le02.symboltable.MethodDescriptor;
 import edu.mit.compilers.le02.symboltable.SymbolTable;
@@ -41,7 +38,16 @@ public class CheckMain {
         } else {
             MethodDescriptor mainDesc = (MethodDescriptor)(methodTable.getMap().get("main"));
             if (mainDesc.getParamSymbolTable().getMap().size() > 0) {
-                ErrorReporting.reportError(new SymbolTableException(root.getSourceLoc(), "Main method takes parameters"));
+                SourceLocation sl = root.getSourceLoc();
+                String message = "Main method takes a parameter";
+                for (MethodDeclNode method : ((ClassNode)root).getMethods()) {
+                    if (method.getName().equals("main")) {
+                        sl = method.getParams().get(0).getSourceLoc();
+                        message += " " + method.getParams().get(0).getName();
+                        break;
+                    }    
+                }
+                ErrorReporting.reportError(new SymbolTableException(sl, message));
             }
         }
     }
