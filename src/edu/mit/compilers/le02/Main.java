@@ -2,6 +2,7 @@
 // All rights reserved.
 
 package edu.mit.compilers.le02;
+
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;

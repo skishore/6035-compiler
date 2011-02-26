@@ -11,7 +11,7 @@ public abstract class ASTNodeVisitor<T> {
     }
   }
 
-  /**
+  /*
    * Default behavior is to visit all nodes, but do nothing at each.
    * This way you only need to override the ones you care about to make
    * a new visitor.

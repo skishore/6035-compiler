@@ -6,6 +6,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 import edu.mit.compilers.le02.DecafType;
+import edu.mit.compilers.le02.Util;
 import edu.mit.compilers.le02.ast.ArrayDeclNode;
 import edu.mit.compilers.le02.ast.AssignNode;
 import edu.mit.compilers.le02.ast.BlockNode;
@@ -31,28 +32,15 @@ public class SymbolTableGeneratorTest extends TestCase {
     stg = SymbolTableGenerator.getInstance();
   }
 
-  private <T> List<T> makeList(T... args) {
-    ArrayList<T> list = new ArrayList<T>();
-    for (T t : args) {
-      list.add(t);
-    }
-    return list;
-  }
-
-  private <T> List<T> emptyList(Class<T> T) {
-    List<T> list = Collections.emptyList(); 
-    return list;
-  }
-
   public void testFields() {
     ClassNode ast = 
       new ClassNode(null, "Program",
-        makeList(
+        Util.makeList(
           new ArrayDeclNode(null, DecafType.INT_ARRAY, "array1", 10),
           new VarDeclNode(null, DecafType.INT, "var1"),
           new ArrayDeclNode(null, DecafType.BOOLEAN_ARRAY, "array2", 20),
           new VarDeclNode(null, DecafType.BOOLEAN, "var2")),        
-        emptyList(MethodDeclNode.class)
+        Util.emptyList(MethodDeclNode.class)
       );
     
     SymbolTable st = null;
@@ -60,6 +48,7 @@ public class SymbolTableGeneratorTest extends TestCase {
       st = SymbolTableGenerator.generateSymbolTable(ast);
     } catch (SymbolTableException e) {
       e.printStackTrace();
+      assertTrue(false);
     }
     
     assertNotNull(st);
@@ -82,17 +71,17 @@ public class SymbolTableGeneratorTest extends TestCase {
   public void testMethod() {
     ClassNode ast = 
       new ClassNode(null, "Program",
-        emptyList(FieldDeclNode.class),
-        makeList(
+        Util.emptyList(FieldDeclNode.class),
+        Util.makeList(
           new MethodDeclNode(null, DecafType.INT, "method1",
-            makeList(
+            Util.makeList(
               new VarDeclNode(null, DecafType.INT, "param1"),
               new VarDeclNode(null, DecafType.BOOLEAN, "param2")),
             new BlockNode(null, 
-              makeList(
+              Util.makeList(
                 new VarDeclNode(null, DecafType.BOOLEAN, "local1"),
                 new VarDeclNode(null, DecafType.INT, "local2")),
-              emptyList(StatementNode.class)
+              Util.emptyList(StatementNode.class)
             )
           )
         )
@@ -103,6 +92,7 @@ public class SymbolTableGeneratorTest extends TestCase {
       st = SymbolTableGenerator.generateSymbolTable(ast);
     } catch (SymbolTableException e) {
       e.printStackTrace();
+      assertTrue(false);
     }
     
     assertNotNull(st);
@@ -135,22 +125,22 @@ public class SymbolTableGeneratorTest extends TestCase {
   public void testBlocks() {
     ClassNode ast = 
       new ClassNode(null, "Program",
-        emptyList(FieldDeclNode.class),
-        makeList(
+        Util.emptyList(FieldDeclNode.class),
+        Util.makeList(
           new MethodDeclNode(null, DecafType.INT, "method1",
-            emptyList(VarDeclNode.class),
+            Util.emptyList(VarDeclNode.class),
             new BlockNode(null, 
-              makeList(
+              Util.makeList(
                 new VarDeclNode(null, DecafType.BOOLEAN, "local1"),
                 new VarDeclNode(null, DecafType.INT, "local2")),
-              makeList(
+              Util.makeList(
                 new BreakNode(null),
                 new BlockNode(null,
-                  makeList(
+                  Util.makeList(
                     new VarDeclNode(null, DecafType.BOOLEAN, "local3"),
                     new VarDeclNode(null, DecafType.INT, "local4")
                   ),
-                  emptyList(StatementNode.class)
+                  Util.emptyList(StatementNode.class)
                 ),
                 new ForNode(null,
                   new AssignNode(null,
@@ -159,8 +149,8 @@ public class SymbolTableGeneratorTest extends TestCase {
                   ),
                   new IntNode(null, 2),
                   new BlockNode(null,
-                    emptyList(VarDeclNode.class),
-                    emptyList(StatementNode.class)
+                    Util.emptyList(VarDeclNode.class),
+                    Util.emptyList(StatementNode.class)
                   )
                 )
               )
@@ -174,6 +164,7 @@ public class SymbolTableGeneratorTest extends TestCase {
       st = SymbolTableGenerator.generateSymbolTable(ast);
     } catch (SymbolTableException e) {
       e.printStackTrace();
+      assertTrue(false);
     }
     
     assertNotNull(st);
