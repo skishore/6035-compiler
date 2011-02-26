@@ -1,19 +1,17 @@
 package edu.mit.compilers.le02.semanticchecks;
 
-import edu.mit.compilers.le02.ErrorReporting;
 import edu.mit.compilers.le02.DecafType;
-import edu.mit.compilers.le02.stgenerator.SymbolTableException;
+import edu.mit.compilers.le02.ErrorReporting;
+import edu.mit.compilers.le02.ast.ArrayLocationNode;
 import edu.mit.compilers.le02.ast.ASTNode;
 import edu.mit.compilers.le02.ast.ASTNodeVisitor;
-
-import edu.mit.compilers.le02.ast.ArrayLocationNode;
 import edu.mit.compilers.le02.ast.BlockNode;
 import edu.mit.compilers.le02.ast.BlockNode;
 import edu.mit.compilers.le02.ast.ClassNode;
 import edu.mit.compilers.le02.ast.MethodCallNode;
 import edu.mit.compilers.le02.ast.MethodDeclNode;
 import edu.mit.compilers.le02.ast.ScalarLocationNode;
-
+import edu.mit.compilers.le02.stgenerator.SymbolTableException;
 import edu.mit.compilers.le02.symboltable.MethodDescriptor;
 import edu.mit.compilers.le02.symboltable.SymbolTable;
 
@@ -83,7 +81,9 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
             search = search.getParent();
         }
         if (search == null) {
-            ErrorReporting.reportError(new SymbolTableException(node.getSourceLoc(), "Undeclared variable " + node.getName()));
+            ErrorReporting.reportError(
+                new SymbolTableException(node.getSourceLoc(),
+                "Undeclared variable " + node.getName()));
         }
 
         for (ASTNode child : node.getChildren()) {
@@ -100,7 +100,9 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
             search = search.getParent();
         }
         if (search == null) {
-            ErrorReporting.reportError(new SymbolTableException(node.getSourceLoc(), "Undeclared variable " + node.getName()));
+            ErrorReporting.reportError(
+                new SymbolTableException(node.getSourceLoc(), 
+                "Undeclared variable " + node.getName()));
         }
 
         return true;
@@ -109,7 +111,9 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
     @Override
     public Boolean visit(MethodCallNode node) {
         if (!methodTable.contains(node.getName())) {
-            ErrorReporting.reportError(new SymbolTableException(node.getSourceLoc(), "Undeclared method " + node.getName()));
+            ErrorReporting.reportError(
+                new SymbolTableException(node.getSourceLoc(),
+                "Undeclared method " + node.getName()));
         }
 
         for (ASTNode child : node.getChildren()) {
