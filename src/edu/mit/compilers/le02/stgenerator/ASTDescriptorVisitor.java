@@ -1,6 +1,7 @@
 package edu.mit.compilers.le02.stgenerator;
 
 import edu.mit.compilers.le02.symboltable.TypedDescriptor;
+import edu.mit.compilers.le02.ast.ASTNode;
 import edu.mit.compilers.le02.ast.ASTNodeVisitor;
 import edu.mit.compilers.le02.ast.ArrayLocationNode;
 import edu.mit.compilers.le02.ast.BlockNode;
@@ -23,14 +24,17 @@ public final class ASTDescriptorVisitor extends ASTNodeVisitor<Object> {
   public void setASTDescriptors(ClassNode node, ClassDescriptor desc) {
     currST = desc.getMethodSymbolTable();
     node.setDesc(desc);
+    for (ASTNode child : node.getChildren()) {
+        child.accept(this);
+    }
   }
 
   @Override
   public Object visit(BlockNode node) {
     SymbolTable last = currST;
     currST = node.getLocalSymbolTable();
-    for (StatementNode s : node.getStatements()) {
-      s.accept(this);
+    for (ASTNode child : node.getChildren()) {
+        child.accept(this);
     }
     currST = last;
     return null;
@@ -39,18 +43,27 @@ public final class ASTDescriptorVisitor extends ASTNodeVisitor<Object> {
   @Override
   public Object visit(MethodCallNode node) {
     node.setDesc((MethodDescriptor) currST.get(node.getName(), false));
+    for (ASTNode child : node.getChildren()) {
+        child.accept(this);
+    }
     return null;
   }
   
   @Override
   public Object visit(ScalarLocationNode node) {
     node.setDesc((TypedDescriptor) currST.get(node.getName(), true));
+    for (ASTNode child : node.getChildren()) {
+        child.accept(this);
+    }
     return null;
   }
 
   @Override
   public Object visit(ArrayLocationNode node) {
     node.setDesc((TypedDescriptor) currST.get(node.getName(), true));
+    for (ASTNode child : node.getChildren()) {
+        child.accept(this);
+    }
     return null;
   }
 
