@@ -29,7 +29,7 @@ public final class ArrayLocationNode extends LocationNode {
 
   @Override
   public String toString() {
-    return super.toString() + " " + type + " " + name + "[" + index + "]";
+    return super.toString() + " " + getType() + " " + name + "[" + index + "]";
   }
 
   @Override
@@ -42,7 +42,7 @@ public final class ArrayLocationNode extends LocationNode {
     }
     ArrayLocationNode other = (ArrayLocationNode)o;
     return (name.equals(other.getName()) &&
-            type.equals(other.getType()) &&
+            getType().equals(other.getType()) &&
             index.equals(other.getIndex()));
   }
 }

@@ -7,7 +7,6 @@ import edu.mit.compilers.le02.symboltable.TypedDescriptor;
 
 
 public abstract class LocationNode extends ASTNode {
-  protected DecafType type;
   protected String name;
   protected TypedDescriptor desc;
 

@@ -24,12 +24,12 @@ public final class ScalarLocationNode extends LocationNode {
     }
     ScalarLocationNode other = (ScalarLocationNode)o;
     return (name.equals(other.getName()) &&
-            type.equals(other.getType()));
+            getType().equals(other.getType()));
   }
 
   @Override
   public String toString() {
-    return super.toString() + " " + type + " " + name;
+    return super.toString() + " " + getType() + " " + name;
   }
 
   @Override
