@@ -20,6 +20,7 @@ public class MasterChecker {
      * Runs all currently implemented semantic checks. 
      */
     public static void checkAll(ASTNode root) {
-        CheckDeclarations.checkDeclarations(root);
+        CheckDeclarations.check(root);
+        CheckMain.check(root);
     }
 }

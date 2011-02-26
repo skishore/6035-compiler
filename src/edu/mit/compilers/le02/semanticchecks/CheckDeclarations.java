@@ -35,7 +35,7 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
     /**
      * Checks that every identifier is declared before it is used.
      */
-    public static void checkDeclarations(ASTNode root) {
+    public static void check(ASTNode root) {
         assert(root instanceof ClassNode);
         root.accept(getInstance());
     }
