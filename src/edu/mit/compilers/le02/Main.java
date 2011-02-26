@@ -23,7 +23,6 @@ import edu.mit.compilers.le02.grammar.DecafScanner;
 import edu.mit.compilers.le02.grammar.DecafScannerTokenTypes;
 import edu.mit.compilers.le02.grammar.LineNumberedAST;
 import edu.mit.compilers.le02.grammar.ScanException;
-import edu.mit.compilers.le02.ir.IntRangeChecker;
 import edu.mit.compilers.le02.ir.IrGenerator;
 import edu.mit.compilers.le02.stgenerator.SymbolTableException;
 import edu.mit.compilers.le02.stgenerator.SymbolTableGenerator;
@@ -290,7 +289,6 @@ public class Main {
       parser.program();
 
       ASTNode parent = IrGenerator.generateIR(parser.getAST());
-      new IntRangeChecker().visit(parent);
       SymbolTable st = SymbolTableGenerator.generateSymbolTable(parent);
 
       if (CLI.debug) {

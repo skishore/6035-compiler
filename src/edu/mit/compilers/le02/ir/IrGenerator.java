@@ -67,8 +67,10 @@ public class IrGenerator {
   /**
    * Generates an intermediate representation based on an input AST.
    */
-  public static ASTNode generateIR(AST root) {
-    return getInstance().visit(root);
+  public static ASTNode generateIR(AST rootAst) {
+    ASTNode rootNode = getInstance().visit(rootAst);
+    new IntRangeChecker().visit(rootNode);
+    return rootNode;
   }
 
   /**
