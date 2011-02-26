@@ -25,5 +25,10 @@ public final class ArrayDeclNode extends FieldDeclNode {
   }
 
   @Override
+  public String toString() {
+    return super.toString() + " " + type + " " + name + "[" + length + "]";
+  }
+
+  @Override
   public <T> T accept(ASTNodeVisitor<T> v) { return v.visit(this); }
 }

@@ -15,6 +15,7 @@ import antlr.DumpASTVisitor;
 import antlr.Token;
 import antlr.debug.misc.ASTFrame;
 import edu.mit.compilers.le02.ast.ASTNode;
+import edu.mit.compilers.le02.ast.AstPrettyPrinter;
 import edu.mit.compilers.le02.grammar.DecafParser;
 import edu.mit.compilers.le02.grammar.DecafParserTokenTypes;
 import edu.mit.compilers.le02.grammar.DecafScanner;
@@ -278,7 +279,7 @@ public class Main {
       SymbolTable st = SymbolTableGenerator.generateSymbolTable(parent);
       
       if (CLI.debug) {
-        System.out.println(parent);
+        parent.accept(new AstPrettyPrinter());
       }
     } catch (ANTLRException e) {
       reportError(e);

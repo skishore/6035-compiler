@@ -83,10 +83,6 @@ public class IrGenerator {
     }
 
     final SourceLocation sl = new SourceLocation(node);
-    if (CLI.debug) {
-      System.out.println("" + sl + " ["+ node.getType() + "]: " +
-                         node.getText());
-    }
 
     switch (node.getType()) {
      case DecafParserTokenTypes.PROGRAM:

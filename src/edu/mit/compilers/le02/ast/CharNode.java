@@ -8,7 +8,7 @@ import edu.mit.compilers.le02.SourceLocation;
 
 
 public final class CharNode extends ExpressionNode {
-  private int value;
+  private char value;
 
   public CharNode(SourceLocation sl, char c) {
     super(sl);
@@ -30,6 +30,11 @@ public final class CharNode extends ExpressionNode {
       return false;
     }
     return value == ((CharNode)o).getValue();
+  }
+
+  @Override
+  public String toString() {
+    return Character.toString(value);
   }
 
   @Override
