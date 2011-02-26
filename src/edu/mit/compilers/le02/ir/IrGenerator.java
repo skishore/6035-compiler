@@ -1,5 +1,6 @@
 package edu.mit.compilers.le02.ir;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import antlr.collections.AST;
@@ -43,7 +44,6 @@ import edu.mit.compilers.le02.ast.VariableNode;
 import edu.mit.compilers.le02.ast.BoolOpNode.BoolOp;
 import edu.mit.compilers.le02.ast.MathOpNode.MathOp;
 import edu.mit.compilers.le02.grammar.DecafParserTokenTypes;
-import edu.mit.compilers.tools.CLI;
 
 /**
  * Populates an {@link ASTNode} structure from an antlr AST tree.
@@ -234,13 +234,17 @@ public class IrGenerator {
         node.getFirstChild().getType() == DecafParserTokenTypes.TK_true);
 
      case DecafParserTokenTypes.CHAR_LITERAL:
-      return new CharNode(sl, node.getFirstChild().getText().charAt(0));
+      // Chars come as 'a', 'b', 'c', [...] or '\t', '\n', '\"', '\'', '\\'
+      // We currently do not deal with this case.
+      return new CharNode(sl, node.getFirstChild().getText().charAt(1));
 
      case DecafParserTokenTypes.INTEGER_LITERAL:
       return processInt(node, sl);
 
      case DecafParserTokenTypes.STRING_LITERAL:
-      return new StringNode(sl, node.getFirstChild().getText());
+      String str_text = node.getFirstChild().getText();
+      // We need to handle escape sequences here too.
+      return new StringNode(sl, str_text.substring(1, str_text.length() - 1));
 
      default:
       ErrorReporting.reportError(
@@ -311,10 +315,26 @@ public class IrGenerator {
     AST call_target_ast = node.getFirstChild();
     AST call_args_ast = call_target_ast.getNextSibling();
     String call_method = call_target_ast.getText();
+    // We use the same generic concrete parse tree structure for storing
+    // arguments to method calls and callouts. However, our code expects to
+    // see ExpressionNodes rather than the wrapper SyscallArgNodes for
+    // non-callout method calls.
     @SuppressWarnings("unchecked")
-    List<ExpressionNode> call_args =
-      (List<ExpressionNode>)visit(call_args_ast);
-    return new MethodCallNode(sl, call_method, call_args);
+    List<SyscallArgNode> call_args =
+      (List<SyscallArgNode>)visit(call_args_ast);
+    List<ExpressionNode> call_args_expr = new ArrayList<ExpressionNode>();
+    for (SyscallArgNode arg : call_args) {
+      ASTNode expr = arg.getChildren().get(0);
+      if (expr instanceof ExpressionNode) {
+        call_args_expr.add((ExpressionNode)expr);
+      } else {
+        ErrorReporting.reportError(
+          new IrException(expr.getSourceLoc(),
+            "Invalid method call argument type"));
+        call_args_expr.add(new BooleanNode(expr.getSourceLoc(), false));
+      }
+    }
+    return new MethodCallNode(sl, call_method, call_args_expr);
   }
 
   /**
