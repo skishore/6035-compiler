@@ -21,7 +21,6 @@ import edu.mit.compilers.le02.symboltable.SymbolTable;
 public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
     /** Holds the CheckDeclarations singleton. */
     private static CheckDeclarations instance;
-    private static SymbolTable fieldTable;
     private static SymbolTable methodTable;
     private static SymbolTable varTable;
 
@@ -45,9 +44,8 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
 
     @Override
     public Boolean visit(ClassNode node) {
-        fieldTable = node.getDesc().getFieldSymbolTable();
         methodTable = node.getDesc().getMethodSymbolTable();
-        varTable = fieldTable;
+        varTable = node.getDesc().getFieldSymbolTable();
 
         defaultBehavior(node);
         return true;
@@ -83,13 +81,12 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
 
     @Override
     public Boolean visit(ArrayLocationNode node) {
-        SymbolTable search = varTable;
-        if (!fieldTable.contains(node.getName())) {
+        TypedDescriptor desc = (TypedDescriptor)(varTable.get(node.getName(), true));
+        if (desc == null) {
             ErrorReporting.reportError(
                 new SymbolTableException(node.getSourceLoc(),
                 "Undeclared array " + node.getName()));
         } else {
-            TypedDescriptor desc = (TypedDescriptor)(fieldTable.getMap().get(node.getName()));
             if (!((desc.getType() == DecafType.INT_ARRAY) ||
                     (desc.getType() == DecafType.BOOLEAN_ARRAY))) {
                 ErrorReporting.reportError(
@@ -110,22 +107,16 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
 
     @Override
     public Boolean visit(ScalarLocationNode node) {
-        SymbolTable search = varTable;
-        while ((search != null) && (!search.contains(node.getName()))) {
-            search = search.getParent();
-        }
-        if (search == null) {
+        TypedDescriptor desc = (TypedDescriptor)(varTable.get(node.getName(), true));
+        if (desc == null) {
             ErrorReporting.reportError(
                 new SymbolTableException(node.getSourceLoc(), 
                 "Undeclared variable " + node.getName()));
-        } else {
-            TypedDescriptor desc = (TypedDescriptor)(search.getMap().get(node.getName()));
-            if ((desc.getType() == DecafType.INT_ARRAY) ||
-                    (desc.getType() == DecafType.BOOLEAN_ARRAY)) {
-                ErrorReporting.reportError(
-                    new SemanticException(node.getSourceLoc(),
-                    "Array " + node.getName() + " with no index"));
-            }
+        } else if ((desc.getType() == DecafType.INT_ARRAY) ||
+                (desc.getType() == DecafType.BOOLEAN_ARRAY)) {
+            ErrorReporting.reportError(
+                new SemanticException(node.getSourceLoc(),
+                "Array " + node.getName() + " with no index"));
         }
 
         defaultBehavior(node);
