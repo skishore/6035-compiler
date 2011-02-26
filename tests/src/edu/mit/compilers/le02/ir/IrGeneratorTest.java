@@ -6,6 +6,7 @@ import edu.mit.compilers.le02.DecafType;
 import edu.mit.compilers.le02.ErrorReporting;
 import edu.mit.compilers.le02.SourceLocation;
 import edu.mit.compilers.le02.StreamUtil;
+import edu.mit.compilers.le02.Util;
 import edu.mit.compilers.le02.ast.ASTNode;
 import edu.mit.compilers.le02.ast.ArrayDeclNode;
 import edu.mit.compilers.le02.ast.ArrayLocationNode;
@@ -16,8 +17,12 @@ import edu.mit.compilers.le02.ast.BooleanNode;
 import edu.mit.compilers.le02.ast.ClassNode;
 import edu.mit.compilers.le02.ast.IntNode;
 import edu.mit.compilers.le02.ast.MathOpNode;
+import edu.mit.compilers.le02.ast.MethodCallNode;
 import edu.mit.compilers.le02.ast.NotNode;
 import edu.mit.compilers.le02.ast.ScalarLocationNode;
+import edu.mit.compilers.le02.ast.StringNode;
+import edu.mit.compilers.le02.ast.SyscallArgNode;
+import edu.mit.compilers.le02.ast.SystemCallNode;
 import edu.mit.compilers.le02.ast.BoolOpNode.BoolOp;
 import edu.mit.compilers.le02.ast.MathOpNode.MathOp;
 import edu.mit.compilers.le02.grammar.DecafParser;
@@ -198,6 +203,48 @@ public class IrGeneratorTest extends TestCase {
   }
 
   /**
+   * Verifies that SystemCallNodes have SyscallArgNodes as arguments but that
+   * MethodCallNodes have ExpressionNodes attached.
+   */
+  public void testProcessCalloutAndCallArgs() {
+    ErrorReporting.clearErrors();
+    DecafScanner parse_lexer =
+      new DecafScanner(new DataInputStream(
+        StreamUtil.createInputStream(FUNCTION_PROGRAM)));
+    final DecafParser parser = new DecafParser(parse_lexer);
+    try {
+      parser.program();
+      ASTNode root = IrGenerator.generateIR(parser.getAST());
+
+      // Take a nice walk through the tree.
+      assert(root instanceof ClassNode);
+      ClassNode classNode = (ClassNode)root;
+      BlockNode body = classNode.getMethods().get(0).getBody();
+
+      AssignNode firstAssignment = (AssignNode)body.getStatements().get(0);
+      assertEquals(
+        new SystemCallNode(null,
+          new StringNode(null, "printf"), Util.makeList(
+            new SyscallArgNode(null, new StringNode(null, "foo")),
+            new SyscallArgNode(null, new IntNode(null, 5)),
+            new SyscallArgNode(null, new BooleanNode(null, false)))),
+        firstAssignment.getValue());
+      AssignNode secondAssignment = (AssignNode)body.getStatements().get(1);
+      assertEquals(
+          new MethodCallNode(null,
+            "foo", Util.makeList(
+              new IntNode(null, 5),
+              new BooleanNode(null, false))),
+          secondAssignment.getValue());
+    } catch (RecognitionException e) {
+      assert(false);
+    } catch (TokenStreamException e) {
+      assert(false);
+    }
+    assert(ErrorReporting.noErrors());
+  }
+
+  /**
    * Verifies that arithmetic order of operations is happening correctly.
    */
   public void testOrderOfOperations() {
@@ -304,6 +351,13 @@ public class IrGeneratorTest extends TestCase {
   "  void main() {\n" +
   "    a = 1 + 2 + 3 * 4 + 5 / 10 - 2 % 3;\n" +
   "    b[1] = !true || 1 + 2 + 3 * (4 + 5) / 10 == -2 % 3;\n" +
+  "  }\n" +
+  "}\n";
+
+  private static String FUNCTION_PROGRAM = "class Program {\n" +
+  "  void main() {\n" +
+  "    a = callout(\"printf\", \"foo\", 5, false);\n" +
+  "    b = foo(5, false);\n" +
   "  }\n" +
   "}\n";
 
