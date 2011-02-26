@@ -213,7 +213,7 @@ public class CLI {
     // grab infile and lose extra args
     int i = 0;
     while (infile == null && i < extras.size()) {
-      String fn = (String) extras.elementAt(i);
+      String fn = extras.elementAt(i);
 
       if (fn.charAt(0) != '-') {
         infile = fn;
