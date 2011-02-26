@@ -40,10 +40,7 @@ public class CheckMethodCalls extends ASTNodeVisitor<Boolean> {
     public Boolean visit(ClassNode node) {
         methodTable = node.getDesc().getMethodSymbolTable();
 
-        for (ASTNode child : node.getChildren()) {
-            child.accept(this);
-        }
-
+        defaultBehavior(node);
         return true;
     }
 
@@ -67,10 +64,7 @@ public class CheckMethodCalls extends ASTNodeVisitor<Boolean> {
             }
         }
 
-        for (ASTNode child : node.getChildren()) {
-            child.accept(this);
-        }
-
+        defaultBehavior(node);
         return true;
     }
 }

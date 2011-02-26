@@ -36,6 +36,8 @@ public class CheckArrayLengths extends ASTNodeVisitor<Boolean> {
                 new SemanticException(node.getSourceLoc(), 
                 "Array " + node.getName() + " has non-positive size " + node.getLength()));
         }
+
+        defaultBehavior(node);
         return true;
     }
 }

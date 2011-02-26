@@ -24,18 +24,17 @@ public final class ASTDescriptorVisitor extends ASTNodeVisitor<Object> {
   public void setASTDescriptors(ClassNode node, ClassDescriptor desc) {
     currST = desc.getMethodSymbolTable();
     node.setDesc(desc);
-    for (ASTNode child : node.getChildren()) {
-        child.accept(this);
-    }
+
+    defaultBehavior(node);
   }
 
   @Override
   public Object visit(BlockNode node) {
     SymbolTable last = currST;
     currST = node.getLocalSymbolTable();
-    for (ASTNode child : node.getChildren()) {
-        child.accept(this);
-    }
+
+    defaultBehavior(node);
+
     currST = last;
     return null;
   }
@@ -43,27 +42,24 @@ public final class ASTDescriptorVisitor extends ASTNodeVisitor<Object> {
   @Override
   public Object visit(MethodCallNode node) {
     node.setDesc((MethodDescriptor) currST.get(node.getName(), false));
-    for (ASTNode child : node.getChildren()) {
-        child.accept(this);
-    }
+
+    defaultBehavior(node);
     return null;
   }
   
   @Override
   public Object visit(ScalarLocationNode node) {
     node.setDesc((TypedDescriptor) currST.get(node.getName(), true));
-    for (ASTNode child : node.getChildren()) {
-        child.accept(this);
-    }
+
+    defaultBehavior(node);
     return null;
   }
 
   @Override
   public Object visit(ArrayLocationNode node) {
     node.setDesc((TypedDescriptor) currST.get(node.getName(), true));
-    for (ASTNode child : node.getChildren()) {
-        child.accept(this);
-    }
+
+    defaultBehavior(node);
     return null;
   }
 
