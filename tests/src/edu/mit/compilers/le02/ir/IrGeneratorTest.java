@@ -51,6 +51,7 @@ public class IrGeneratorTest extends TestCase {
     assertNotNull(node);
     assertTrue(node instanceof IntNode);
     assertEquals(2147483647, ((IntNode)node).getValue());
+    node.accept(new IntRangeChecker());
     assertTrue(ErrorReporting.noErrors());
   }
 
@@ -77,6 +78,7 @@ public class IrGeneratorTest extends TestCase {
     ASTNode node = gen.processTermF(termf, new SourceLocation(minus));
     assertTrue(node instanceof IntNode);
     assertEquals(-2147483648, ((IntNode)node).getValue());
+    node.accept(new IntRangeChecker());
     assertTrue(ErrorReporting.noErrors());
   }
 
@@ -102,7 +104,7 @@ public class IrGeneratorTest extends TestCase {
     // by looking for positive getValue() results from inverted nodes.
     assertEquals(-(-2147483648), ((IntNode)node).getValue());
     assertTrue(ErrorReporting.noErrors());
-    new IntRangeChecker().visit(node);
+    node.accept(new IntRangeChecker());
     assertFalse(ErrorReporting.noErrors());
   }
 
@@ -126,6 +128,9 @@ public class IrGeneratorTest extends TestCase {
     assertTrue(node instanceof IntNode);
     assertEquals(Integer.MAX_VALUE, ((IntNode)node).getValue());
     assertFalse(ErrorReporting.noErrors());
+    ErrorReporting.clearErrors();
+    node.accept(new IntRangeChecker());
+    assertTrue(ErrorReporting.noErrors());
   }
 
   /**
@@ -153,6 +158,9 @@ public class IrGeneratorTest extends TestCase {
     assertTrue(node instanceof IntNode);
     assertEquals(-Integer.MAX_VALUE, ((IntNode)node).getValue());
     assertFalse(ErrorReporting.noErrors());
+    ErrorReporting.clearErrors();
+    node.accept(new IntRangeChecker());
+    assertTrue(ErrorReporting.noErrors());
   }
 
   /**

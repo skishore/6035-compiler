@@ -294,10 +294,6 @@ public class Main {
     } catch (ANTLRException e) {
       ErrorReporting.reportErrorCompat(e);
       success = false;
-    } catch (SymbolTableException ste) {
-      System.out.println(ste);
-      ste.printStackTrace(System.out);
-      success = false;
     }
     return success;
   }

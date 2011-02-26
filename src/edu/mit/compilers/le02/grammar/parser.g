@@ -50,11 +50,6 @@ tokens
 {
   // Do our own reporting of errors so the parser can return a non-zero status
   // if any errors are detected.
-  // TODO(lizfong): don't use native error reporting, and instead collect the
-  // errors into an ArrayList so they can be pretty-printed along the lines of
-  // the clang/llvm frontend or
-  // http://www.milk.com/kodebase/antlr-tutorial/ErrorFormatter.java
-
   /** Reports if any errors were reported during parse. */
   private boolean error;
 

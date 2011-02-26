@@ -69,7 +69,7 @@ public class IrGenerator {
    */
   public static ASTNode generateIR(AST rootAst) {
     ASTNode rootNode = getInstance().visit(rootAst);
-    new IntRangeChecker().visit(rootNode);
+    rootNode.accept(new IntRangeChecker());
     return rootNode;
   }
 

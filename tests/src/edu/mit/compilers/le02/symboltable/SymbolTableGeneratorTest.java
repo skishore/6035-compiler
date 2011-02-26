@@ -1,11 +1,8 @@
 package edu.mit.compilers.le02.symboltable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import junit.framework.TestCase;
 import edu.mit.compilers.le02.DecafType;
+import edu.mit.compilers.le02.ErrorReporting;
 import edu.mit.compilers.le02.Util;
 import edu.mit.compilers.le02.ast.ArrayDeclNode;
 import edu.mit.compilers.le02.ast.AssignNode;
@@ -15,23 +12,14 @@ import edu.mit.compilers.le02.ast.ClassNode;
 import edu.mit.compilers.le02.ast.FieldDeclNode;
 import edu.mit.compilers.le02.ast.ForNode;
 import edu.mit.compilers.le02.ast.IntNode;
-import edu.mit.compilers.le02.ast.LocationNode;
 import edu.mit.compilers.le02.ast.MethodDeclNode;
 import edu.mit.compilers.le02.ast.ScalarLocationNode;
 import edu.mit.compilers.le02.ast.StatementNode;
 import edu.mit.compilers.le02.ast.VarDeclNode;
-import edu.mit.compilers.le02.stgenerator.SymbolTableException;
 import edu.mit.compilers.le02.stgenerator.SymbolTableGenerator;
 
 
 public class SymbolTableGeneratorTest extends TestCase {
-  private SymbolTableGenerator stg;
-  
-  public void setUp() {
-    
-    stg = SymbolTableGenerator.getInstance();
-  }
-
   public void testFields() {
     ClassNode ast = 
       new ClassNode(null, "Program",
@@ -43,13 +31,9 @@ public class SymbolTableGeneratorTest extends TestCase {
         Util.emptyList(MethodDeclNode.class)
       );
     
-    SymbolTable st = null;
-    try {
-      st = SymbolTableGenerator.generateSymbolTable(ast);
-    } catch (SymbolTableException e) {
-      e.printStackTrace();
-      assertTrue(false);
-    }
+    ErrorReporting.clearErrors();
+    SymbolTable st = SymbolTableGenerator.generateSymbolTable(ast);
+    assertTrue(ErrorReporting.noErrors());
     
     assertNotNull(st);
     ClassDescriptor cd = (ClassDescriptor) st.get("Program", null);
@@ -87,13 +71,9 @@ public class SymbolTableGeneratorTest extends TestCase {
         )
       );
     
-    SymbolTable st = null;
-    try {
-      st = SymbolTableGenerator.generateSymbolTable(ast);
-    } catch (SymbolTableException e) {
-      e.printStackTrace();
-      assertTrue(false);
-    }
+    ErrorReporting.clearErrors();
+    SymbolTable st = SymbolTableGenerator.generateSymbolTable(ast);
+    assertTrue(ErrorReporting.noErrors());
     
     assertNotNull(st);
     ClassDescriptor cd = (ClassDescriptor) st.get("Program", null);
@@ -158,15 +138,10 @@ public class SymbolTableGeneratorTest extends TestCase {
           )
         )
       );
-    
-    SymbolTable st = null;
-    try {
-      st = SymbolTableGenerator.generateSymbolTable(ast);
-    } catch (SymbolTableException e) {
-      e.printStackTrace();
-      assertTrue(false);
-    }
-    
+    ErrorReporting.clearErrors();
+    SymbolTable st = SymbolTableGenerator.generateSymbolTable(ast);
+    assertTrue(ErrorReporting.noErrors());
+
     assertNotNull(st);
     ClassDescriptor cd = (ClassDescriptor) st.get("Program", null);
     assertNotNull(cd);
@@ -193,9 +168,43 @@ public class SymbolTableGeneratorTest extends TestCase {
     assertNotNull(lst);
     ld = (LocalDescriptor) lst.get("forVar", null);
     checkTypedDesc(ld, "forVar", DecafType.INT);
-    
   }
-  
+
+  public void testDupeReporting() {
+    ClassNode ast = 
+      new ClassNode(null, "Program",
+        Util.emptyList(FieldDeclNode.class),
+        Util.makeList(
+          new MethodDeclNode(null, DecafType.INT, "method1",
+            Util.makeList(
+              new VarDeclNode(null, DecafType.INT, "param1"),
+              new VarDeclNode(null, DecafType.BOOLEAN, "param2")),
+            new BlockNode(null, 
+              Util.makeList(
+                new VarDeclNode(null, DecafType.BOOLEAN, "local1"),
+                new VarDeclNode(null, DecafType.INT, "local2")),
+              Util.emptyList(StatementNode.class)
+            )
+          ),
+          new MethodDeclNode(null, DecafType.INT, "method1",
+              Util.makeList(
+                new VarDeclNode(null, DecafType.BOOLEAN, "param1"),
+                new VarDeclNode(null, DecafType.INT, "param2")),
+              new BlockNode(null, 
+                Util.makeList(
+                  new VarDeclNode(null, DecafType.BOOLEAN, "local4"),
+                  new VarDeclNode(null, DecafType.INT, "local5")),
+                Util.emptyList(StatementNode.class)
+              )
+          )
+        )
+      );
+    
+    ErrorReporting.clearErrors();
+    SymbolTableGenerator.generateSymbolTable(ast);
+    assertFalse(ErrorReporting.noErrors());
+  }
+
   private void checkTypedDesc(TypedDescriptor td, String id, DecafType type) {
     assertNotNull(td);
     assertEquals(id, td.getId());
