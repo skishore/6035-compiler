@@ -39,13 +39,15 @@ public class CheckMain {
             MethodDescriptor mainDesc = (MethodDescriptor)(methodTable.getMap().get("main"));
             if (mainDesc.getParamSymbolTable().getMap().size() > 0) {
                 SourceLocation sl = root.getSourceLoc();
+                String message = "Main method takes a parameter";
                 for (MethodDeclNode method : ((ClassNode)root).getMethods()) {
                     if (method.getName().equals("main")) {
                         sl = method.getParams().get(0).getSourceLoc();
+                        message += " " + method.getParams().get(0).getName();
                         break;
                     }    
                 }
-                ErrorReporting.reportError(new SymbolTableException(sl, "Main method takes parameters"));
+                ErrorReporting.reportError(new SymbolTableException(sl, method));
             }
         }
     }
