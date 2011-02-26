@@ -20,6 +20,11 @@ public final class MinusNode extends UnaryOpNode {
   }
 
   @Override
+  public String toString() {
+    return "-";
+  }
+
+  @Override
   public <T> T accept(ASTNodeVisitor<T> v) { 
     return v.visit(this); 
   }

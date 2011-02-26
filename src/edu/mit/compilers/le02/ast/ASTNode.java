@@ -1,6 +1,5 @@
 package edu.mit.compilers.le02.ast;
 
-import java.util.Arrays;
 import java.util.List;
 
 import edu.mit.compilers.le02.SourceLocation;
@@ -18,8 +17,7 @@ public abstract class ASTNode {
 
   @Override
   public String toString() {
-    return this.getClass().getSimpleName() 
-           + Arrays.toString(getChildren().toArray());
+    return this.getClass().getSimpleName();
   }
 
   abstract public List<ASTNode> getChildren();
