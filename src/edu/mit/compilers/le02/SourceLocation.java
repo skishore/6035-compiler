@@ -34,6 +34,7 @@ public final class SourceLocation {
     this(CLI.getInputFilename(), node.getLine(), node.getColumn());
   }
 
+  @Override
   public String toString() {
     return filename + ":" + line + ":" + col;
   }

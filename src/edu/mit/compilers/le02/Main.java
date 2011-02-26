@@ -3,18 +3,16 @@
 
 package edu.mit.compilers.le02;
 import java.io.DataInputStream;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import antlr.ANTLRException;
 import antlr.ASTFactory;
 import antlr.CharStreamException;
 import antlr.DumpASTVisitor;
 import antlr.Token;
-import antlr.ANTLRException;
 import antlr.debug.misc.ASTFrame;
-
 import edu.mit.compilers.le02.ast.ASTNode;
 import edu.mit.compilers.le02.grammar.DecafParser;
 import edu.mit.compilers.le02.grammar.DecafParserTokenTypes;
@@ -26,8 +24,6 @@ import edu.mit.compilers.le02.ir.IrGenerator;
 import edu.mit.compilers.le02.stgenerator.SymbolTableException;
 import edu.mit.compilers.le02.stgenerator.SymbolTableGenerator;
 import edu.mit.compilers.le02.symboltable.SymbolTable;
-
-
 import edu.mit.compilers.tools.CLI;
 
 /**
