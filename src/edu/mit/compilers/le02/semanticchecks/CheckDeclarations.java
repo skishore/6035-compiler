@@ -45,9 +45,7 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
         varTable = node.getDesc().getFieldSymbolTable();
         methodTable = node.getDesc().getMethodSymbolTable();
 
-        for (ASTNode child : node.getChildren()) {
-            child.accept(this);
-        }
+        defaultBehavior(node);
         return true;
     }
 
@@ -56,7 +54,7 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
         SymbolTable parent = varTable;
         varTable = ((MethodDescriptor)methodTable.getMap().get(node.getName())).getParamSymbolTable();
 
-        node.getBody().accept(this);
+        defaultBehavior(node);
 
         varTable = parent;
         return true;
@@ -73,9 +71,7 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
         SymbolTable parent = varTable;
         varTable = node.getLocalSymbolTable();
 
-        for (ASTNode child : node.getChildren()) {
-            child.accept(this);
-        }
+        defaultBehavior(node);
 
         varTable = parent;
         return true;
@@ -93,10 +89,7 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
                 "Undeclared variable " + node.getName()));
         }
 
-        for (ASTNode child : node.getChildren()) {
-            child.accept(this);
-        }
-
+        defaultBehavior(node);
         return true;
     }
 
@@ -112,6 +105,7 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
                 "Undeclared variable " + node.getName()));
         }
 
+        defaultBehavior(node);
         return true;
     }
 
@@ -123,10 +117,7 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
                 "Undeclared method " + node.getName()));
         }
 
-        for (ASTNode child : node.getChildren()) {
-            child.accept(this);
-        }
-
+        defaultBehavior(node);
         return true;
     }
 }

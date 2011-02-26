@@ -20,6 +20,8 @@ import edu.mit.compilers.le02.symboltable.LocalDescriptor;
 import edu.mit.compilers.le02.symboltable.MethodDescriptor;
 import edu.mit.compilers.le02.symboltable.ParamDescriptor;
 import edu.mit.compilers.le02.symboltable.SymbolTable;
+import java.util.List;
+import java.util.ArrayList;
 
 public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
   private SymbolTable currParent = null;
@@ -97,10 +99,12 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
 
     // Create and fill paramSymbolTable
     SymbolTable paramSymbolTable = new SymbolTable(parent);
+    List<String> params = new ArrayList<String>();
     currParent = paramSymbolTable;
     isParam = true;
     for (VarDeclNode v : node.getParams()) {
       paramSymbolTable.put(v.getName(), v.accept(this), v.getSourceLoc());
+      params.add(v.getName());
     }
     isParam = false;
     
@@ -109,7 +113,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
     
     currParent = parent;
     return new MethodDescriptor(parent, node.getName(), node.getType(),
-                                paramSymbolTable, 
+                                paramSymbolTable, params,
                                 node.getBody());
   }
   
@@ -131,7 +135,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
   public Descriptor visit(BlockNode node) {
     SymbolTable parent = new SymbolTable(currParent);
     
-    // Create and fill localSymbolTable
+    // Create and fill localSymbolTable and params list
     SymbolTable localSymbolTable = new SymbolTable(parent);
     currParent = localSymbolTable;
     for (VarDeclNode v : node.getDecls()) {

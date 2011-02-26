@@ -23,5 +23,6 @@ public class MasterChecker {
         CheckDeclarations.check(root);
         CheckMain.check(root);
         CheckArrayLengths.check(root);
+        CheckMethodCalls.check(root);
     }
 }
