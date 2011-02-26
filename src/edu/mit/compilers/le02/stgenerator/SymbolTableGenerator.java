@@ -64,7 +64,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
   }
   
   @Override
-  public Descriptor visit(ClassNode node) throws SymbolTableException {
+  public Descriptor visit(ClassNode node) {
     SymbolTable parent = currParent;
 
     // Create and fill fieldSymbolTable
@@ -72,7 +72,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
     currParent = fieldSymbolTable;
     isField = true;
     for (FieldDeclNode n : node.getFields()) {
-      fieldSymbolTable.put(n.getName(), this.accept(n), n.getSourceLoc());
+      fieldSymbolTable.put(n.getName(), n.accept(this));
     }
     isField = false;
 
@@ -80,7 +80,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
     SymbolTable methodSymbolTable = new SymbolTable(fieldSymbolTable);
     currParent = methodSymbolTable;
     for (MethodDeclNode m : node.getMethods()) {
-      methodSymbolTable.put(m.getName(), this.accept(m), m.getSourceLoc());
+      methodSymbolTable.put(m.getName(), m.accept(this));
     }
     
     currParent = parent;
@@ -89,7 +89,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
   }
 
   @Override
-  public Descriptor visit(MethodDeclNode node) throws SymbolTableException {
+  public Descriptor visit(MethodDeclNode node) {
     SymbolTable parent = currParent;
 
     // Create and fill paramSymbolTable
@@ -97,7 +97,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
     currParent = paramSymbolTable;
     isParam = true;
     for (VarDeclNode v : node.getParams()) {
-      paramSymbolTable.put(v.getName(), this.accept(v), v.getSourceLoc());
+      paramSymbolTable.put(v.getName(), v.accept(this));
     }
     isParam = false;
     
@@ -111,7 +111,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
   }
   
   @Override
-  public Descriptor visit(BlockNode node) throws SymbolTableException {
+  public Descriptor visit(BlockNode node) {
     SymbolTable parent = new SymbolTable(currParent);
     
     // Create and fill localSymbolTable

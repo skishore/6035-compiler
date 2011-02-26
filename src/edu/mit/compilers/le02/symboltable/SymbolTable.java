@@ -22,9 +22,11 @@ public class SymbolTable {
 	 * @param descriptor The descriptor of the new entry
 	 * @return True if entry was successful
 	 */
-	public boolean put(String id, Descriptor descriptor, SourceLocation sl) throws SymbolTableException {
+	public boolean put(String id, Descriptor descriptor) {
 		if (table.containsKey(id)) {
-            throw new SymbolTableException(sl, "Duplicate identifier");
+            //throw new SymbolTableException(sl, "Duplicate identifier");
+            System.out.println("Duplicate identifier");
+            return false;
 		} else {
 			if (descriptor != null) {
 				this.table.put(id, descriptor);
