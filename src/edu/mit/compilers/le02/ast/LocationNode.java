@@ -20,7 +20,7 @@ public abstract class LocationNode extends ASTNode {
   }
 
   public DecafType getType() {
-    return desc.getType();
+    return (desc == null) ? null : desc.getType();
   }
 
   public String getName() {

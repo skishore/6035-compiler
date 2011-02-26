@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.mit.compilers.le02.SourceLocation;
+import edu.mit.compilers.le02.Util;
 
 public final class StringNode extends ASTNode {
   private String value;
@@ -24,7 +25,7 @@ public final class StringNode extends ASTNode {
 
   @Override
   public String toString() {
-    return value;
+    return "\"" + Util.escape(value) + "\"";
   }
 
   @Override

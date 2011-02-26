@@ -18,4 +18,30 @@ public class Util {
     List<T> list = Collections.emptyList(); 
     return list;
   }
+
+  /**
+   * We need to replace the characters '\t', '\n', '\"', '\'', '\\' with their
+   * escaped alternatives.
+   */
+  public static String escape(String s) {
+    return s.replace(
+      "\\", "\\\\").replace(
+        "\t", "\\t").replace(
+          "\n", "\\n").replace(
+            "\"", "\\\"").replace(
+              "\'", "\\\'");
+  }
+
+  /**
+   * We need to replace the unescaped sequences
+   * "\\t", "\\n", "\\\"", "\\'", "\\\\" with their unescaped alternatives.
+   */
+  public static String unescape(String s) {
+    return s.replace(
+      "\\t", "\t").replace(
+        "\\n", "\n").replace(
+          "\\\"", "\"").replace(
+            "\\\'", "\'").replace(
+              "\\\\", "\\");
+  }
 }

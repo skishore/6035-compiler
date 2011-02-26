@@ -14,6 +14,7 @@ import edu.mit.compilers.le02.ast.AssignNode;
 import edu.mit.compilers.le02.ast.BlockNode;
 import edu.mit.compilers.le02.ast.BoolOpNode;
 import edu.mit.compilers.le02.ast.BooleanNode;
+import edu.mit.compilers.le02.ast.CharNode;
 import edu.mit.compilers.le02.ast.ClassNode;
 import edu.mit.compilers.le02.ast.IntNode;
 import edu.mit.compilers.le02.ast.MathOpNode;
@@ -165,6 +166,48 @@ public class IrGeneratorTest extends TestCase {
     assertFalse(ErrorReporting.noErrors());
     ErrorReporting.clearErrors();
     node.accept(new IntRangeChecker());
+    assertTrue(ErrorReporting.noErrors());
+  }
+
+  /**
+   * Test that escaping/unescaping of char/string literals is working.
+   */
+  public void testEscapeUnescape() {
+    IrGenerator gen = IrGenerator.getInstance();
+    ErrorReporting.clearErrors();
+
+    System.out.println("\"foo bar \\t \\n \\\" \\\' \\\\ ack\"");
+    AST escapedString = generateString(
+      "\"foo bar \\t \\n \\\" \\\' \\\\ ack\"");
+    StringNode stringNode = (StringNode)gen.visit(escapedString);
+    assertEquals("\"foo bar \\t \\n \\\" \\' \\\\ ack\"",
+      stringNode.toString());
+    assertEquals("foo bar \t \n \" \' \\ ack", stringNode.getValue());
+
+    AST tabChar = generateChar("'\\t'");
+    AST newlineChar = generateChar("'\\n'");
+    AST doublequoteChar = generateChar("'\\\"'");
+    AST singlequoteChar = generateChar("'\\\''");
+    AST slashChar = generateChar("'\\\\'");
+
+    CharNode tabCharNode = (CharNode)gen.visit(tabChar);
+    CharNode newlineCharNode = (CharNode)gen.visit(newlineChar);
+    CharNode doublequoteCharNode = (CharNode)gen.visit(doublequoteChar);
+    CharNode singlequoteCharNode = (CharNode)gen.visit(singlequoteChar);
+    CharNode slashCharNode = (CharNode)gen.visit(slashChar);
+
+    assertEquals('\t', tabCharNode.getValue());
+    assertEquals('\n', newlineCharNode.getValue());
+    assertEquals('\"', doublequoteCharNode.getValue());
+    assertEquals('\'', singlequoteCharNode.getValue());
+    assertEquals('\\', slashCharNode.getValue());
+
+    assertEquals("'\\t'", tabCharNode.toString());
+    assertEquals("'\\n'", newlineCharNode.toString());
+    assertEquals("'\\\"'", doublequoteCharNode.toString());
+    assertEquals("'\\\''", singlequoteCharNode.toString());
+    assertEquals("'\\\\'", slashCharNode.toString());
+
     assertTrue(ErrorReporting.noErrors());
   }
 
@@ -377,5 +420,23 @@ public class IrGeneratorTest extends TestCase {
     AST ast = new CommonAST();
     ast.initialize(DecafParserTokenTypes.TERM_PRIME, "Term'");
     return ast;
+  }
+
+  private AST generateChar(String token) {
+    AST container = new CommonAST();
+    container.initialize(DecafParserTokenTypes.CHAR_LITERAL, "Char");
+    AST ast = new CommonAST();
+    ast.initialize(DecafParserTokenTypes.CHAR, token);
+    container.setFirstChild(ast);
+    return container;
+  }
+
+  private AST generateString(String token) {
+    AST container = new CommonAST();
+    container.initialize(DecafParserTokenTypes.STRING_LITERAL, "String");
+    AST ast = new CommonAST();
+    ast.initialize(DecafParserTokenTypes.STRING, token);
+    container.setFirstChild(ast);
+    return container;
   }
 }

@@ -7,6 +7,7 @@ import antlr.collections.AST;
 import edu.mit.compilers.le02.DecafType;
 import edu.mit.compilers.le02.ErrorReporting;
 import edu.mit.compilers.le02.SourceLocation;
+import edu.mit.compilers.le02.Util;
 import edu.mit.compilers.le02.ast.ASTNode;
 import edu.mit.compilers.le02.ast.ArrayDeclNode;
 import edu.mit.compilers.le02.ast.ArrayLocationNode;
@@ -232,7 +233,8 @@ public class IrGenerator {
      case DecafParserTokenTypes.CHAR_LITERAL:
       // Chars come as 'a', 'b', 'c', [...] or '\t', '\n', '\"', '\'', '\\'
       // We currently do not deal with this case.
-      return new CharNode(sl, node.getFirstChild().getText().charAt(1));
+      return new CharNode(sl,
+        Util.unescape(node.getFirstChild().getText()).charAt(1));
 
      case DecafParserTokenTypes.INTEGER_LITERAL:
       return processInt(node, sl);
@@ -240,7 +242,8 @@ public class IrGenerator {
      case DecafParserTokenTypes.STRING_LITERAL:
       String str_text = node.getFirstChild().getText();
       // We need to handle escape sequences here too.
-      return new StringNode(sl, str_text.substring(1, str_text.length() - 1));
+      return new StringNode(sl,
+        Util.unescape(str_text.substring(1, str_text.length() - 1)));
 
      default:
       ErrorReporting.reportError(
