@@ -6,6 +6,7 @@ import edu.mit.compilers.le02.ast.ArrayLocationNode;
 import edu.mit.compilers.le02.ast.ASTNode;
 import edu.mit.compilers.le02.ast.ASTNodeVisitor;
 import edu.mit.compilers.le02.ast.ClassNode;
+import edu.mit.compilers.le02.ast.ExpressionNode;
 import edu.mit.compilers.le02.ast.MethodCallNode;
 import edu.mit.compilers.le02.stgenerator.SymbolTableException;
 import edu.mit.compilers.le02.symboltable.MethodDescriptor;
@@ -55,7 +56,6 @@ public class CheckMethodCalls extends ASTNodeVisitor<Boolean> {
                 "Method " + node.getName() + " expects " + methodDesc.getParams().size()
                 + " arguments, got " + node.getArgs().size()));
         } else {
-            System.out.println(node.getName() + " " + node.getSourceLoc());
             for (int i = 0; i < methodDesc.getParams().size(); i++) {
                 DecafType expected = ((ParamDescriptor)methodDesc.getParamSymbolTable().getMap().get(methodDesc.getParams().get(i))).getType();
                 DecafType got = node.getArgs().get(i).getType();
