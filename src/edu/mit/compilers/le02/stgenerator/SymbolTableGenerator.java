@@ -1,6 +1,8 @@
 package edu.mit.compilers.le02.stgenerator;
 
 import edu.mit.compilers.le02.DecafType;
+import edu.mit.compilers.le02.ErrorReporting;
+
 import edu.mit.compilers.le02.ast.ASTNode;
 import edu.mit.compilers.le02.ast.ASTNodeVisitor;
 import edu.mit.compilers.le02.ast.ArrayDeclNode;

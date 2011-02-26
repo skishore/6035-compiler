@@ -25,6 +25,7 @@ import edu.mit.compilers.le02.grammar.ScanException;
 import edu.mit.compilers.le02.ir.IrGenerator;
 import edu.mit.compilers.le02.stgenerator.SymbolTableGenerator;
 import edu.mit.compilers.le02.symboltable.SymbolTable;
+import edu.mit.compilers.le02.semanticchecks.CheckDeclarations;
 import edu.mit.compilers.tools.CLI;
 
 /**
@@ -286,6 +287,7 @@ public class Main {
 
       ASTNode parent = IrGenerator.generateIR(parser.getAST());
       SymbolTable st = SymbolTableGenerator.generateSymbolTable(parent);
+      CheckDeclarations.checkDeclarations(parent);
 
       if (CLI.debug) {
         System.out.println(parent);
