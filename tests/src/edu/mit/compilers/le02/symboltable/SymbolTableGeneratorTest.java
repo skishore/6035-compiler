@@ -38,7 +38,7 @@ public class SymbolTableGeneratorTest extends TestCase {
     assertNotNull(st);
     ClassDescriptor cd = (ClassDescriptor) st.get("Program", null);
     assertNotNull(cd);
-    SymbolTable fst = cd.getFieldSymbolTable();
+    SymbolTable fst = cd.getSymbolTable();
     assertNotNull(fst);
 
     FieldDescriptor fd = (FieldDescriptor) fst.get("array1", null);
@@ -78,12 +78,12 @@ public class SymbolTableGeneratorTest extends TestCase {
     assertNotNull(st);
     ClassDescriptor cd = (ClassDescriptor) st.get("Program", null);
     assertNotNull(cd);
-    SymbolTable mst = cd.getMethodSymbolTable();
+    SymbolTable mst = cd.getSymbolTable();
     assertNotNull(mst);
 
     MethodDescriptor md = (MethodDescriptor) mst.get("method1", null);
     checkTypedDesc(md, "method1", DecafType.INT);
-    SymbolTable pst = md.getParamSymbolTable();
+    SymbolTable pst = md.getSymbolTable();
     SymbolTable lst = md.getCode().getLocalSymbolTable();
     assertNotNull(pst);
     assertNotNull(lst);
@@ -145,7 +145,7 @@ public class SymbolTableGeneratorTest extends TestCase {
     assertNotNull(st);
     ClassDescriptor cd = (ClassDescriptor) st.get("Program", null);
     assertNotNull(cd);
-    SymbolTable mst = cd.getMethodSymbolTable();
+    SymbolTable mst = cd.getSymbolTable();
     assertNotNull(mst);
 
     MethodDescriptor md = (MethodDescriptor) mst.get("method1", null);

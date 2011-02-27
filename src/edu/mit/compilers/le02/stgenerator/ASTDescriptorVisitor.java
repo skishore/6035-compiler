@@ -21,7 +21,7 @@ public final class ASTDescriptorVisitor extends ASTNodeVisitor<Object> {
   private SymbolTable currST;
 
   public void setASTDescriptors(ClassNode node, ClassDescriptor desc) {
-    currST = desc.getMethodSymbolTable();
+    currST = desc.getSymbolTable();
     node.setDesc(desc);
 
     defaultBehavior(node);

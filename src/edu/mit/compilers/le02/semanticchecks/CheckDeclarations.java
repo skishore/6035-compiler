@@ -20,8 +20,7 @@ import edu.mit.compilers.le02.symboltable.SymbolTable;
 public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
   /** Holds the CheckDeclarations singleton. */
   private static CheckDeclarations instance;
-  private static SymbolTable methodTable;
-  private static SymbolTable varTable;
+  private static SymbolTable symbolTable;
 
   /**
    * Retrieves the CheckDeclarations singleton, creating if necessary.
@@ -43,8 +42,7 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
 
   @Override
   public Boolean visit(ClassNode node) {
-      methodTable = node.getDesc().getMethodSymbolTable();
-      varTable = node.getDesc().getFieldSymbolTable();
+      symbolTable = node.getDesc().getSymbolTable();
 
       defaultBehavior(node);
       return true;
@@ -52,13 +50,13 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
 
   @Override
   public Boolean visit(MethodDeclNode node) {
-      SymbolTable parent = varTable;
-      varTable = ((MethodDescriptor)methodTable.getMap().get(
-        node.getName())).getParamSymbolTable();
+      SymbolTable parent = symbolTable;
+      symbolTable = ((MethodDescriptor) 
+          symbolTable.get(node.getName(), false)).getSymbolTable();
 
       defaultBehavior(node);
 
-      varTable = parent;
+      symbolTable = parent;
       return true;
   }
 
@@ -70,19 +68,19 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
 
   @Override
   public Boolean visit(BlockNode node) {
-      SymbolTable parent = varTable;
-      varTable = node.getLocalSymbolTable();
+      SymbolTable parent = symbolTable;
+      symbolTable = node.getLocalSymbolTable();
 
       defaultBehavior(node);
 
-      varTable = parent;
+      symbolTable = parent;
       return true;
   }
 
   @Override
   public Boolean visit(ArrayLocationNode node) {
     TypedDescriptor desc =
-      (TypedDescriptor)(varTable.get(node.getName(), true));
+      (TypedDescriptor)(symbolTable.get(node.getName(), true));
     if (desc == null) {
       ErrorReporting.reportError(
         new SymbolTableException(node.getSourceLoc(),
@@ -109,7 +107,7 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
   @Override
   public Boolean visit(ScalarLocationNode node) {
     TypedDescriptor desc =
-      (TypedDescriptor)(varTable.get(node.getName(), true));
+      (TypedDescriptor)(symbolTable.get(node.getName(), true));
     if (desc == null) {
       ErrorReporting.reportError(
         new SymbolTableException(node.getSourceLoc(),
@@ -127,7 +125,7 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
 
   @Override
   public Boolean visit(MethodCallNode node) {
-    if (!methodTable.contains(node.getName())) {
+    if (symbolTable.get(node.getName(), false) == null) {
       ErrorReporting.reportError(
         new SymbolTableException(node.getSourceLoc(),
           "Undeclared method " + node.getName()));

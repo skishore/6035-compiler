@@ -89,8 +89,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
     }
 
     currParent = parent;
-    return new ClassDescriptor(parent, node.getName(), fieldSymbolTable,
-                               methodSymbolTable);
+    return new ClassDescriptor(parent, node.getName(), methodSymbolTable);
   }
 
   @Override

@@ -55,6 +55,9 @@ public class SymbolTable {
         } else if (primitive && d instanceof TypedDescriptor ||
                    !primitive && d instanceof MethodDescriptor) {
           return d;
+        } else {
+          // Found descriptor of the wrong type
+          return null;
         }
 
       }
@@ -67,26 +70,30 @@ public class SymbolTable {
    * Checks if this symbol table or any ancestor contains the query id
    *
    * @param id The id to be searched for
+   * @param primitive Whether the string is a primitive or a method,
+   *                  null for either
    * @return True if found, false otherwise
    */
-  public boolean contains(String id) {
-    Boolean found = false;
+  public boolean contains(String id, Boolean primitive) {
     SymbolTable st = this;
-    while (st != null) {
-      if (st.getMap().containsKey(id)) {
-        found = true;
-      }
-      st = st.getParent();
-    }
-    return found;
+    Descriptor desc = st.get(id, primitive);
+    return (desc != null);
   }
 
   public SymbolTable getParent() {
     return this.parent;
   }
 
-  public Map<String, Descriptor> getMap() {
+  private Map<String, Descriptor> getMap() {
     return table;
+  }
+  
+  public int size() {
+    if (parent == null) {
+      return table.size();
+    }
+    
+    return table.size() + parent.size();
   }
 
   @Override

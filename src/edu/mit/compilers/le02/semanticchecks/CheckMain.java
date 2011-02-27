@@ -29,15 +29,15 @@ public class CheckMain {
   public static void check(ASTNode root) {
     assert(root instanceof ClassNode);
 
-    SymbolTable methodTable =
-      ((ClassNode)root).getDesc().getMethodSymbolTable();
-    if (!methodTable.contains("main")) {
+    SymbolTable symbolTable =
+      ((ClassNode)root).getDesc().getSymbolTable();
+    if (!symbolTable.contains("main", false)) {
       ErrorReporting.reportError(
         new SymbolTableException(root.getSourceLoc(), "No main method found"));
     } else {
       MethodDescriptor mainDesc =
-        (MethodDescriptor)(methodTable.getMap().get("main"));
-      if (mainDesc.getParamSymbolTable().getMap().size() > 0) {
+        (MethodDescriptor)(symbolTable.get("main", false));
+      if (mainDesc.getParams().size() > 0) {
         SourceLocation sl = root.getSourceLoc();
         String message = "Main method takes a parameter";
         for (MethodDeclNode method : ((ClassNode)root).getMethods()) {
