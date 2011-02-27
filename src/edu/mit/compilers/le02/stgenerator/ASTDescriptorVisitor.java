@@ -1,14 +1,13 @@
 package edu.mit.compilers.le02.stgenerator;
 
 import edu.mit.compilers.le02.symboltable.TypedDescriptor;
-import edu.mit.compilers.le02.ast.ASTNode;
 import edu.mit.compilers.le02.ast.ASTNodeVisitor;
 import edu.mit.compilers.le02.ast.ArrayLocationNode;
 import edu.mit.compilers.le02.ast.BlockNode;
 import edu.mit.compilers.le02.ast.ClassNode;
+import edu.mit.compilers.le02.ast.ForNode;
 import edu.mit.compilers.le02.ast.MethodCallNode;
 import edu.mit.compilers.le02.ast.ScalarLocationNode;
-import edu.mit.compilers.le02.ast.StatementNode;
 import edu.mit.compilers.le02.symboltable.ClassDescriptor;
 import edu.mit.compilers.le02.symboltable.MethodDescriptor;
 import edu.mit.compilers.le02.symboltable.SymbolTable;
@@ -46,7 +45,19 @@ public final class ASTDescriptorVisitor extends ASTNodeVisitor<Object> {
     defaultBehavior(node);
     return null;
   }
-  
+
+  @Override
+  public Object visit(ForNode node) {
+    node.getInit().getLoc().setDesc(
+      (TypedDescriptor)node.getBody().getLocalSymbolTable().get(
+        node.getInit().getLoc().getName(), true));
+    // Do not visit init statement again, because it'll cause us to overwrite.
+    node.getInit().getValue().accept(this);
+    node.getEnd().accept(this);
+    node.getBody().accept(this);
+    return null;
+  }
+
   @Override
   public Object visit(ScalarLocationNode node) {
     node.setDesc((TypedDescriptor) currST.get(node.getName(), true));
