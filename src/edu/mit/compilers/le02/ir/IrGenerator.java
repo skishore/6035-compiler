@@ -84,12 +84,16 @@ public class IrGenerator {
       ErrorReporting.reportError(
         new IrException(SourceLocation.getSourceLocationWithoutDetails(),
           "Attempted to visit null node. Check if parse tree is malformed"));
+      // This should never happen, but if it does, we return a dummy
+      // BooleanNode so that the rest of IrGenerator can run.
       return new BooleanNode(
         SourceLocation.getSourceLocationWithoutDetails(), false);
     }
 
     final SourceLocation sl = new SourceLocation(node);
 
+    // The action we want to take depends upon what the
+    // DecafParserTokenType of the AST node is.
     switch (node.getType()) {
      case DecafParserTokenTypes.PROGRAM:
       return processProgram(node, sl);
@@ -178,10 +182,10 @@ public class IrGenerator {
      //   {#statement = #([TK_return], r);} |
      case DecafParserTokenTypes.TK_return:
       if (node.getFirstChild() != null) {
-       return new ReturnNode(sl,
-         (ExpressionNode)visit(node.getFirstChild()));
+        return new ReturnNode(sl,
+          (ExpressionNode)visit(node.getFirstChild()));
       } else {
-       return new ReturnNode(sl);
+        return new ReturnNode(sl);
       }
 
      //  TK_break SEMICOLON! |
@@ -236,14 +240,14 @@ public class IrGenerator {
       return new CharNode(sl,
         Util.unescape(node.getFirstChild().getText()).charAt(1));
 
-     case DecafParserTokenTypes.INTEGER_LITERAL:
-      return processInt(node, sl);
-
      case DecafParserTokenTypes.STRING_LITERAL:
       String str_text = node.getFirstChild().getText();
       // Remove the leading and trailing quotes, and unescape.
       return new StringNode(sl,
         Util.unescape(str_text.substring(1, str_text.length() - 1)));
+
+     case DecafParserTokenTypes.INTEGER_LITERAL:
+      return processInt(node, sl);
 
      default:
       ErrorReporting.reportError(
@@ -294,10 +298,10 @@ public class IrGenerator {
     switch (call_arg.getType()) {
      case DecafParserTokenTypes.EXPR:
       return new SyscallArgNode(call_arg_loc,
-                                 (ExpressionNode)visit(call_arg));
+                                (ExpressionNode)visit(call_arg));
      case DecafParserTokenTypes.STRING_LITERAL:
       return new SyscallArgNode(call_arg_loc,
-                                 (StringNode)visit(call_arg));
+                                (StringNode)visit(call_arg));
      default:
        ErrorReporting.reportError(
          new IrException(call_arg_loc, "Invalid syscall argument type"));
@@ -368,12 +372,15 @@ public class IrGenerator {
     switch (termChild.getType()) {
      case DecafParserTokenTypes.MINUS:
       return processMinus(termChild.getNextSibling(), sl);
+
      case DecafParserTokenTypes.NOT:
       return new NotNode(sl,
         (ExpressionNode)visit(termChild.getNextSibling()));
+
      case DecafParserTokenTypes.LOCATION:
       return new VariableNode(new SourceLocation(termChild),
         (LocationNode)visit(termChild));
+
      case DecafParserTokenTypes.CALL:
      case DecafParserTokenTypes.TK_callout:
      case DecafParserTokenTypes.INTEGER_LITERAL:
@@ -383,6 +390,7 @@ public class IrGenerator {
      case DecafParserTokenTypes.TERMF:
        // Use general parsing routines.
        return (ExpressionNode)visit(termChild);
+
      default:
       ErrorReporting.reportError(new IrException(new SourceLocation(termChild),
         "Unknown expression terminal " + termChild.getType()));
@@ -413,6 +421,8 @@ public class IrGenerator {
     ExpressionNode rightExpr = (ExpressionNode)visit(rightTerm);
     ExpressionNode nextExpr = (ExpressionNode)visit(nextPrime);
     BinaryOpNode left;
+
+    // Generate the correct BinaryOpNode.
     switch (primeChild.getType()) {
      case DecafParserTokenTypes.LOGICAL_OR:
       left = new BoolOpNode(sl, null, rightExpr, BoolOp.OR);
@@ -459,6 +469,8 @@ public class IrGenerator {
           "Unknown binary operation " + primeChild.getText()));
       return new BooleanNode(sl, false);
     }
+
+    // Chain consecutive binary operation nodes together.
     if (nextExpr != null && nextExpr instanceof BinaryOpNode) {
       BinaryOpNode right = (BinaryOpNode)nextExpr;
       return composite(left, right);
@@ -482,6 +494,9 @@ public class IrGenerator {
     ExpressionNode value = (ExpressionNode)visit(value_ast);
     SourceLocation op_ast_location = new SourceLocation(op_ast);
 
+    // We transform inc-assign and dec-assign operations directly into the
+    // appropriate value expression and a vanilla assignment so we only need
+    // one kind of AssignNode in our AST.
     switch (op_ast.getType()) {
      case DecafParserTokenTypes.ASSIGN:
       return new AssignNode(sl, loc, value);
@@ -630,6 +645,7 @@ public class IrGenerator {
 
   /**
    * Processes an {@link DecafParserTokenTypes.INTEGER_LITERAL} token.
+   * See javadoc for {@link IntNode} for why we invert the raw token values.
    */
   protected IntNode processInt(AST node, SourceLocation sl) {
     String raw_int = node.getFirstChild().getText();
@@ -669,6 +685,7 @@ public class IrGenerator {
       return new MinusNode(sl, child);
     }
   }
+
   /**
    * Converts a subtree containing {@link ASTNode} children of type T to a
    * {@link NodeList} of those children.

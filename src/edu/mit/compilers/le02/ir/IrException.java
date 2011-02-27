@@ -3,6 +3,10 @@ package edu.mit.compilers.le02.ir;
 import edu.mit.compilers.le02.semanticchecks.SemanticException;
 import edu.mit.compilers.le02.SourceLocation;
 
+
+/**
+ * Represents an exception discovered in the IrGenerator.
+ */
 public class IrException extends SemanticException {
   public IrException(SourceLocation loc) {
     super(loc);
