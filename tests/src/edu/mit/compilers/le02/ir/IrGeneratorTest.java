@@ -176,7 +176,6 @@ public class IrGeneratorTest extends TestCase {
     IrGenerator gen = IrGenerator.getInstance();
     ErrorReporting.clearErrors();
 
-    System.out.println("\"foo bar \\t \\n \\\" \\\' \\\\ ack\"");
     AST escapedString = generateString(
       "\"foo bar \\t \\n \\\" \\\' \\\\ ack\"");
     StringNode stringNode = (StringNode)gen.visit(escapedString);
