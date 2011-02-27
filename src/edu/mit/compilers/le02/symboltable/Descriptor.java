@@ -2,24 +2,24 @@ package edu.mit.compilers.le02.symboltable;
 
 
 public abstract class Descriptor {
-	private SymbolTable parent;
-	private String id;
-	
-	public Descriptor(SymbolTable parent, String id){
-		this.parent = parent;
-		this.id = id;
-	}
-	
-	public SymbolTable getParent(){
-		return this.parent;
-	}
-	
-	public String getId(){
-		return this.id;
-	}
+  private SymbolTable parent;
+  private String id;
 
-	@Override
-	public abstract String toString();
+  public Descriptor(SymbolTable parent, String id) {
+    this.parent = parent;
+    this.id = id;
+  }
 
-	
+  public SymbolTable getParent() {
+    return this.parent;
+  }
+
+  public String getId() {
+    return this.id;
+  }
+
+  @Override
+  public abstract String toString();
+
+
 }

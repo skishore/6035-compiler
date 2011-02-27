@@ -45,15 +45,15 @@ public final class BlockNode extends StatementNode {
   public void setLocalSymbolTable(SymbolTable locals) {
     localSymbolTable = locals;
   }
-  
+
   public SymbolTable getLocalSymbolTable() {
     return localSymbolTable;
   }
 
 
   @Override
-  public <T> T accept(ASTNodeVisitor<T> v) { 
-    return v.visit(this); 
+  public <T> T accept(ASTNodeVisitor<T> v) {
+    return v.visit(this);
   }
 
 }

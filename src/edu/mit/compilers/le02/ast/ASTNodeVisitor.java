@@ -18,7 +18,7 @@ public abstract class ASTNodeVisitor<T> {
    *
    * Alternatively, you can override the default behavior method if you
    * need to.
-   * 
+   *
    * Replacing these with a base class method doesn't work, due to Java's
    * inheritance handling.
    */

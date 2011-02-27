@@ -45,8 +45,8 @@ public final class SystemCallNode extends CallNode {
   }
 
   @Override
-  public <T> T accept(ASTNodeVisitor<T> v) { 
-    return v.visit(this); 
+  public <T> T accept(ASTNodeVisitor<T> v) {
+    return v.visit(this);
   }
 
   @Override

@@ -37,7 +37,7 @@ public final class StringNode extends ASTNode {
   }
 
   @Override
-  public <T> T accept(ASTNodeVisitor<T> v) { 
-    return v.visit(this); 
+  public <T> T accept(ASTNodeVisitor<T> v) {
+    return v.visit(this);
   }
 }

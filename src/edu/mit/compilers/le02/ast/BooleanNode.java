@@ -37,8 +37,8 @@ public final class BooleanNode extends ExpressionNode {
   }
 
   @Override
-  public <T> T accept(ASTNodeVisitor<T> v) { 
-    return v.visit(this); 
+  public <T> T accept(ASTNodeVisitor<T> v) {
+    return v.visit(this);
   }
 
   @Override

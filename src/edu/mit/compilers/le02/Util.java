@@ -15,7 +15,7 @@ public class Util {
   }
 
   public static <T> List<T> emptyList(Class<T> T) {
-    List<T> list = Collections.emptyList(); 
+    List<T> list = Collections.emptyList();
     return list;
   }
 

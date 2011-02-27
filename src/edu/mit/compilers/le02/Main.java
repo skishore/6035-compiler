@@ -131,7 +131,7 @@ public class Main {
 
     // If debug mode is set, enable tracing in the scanner.
     scanner.setTrace(CLI.debug);
-    if (!CLI.compat) { 
+    if (!CLI.compat) {
       scanner.setFilename(CLI.infile);
     }
 
@@ -293,7 +293,7 @@ public class Main {
         if (CLI.debug) {
           parent.accept(new AstPrettyPrinter());
         }
-      } 
+      }
     } catch (ANTLRException e) {
       ErrorReporting.reportErrorCompat(e);
       success = false;

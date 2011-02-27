@@ -49,7 +49,7 @@ public final class ClassNode extends ASTNode {
   public void setMethods(List<MethodDeclNode> methods) {
     this.methods = methods;
   }
-  
+
   public ClassDescriptor getDesc() {
     return desc;
   }
@@ -57,9 +57,9 @@ public final class ClassNode extends ASTNode {
   public void setDesc(ClassDescriptor desc) {
     this.desc = desc;
   }
-  
+
   @Override
-  public <T> T accept(ASTNodeVisitor<T> v) { 
-    return v.visit(this); 
+  public <T> T accept(ASTNodeVisitor<T> v) {
+    return v.visit(this);
   }
 }

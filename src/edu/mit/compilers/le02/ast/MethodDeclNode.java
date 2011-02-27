@@ -9,7 +9,7 @@ import edu.mit.compilers.le02.SourceLocation;
 public final class MethodDeclNode extends DeclNode {
   private List<VarDeclNode> params;
   private BlockNode body;
-  
+
   public MethodDeclNode(SourceLocation sl, DecafType type,
                         String id, List<VarDeclNode> params, BlockNode body) {
     super(sl, type, id);
@@ -38,7 +38,7 @@ public final class MethodDeclNode extends DeclNode {
   }
 
   @Override
-  public <T> T accept(ASTNodeVisitor<T> v) { 
-    return v.visit(this); 
+  public <T> T accept(ASTNodeVisitor<T> v) {
+    return v.visit(this);
   }
 }

@@ -19,7 +19,7 @@ import edu.mit.compilers.le02.symboltable.SymbolTable;
  */
 public final class ASTDescriptorVisitor extends ASTNodeVisitor<Object> {
   private SymbolTable currST;
-  
+
   public void setASTDescriptors(ClassNode node, ClassDescriptor desc) {
     currST = desc.getMethodSymbolTable();
     node.setDesc(desc);

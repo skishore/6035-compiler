@@ -78,7 +78,7 @@ public class CLI {
 
   /**
    * Whether to return behavior compatible with the provided scanner testcases
-   * rather than the friendlier format from the new error reporting system. 
+   * rather than the friendlier format from the new error reporting system.
    */
   public static boolean compat;
 

@@ -142,8 +142,8 @@ public class NodeList<T extends ASTNode> extends ASTNode implements List<T> {
   }
 
   @Override
-  public <V> V accept(ASTNodeVisitor<V> v) { 
-    return v.visit(this); 
+  public <V> V accept(ASTNodeVisitor<V> v) {
+    return v.visit(this);
   }
-  
+
 }

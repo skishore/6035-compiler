@@ -8,7 +8,7 @@ import edu.mit.compilers.le02.Util;
 public final class ArrayLocationNode extends LocationNode {
   private ExpressionNode index;
 
-  public ArrayLocationNode(SourceLocation sl, String name, 
+  public ArrayLocationNode(SourceLocation sl, String name,
                            ExpressionNode index) {
     super(sl, name);
     this.index = index;

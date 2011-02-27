@@ -9,7 +9,7 @@ public abstract class ExpressionNode extends ASTNode {
   public ExpressionNode(SourceLocation sl) {
     super(sl);
   }
-  
+
   abstract public DecafType getType();
 
 }

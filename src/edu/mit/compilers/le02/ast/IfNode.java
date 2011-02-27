@@ -33,7 +33,7 @@ public final class IfNode extends StatementNode {
     List<ASTNode> children = new ArrayList<ASTNode>();
     children.add(condition);
     children.add(thenBlock);
-    
+
     if (hasElse) {
       children.add(elseBlock);
     }
@@ -70,7 +70,7 @@ public final class IfNode extends StatementNode {
   }
 
   @Override
-  public <T> T accept(ASTNodeVisitor<T> v) { 
-    return v.visit(this); 
+  public <T> T accept(ASTNodeVisitor<T> v) {
+    return v.visit(this);
   }
 }
