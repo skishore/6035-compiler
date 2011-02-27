@@ -24,5 +24,6 @@ public class MasterChecker {
         CheckMain.check(root);
         CheckArrayLengths.check(root);
         CheckMethodCalls.check(root);
+        CheckExprTypes.check(root);
     }
 }

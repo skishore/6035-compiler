@@ -12,15 +12,17 @@ import edu.mit.compilers.le02.ast.ForNode;
 import edu.mit.compilers.le02.ast.MethodCallNode;
 import edu.mit.compilers.le02.ast.MethodDeclNode;
 import edu.mit.compilers.le02.ast.ScalarLocationNode;
+import edu.mit.compilers.le02.semanticchecks.SemanticException;
 import edu.mit.compilers.le02.stgenerator.SymbolTableException;
+import edu.mit.compilers.le02.symboltable.TypedDescriptor;
 import edu.mit.compilers.le02.symboltable.MethodDescriptor;
 import edu.mit.compilers.le02.symboltable.SymbolTable;
 
 public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
     /** Holds the CheckDeclarations singleton. */
     private static CheckDeclarations instance;
-    private static SymbolTable varTable;
     private static SymbolTable methodTable;
+    private static SymbolTable varTable;
 
     /**
      * Retrieves the CheckDeclarations singleton, creating if necessary.
@@ -42,8 +44,8 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
 
     @Override
     public Boolean visit(ClassNode node) {
-        varTable = node.getDesc().getFieldSymbolTable();
         methodTable = node.getDesc().getMethodSymbolTable();
+        varTable = node.getDesc().getFieldSymbolTable();
 
         defaultBehavior(node);
         return true;
@@ -79,14 +81,24 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
 
     @Override
     public Boolean visit(ArrayLocationNode node) {
-        SymbolTable search = varTable;
-        while ((!search.contains(node.getName())) && (search.getParent() != null)) {
-            search = search.getParent();
-        }
-        if (search == null) {
+        TypedDescriptor desc = (TypedDescriptor)(varTable.get(node.getName(), true));
+        if (desc == null) {
             ErrorReporting.reportError(
                 new SymbolTableException(node.getSourceLoc(),
-                "Undeclared variable " + node.getName()));
+                "Undeclared array " + node.getName()));
+        } else {
+            if (!((desc.getType() == DecafType.INT_ARRAY) ||
+                    (desc.getType() == DecafType.BOOLEAN_ARRAY))) {
+                ErrorReporting.reportError(
+                    new SemanticException(node.getSourceLoc(),
+                    "Indexing into non-array " + node.getName()));
+            }
+
+            if (node.getIndex().getType() != DecafType.INT) {
+                ErrorReporting.reportError(
+                    new SemanticException(node.getIndex().getSourceLoc(),
+                    "Non-integer index into array " + node.getName()));
+            }
         }
 
         defaultBehavior(node);
@@ -95,14 +107,16 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
 
     @Override
     public Boolean visit(ScalarLocationNode node) {
-        SymbolTable search = varTable;
-        while ((search != null) && (!search.contains(node.getName()))) {
-            search = search.getParent();
-        }
-        if (search == null) {
+        TypedDescriptor desc = (TypedDescriptor)(varTable.get(node.getName(), true));
+        if (desc == null) {
             ErrorReporting.reportError(
                 new SymbolTableException(node.getSourceLoc(), 
                 "Undeclared variable " + node.getName()));
+        } else if ((desc.getType() == DecafType.INT_ARRAY) ||
+                (desc.getType() == DecafType.BOOLEAN_ARRAY)) {
+            ErrorReporting.reportError(
+                new SemanticException(node.getSourceLoc(),
+                "Array " + node.getName() + " with no index"));
         }
 
         defaultBehavior(node);
