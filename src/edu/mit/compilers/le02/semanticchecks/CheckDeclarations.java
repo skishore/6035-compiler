@@ -126,7 +126,7 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
 
   @Override
   public Boolean visit(MethodCallNode node) {
-    if (symbolTable.get(node.getName(), SymbolType.METHOD) == null) {
+    if (!symbolTable.contains(node.getName(), SymbolType.METHOD)) {
       ErrorReporting.reportError(
         new SymbolTableException(node.getSourceLoc(),
           "Undeclared method " + node.getName()));
