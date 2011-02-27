@@ -112,7 +112,8 @@ public class CheckExprTypes extends ASTNodeVisitor<Boolean> {
   @Override
   public Boolean visit(AssignNode node) {
     DecafType expected = DecafType.simplify(node.getLoc().getType());
-    if (expected != DecafType.simplify(node.getValue().getType())) {
+    if (expected != null &&
+        expected != DecafType.simplify(node.getValue().getType())) {
       ErrorReporting.reportError(
         new SemanticException(node.getValue().getSourceLoc(),
           "Type mismatch: assignment to " + node.getLoc().getName() +
