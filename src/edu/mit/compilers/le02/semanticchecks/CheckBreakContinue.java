@@ -30,10 +30,7 @@ public class CheckBreakContinue extends ASTNodeVisitor<Boolean> {
     }
 
     /**
-     * Checks that every operation is performed on two expressions of the correct type,
-     * that the types of assignments agree,
-     * that for statements have integer bounds,
-     * and that if statements have boolean conditionals,
+     * Checks that every break and continue statement is in the body of a for loop. 
      */
     public static void check(ASTNode root) {
         inForLoop = false;

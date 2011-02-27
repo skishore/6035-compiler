@@ -30,10 +30,8 @@ public class CheckReturnValues extends ASTNodeVisitor<Boolean> {
     }
 
     /**
-     * Checks that every operation is performed on two expressions of the correct type,
-     * that the types of assignments agree,
-     * that for statements have integer bounds,
-     * and that if statements have boolean conditionals,
+     * Checks that no void method returns a value and that every other
+     * method returns a value of the correct type.
      */
     public static void check(ASTNode root) {
         assert(root instanceof ClassNode);
