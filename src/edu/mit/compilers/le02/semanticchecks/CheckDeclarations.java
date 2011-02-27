@@ -118,7 +118,7 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
                (desc.getType() == DecafType.BOOLEAN_ARRAY)) {
       ErrorReporting.reportError(
         new SemanticException(node.getSourceLoc(),
-          "Array " + node.getName() + " with no index"));
+          "Array " + node.getName() + " used without index as scalar"));
     }
 
     defaultBehavior(node);
