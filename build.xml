@@ -124,7 +124,7 @@
     <!-- Iterate over the non-unittest test directories -->
     <exec executable="${tests}/scanner/test.sh" failonerror="true" />
     <exec executable="${tests}/parser/test.sh" failonerror="true" />
-    <exec executable="${tests}/semantics/test.sh" failonerror="false" />
+    <exec executable="${tests}/semantics/test.sh" failonerror="true" />
   </target>
 
  <!-- to clean, delete everything in the autogen, classes, and dist
