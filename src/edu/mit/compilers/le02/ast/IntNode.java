@@ -11,6 +11,8 @@ import edu.mit.compilers.le02.SourceLocation;
  * need to store input values of [0,2^31]. We then later verify that any
  * values of 2^31 (outside the range) were in fact inverted to -2^31.
  * Any values of 2^31 that are left outstanding need to be marked invalid.
+ * We cannot store non-inverted values initially because we may need to store
+ * a positive 2^31 which won't fit in a regular int.
  */
 public final class IntNode extends ExpressionNode {
   private int value;

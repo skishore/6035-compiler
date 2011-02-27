@@ -261,6 +261,9 @@ method_call!:
 // Rewriting the grammar for expression evaluation to not cascade left,
 // and simultaneously ensuring order of operations is observed.
 
+// See comments in IrGenerator.java for processTerm, processTermF, and
+// processTermPrime for definitions.
+
 // Tier -1: ||
 expr!: zero:term_zero prime:expr_prime
  { #expr = #([EXPR,"Expr"], zero, prime); };
@@ -315,7 +318,7 @@ term_five!: t6:term_six { #term_five = #([TERMF,"TermF"], t6); } |
             n:NOT t5:term_five
               { #term_five = #([TERMF,"TermF"], n,
                   #([TERMF,"TermF"], t5)); };
-// Tier 6: urnary -
+// Tier 6: unary -
 term_six: term_final |! m:MINUS t:term_six
                         { #term_six = #([TERMF,"TermF"], m,
                             #([TERMF,"TermF"], t)); };

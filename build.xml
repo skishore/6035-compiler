@@ -1,4 +1,4 @@
-<project name="Compiler" default="integration_tests" basedir=".">
+<project name="Compiler" default="presubmit" basedir=".">
 
   <property name="base_package_dir" value="edu/mit/compilers/le02" />
   <property name="base_package_name" value="edu.mit.compilers.le02" />
@@ -120,11 +120,18 @@
              overwrite="true" />
   </target>
 
-  <target name="integration_tests" depends="jar">
+  <target name="integrationtests" depends="jar">
     <!-- Iterate over the non-unittest test directories -->
     <exec executable="${tests}/scanner/test.sh" failonerror="true" />
     <exec executable="${tests}/parser/test.sh" failonerror="true" />
     <exec executable="${tests}/semantics/test.sh" failonerror="true" />
+  </target>
+
+  <target name="lint">
+    <exec executable="${bin}/lint.sh" failonerror="true" />
+  </target>
+
+  <target name="presubmit" depends="integrationtests,lint">
   </target>
 
  <!-- to clean, delete everything in the autogen, classes, and dist

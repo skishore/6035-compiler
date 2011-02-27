@@ -5,7 +5,7 @@ import antlr.Token;
 
 /**
  * Implement a version of an AST node that stores token locations.
- * @author Liz Fong <lizfong@mit.edu>
+ * @author lizfong@mit.edu (Liz Fong)
  */
 public class LineNumberedAST extends CommonAST {
   private int line = -1;
@@ -20,6 +20,9 @@ public class LineNumberedAST extends CommonAST {
 
   @Override
   public int getLine() {
+    // If we have a line, return it directly; otherwise recurse to
+    // find the nearest location information first through children and
+    // then through siblings.
     if (line != -1) {
       return line;
     } else if (getFirstChild() != null) {
@@ -33,6 +36,9 @@ public class LineNumberedAST extends CommonAST {
 
   @Override
   public int getColumn() {
+    // If we have a column, return it directly; otherwise recurse to
+    // find the nearest location information first through children and
+    // then through siblings.
     if (col != -1) {
       return col;
     } else if (getFirstChild() != null) {

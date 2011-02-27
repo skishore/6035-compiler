@@ -3,5 +3,4 @@ dist
 autogen
 .classpath
 .project
-bin
 code/

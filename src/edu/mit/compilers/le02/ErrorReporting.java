@@ -12,17 +12,26 @@ import edu.mit.compilers.tools.CLI;
 public class ErrorReporting {
 
   /**
-   * Utility method to pretty-print an exception along with the corresponding
-   * file name.
+   * Utility method to immediately pretty-print an exception to stdout
+   * along with the corresponding file name. No location information is
+   * printed since generic Exceptions do not have attached SourceLocations.
    */
   public static void reportErrorCompat(Exception e) {
     System.out.println(CLI.getInputFilename() + " " + e);
   }
 
+  /**
+   * Reports a specific CompilerException to be stored in the list of
+   * compilation errors and reported later.
+   */
   public static void reportError(CompilerException ce) {
     errorList.add(ce);
   }
 
+  /**
+   * Prints all currently stored CompilerExceptions to the specified
+   * PrintStream e.g. System.out or System.err.
+   */
   public static void printErrors(PrintStream ps) {
     for (CompilerException ce : errorList) {
       ps.println(ce.getMessage());
@@ -49,14 +58,22 @@ public class ErrorReporting {
     }
   }
 
+  /**
+   * Returns whether there are no errors accumulated since ErrorReporting was
+   * last cleared.
+   */
   public static boolean noErrors() {
     return errorList.isEmpty();
   }
 
+  /**
+   * Clears the list of errors. Most useful for unit testing.
+   */
   public static void clearErrors() {
     errorList.clear();
   }
 
+  /** The list of all CompilerExceptions reported thus far. */
   private static List<CompilerException> errorList =
     new ArrayList<CompilerException>();
 }
