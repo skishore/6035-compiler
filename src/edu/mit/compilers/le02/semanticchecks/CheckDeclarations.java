@@ -16,6 +16,7 @@ import edu.mit.compilers.le02.stgenerator.SymbolTableException;
 import edu.mit.compilers.le02.symboltable.TypedDescriptor;
 import edu.mit.compilers.le02.symboltable.MethodDescriptor;
 import edu.mit.compilers.le02.symboltable.SymbolTable;
+import edu.mit.compilers.le02.symboltable.SymbolTable.SymbolType;
 
 public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
   /** Holds the CheckDeclarations singleton. */
@@ -52,7 +53,7 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
   public Boolean visit(MethodDeclNode node) {
       SymbolTable parent = symbolTable;
       symbolTable = ((MethodDescriptor) 
-          symbolTable.get(node.getName(), false)).getSymbolTable();
+          symbolTable.get(node.getName(), SymbolType.METHOD)).getSymbolTable();
 
       defaultBehavior(node);
 
@@ -80,7 +81,7 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
   @Override
   public Boolean visit(ArrayLocationNode node) {
     TypedDescriptor desc =
-      (TypedDescriptor)(symbolTable.get(node.getName(), true));
+      (TypedDescriptor)(symbolTable.get(node.getName(), SymbolType.VARIABLE));
     if (desc == null) {
       ErrorReporting.reportError(
         new SymbolTableException(node.getSourceLoc(),
@@ -107,7 +108,7 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
   @Override
   public Boolean visit(ScalarLocationNode node) {
     TypedDescriptor desc =
-      (TypedDescriptor)(symbolTable.get(node.getName(), true));
+      (TypedDescriptor)(symbolTable.get(node.getName(), SymbolType.VARIABLE));
     if (desc == null) {
       ErrorReporting.reportError(
         new SymbolTableException(node.getSourceLoc(),
@@ -125,7 +126,7 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
 
   @Override
   public Boolean visit(MethodCallNode node) {
-    if (symbolTable.get(node.getName(), false) == null) {
+    if (symbolTable.get(node.getName(), SymbolType.METHOD) == null) {
       ErrorReporting.reportError(
         new SymbolTableException(node.getSourceLoc(),
           "Undeclared method " + node.getName()));

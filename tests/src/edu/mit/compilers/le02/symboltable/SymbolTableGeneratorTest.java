@@ -17,6 +17,7 @@ import edu.mit.compilers.le02.ast.ScalarLocationNode;
 import edu.mit.compilers.le02.ast.StatementNode;
 import edu.mit.compilers.le02.ast.VarDeclNode;
 import edu.mit.compilers.le02.stgenerator.SymbolTableGenerator;
+import edu.mit.compilers.le02.symboltable.SymbolTable.SymbolType;
 
 
 public class SymbolTableGeneratorTest extends TestCase {
@@ -36,18 +37,20 @@ public class SymbolTableGeneratorTest extends TestCase {
     assertTrue(ErrorReporting.noErrors());
 
     assertNotNull(st);
-    ClassDescriptor cd = (ClassDescriptor) st.get("Program", null);
+    ClassDescriptor cd = (ClassDescriptor) st.get("Program", 
+                                                  SymbolType.EITHER);
     assertNotNull(cd);
     SymbolTable fst = cd.getSymbolTable();
     assertNotNull(fst);
 
-    FieldDescriptor fd = (FieldDescriptor) fst.get("array1", null);
+    FieldDescriptor fd = (FieldDescriptor) fst.get("array1", 
+                                                   SymbolType.EITHER);
     checkTypedDesc(fd, "array1", DecafType.INT_ARRAY);
-    fd = (FieldDescriptor) fst.get("array2", null);
+    fd = (FieldDescriptor) fst.get("array2", SymbolType.EITHER);
     checkTypedDesc(fd, "array2", DecafType.BOOLEAN_ARRAY);
-    fd = (FieldDescriptor) fst.get("var1", null);
+    fd = (FieldDescriptor) fst.get("var1", SymbolType.EITHER);
     checkTypedDesc(fd, "var1", DecafType.INT);
-    fd = (FieldDescriptor) fst.get("var2", null);
+    fd = (FieldDescriptor) fst.get("var2", SymbolType.EITHER);
     checkTypedDesc(fd, "var2", DecafType.BOOLEAN);
   }
 
@@ -76,12 +79,14 @@ public class SymbolTableGeneratorTest extends TestCase {
     assertTrue(ErrorReporting.noErrors());
 
     assertNotNull(st);
-    ClassDescriptor cd = (ClassDescriptor) st.get("Program", null);
+    ClassDescriptor cd = (ClassDescriptor) st.get("Program", 
+                                                  SymbolType.EITHER);
     assertNotNull(cd);
     SymbolTable mst = cd.getSymbolTable();
     assertNotNull(mst);
 
-    MethodDescriptor md = (MethodDescriptor) mst.get("method1", null);
+    MethodDescriptor md = (MethodDescriptor) mst.get("method1", 
+                                                     SymbolType.EITHER);
     checkTypedDesc(md, "method1", DecafType.INT);
     SymbolTable pst = md.getSymbolTable();
     SymbolTable lst = md.getCode().getLocalSymbolTable();
@@ -89,15 +94,17 @@ public class SymbolTableGeneratorTest extends TestCase {
     assertNotNull(lst);
 
 
-    ParamDescriptor pd = (ParamDescriptor) pst.get("param1", null);
+    ParamDescriptor pd = (ParamDescriptor) pst.get("param1", 
+                                                   SymbolType.EITHER);
     checkTypedDesc(pd, "param1", DecafType.INT);
 
-    pd = (ParamDescriptor) pst.get("param2", null);
+    pd = (ParamDescriptor) pst.get("param2", SymbolType.EITHER);
     checkTypedDesc(pd, "param2", DecafType.BOOLEAN);
 
-    LocalDescriptor ld = (LocalDescriptor) lst.get("local1", null);
+    LocalDescriptor ld = (LocalDescriptor) lst.get("local1", 
+                                                   SymbolType.EITHER);
     checkTypedDesc(ld, "local1", DecafType.BOOLEAN);
-    ld = (LocalDescriptor) lst.get("local2", null);
+    ld = (LocalDescriptor) lst.get("local2", SymbolType.EITHER);
     checkTypedDesc(ld, "local2", DecafType.INT);
   }
 
@@ -143,30 +150,33 @@ public class SymbolTableGeneratorTest extends TestCase {
     assertTrue(ErrorReporting.noErrors());
 
     assertNotNull(st);
-    ClassDescriptor cd = (ClassDescriptor) st.get("Program", null);
+    ClassDescriptor cd = (ClassDescriptor) st.get("Program", 
+                                                  SymbolType.EITHER);
     assertNotNull(cd);
     SymbolTable mst = cd.getSymbolTable();
     assertNotNull(mst);
 
-    MethodDescriptor md = (MethodDescriptor) mst.get("method1", null);
+    MethodDescriptor md = (MethodDescriptor) mst.get("method1", 
+                                                     SymbolType.EITHER);
     checkTypedDesc(md, "method1", DecafType.INT);
     BlockNode node = (BlockNode) md.getCode().getStatements().get(1);
     SymbolTable lst = node.getLocalSymbolTable();
     assertNotNull(lst);
 
-    LocalDescriptor ld = (LocalDescriptor) lst.get("local1", null);
+    LocalDescriptor ld = (LocalDescriptor) lst.get("local1", 
+                                                   SymbolType.EITHER);
     checkTypedDesc(ld, "local1", DecafType.BOOLEAN);
-    ld = (LocalDescriptor) lst.get("local2", null);
+    ld = (LocalDescriptor) lst.get("local2", SymbolType.EITHER);
     checkTypedDesc(ld, "local2", DecafType.INT);
-    ld = (LocalDescriptor) lst.get("local3", null);
+    ld = (LocalDescriptor) lst.get("local3", SymbolType.EITHER);
     checkTypedDesc(ld, "local3", DecafType.BOOLEAN);
-    ld = (LocalDescriptor) lst.get("local4", null);
+    ld = (LocalDescriptor) lst.get("local4", SymbolType.EITHER);
     checkTypedDesc(ld, "local4", DecafType.INT);
 
     ForNode f = (ForNode) md.getCode().getStatements().get(2);
     lst = f.getBody().getLocalSymbolTable();
     assertNotNull(lst);
-    ld = (LocalDescriptor) lst.get("forVar", null);
+    ld = (LocalDescriptor) lst.get("forVar", SymbolType.EITHER);
     checkTypedDesc(ld, "forVar", DecafType.INT);
   }
 

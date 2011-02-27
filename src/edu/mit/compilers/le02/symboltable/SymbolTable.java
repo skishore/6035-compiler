@@ -10,6 +10,12 @@ import edu.mit.compilers.le02.stgenerator.SymbolTableException;
 public class SymbolTable {
   private SymbolTable parent;
   private Map<String, Descriptor> table;
+  
+  public enum SymbolType {
+    METHOD,
+    VARIABLE,
+    EITHER
+  }
 
   public SymbolTable(SymbolTable parent) {
     this.parent = parent;
@@ -40,20 +46,23 @@ public class SymbolTable {
   /**
    * Finds a descriptor and recurses upwards until found or at top
    * @param id The id of the descriptor
-   * @param primitive Whether the string is a primitive or a method,
-   *                  null for either
+   * @param type Whether the string is a primitive or a method,
+   *                  or either
    * @return Returns the requested descriptor, or null if not found
    */
-  public Descriptor get(String id, Boolean primitive) {
+  public Descriptor get(String id, SymbolType type) {
     Descriptor d;
     SymbolTable st = this;
     while (st != null) {
       if (st.getMap().containsKey(id)) {
         d = st.getMap().get(id);
-        if (primitive == null) {
+        if (type == SymbolType.EITHER) {
           return d;
-        } else if (primitive && d instanceof TypedDescriptor ||
-                   !primitive && d instanceof MethodDescriptor) {
+        } else if ((type == SymbolType.VARIABLE 
+                    && d instanceof TypedDescriptor
+                    && !(d instanceof MethodDescriptor)) ||
+                   (type == SymbolType.METHOD 
+                    && d instanceof MethodDescriptor)) {
           return d;
         } else {
           // Found descriptor of the wrong type
@@ -74,7 +83,7 @@ public class SymbolTable {
    *                  null for either
    * @return True if found, false otherwise
    */
-  public boolean contains(String id, Boolean primitive) {
+  public boolean contains(String id, SymbolType primitive) {
     SymbolTable st = this;
     Descriptor desc = st.get(id, primitive);
     return (desc != null);

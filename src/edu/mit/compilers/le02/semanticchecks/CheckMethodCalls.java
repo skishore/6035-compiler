@@ -9,6 +9,7 @@ import edu.mit.compilers.le02.ast.MethodCallNode;
 import edu.mit.compilers.le02.symboltable.MethodDescriptor;
 import edu.mit.compilers.le02.symboltable.ParamDescriptor;
 import edu.mit.compilers.le02.symboltable.SymbolTable;
+import edu.mit.compilers.le02.symboltable.SymbolTable.SymbolType;
 
 public class CheckMethodCalls extends ASTNodeVisitor<Boolean> {
   /** Holds the CheckMethodCalls singleton. */
@@ -45,7 +46,7 @@ public class CheckMethodCalls extends ASTNodeVisitor<Boolean> {
   @Override
   public Boolean visit(MethodCallNode node) {
     MethodDescriptor methodDesc =
-      (MethodDescriptor)(methodTable.get(node.getName(), false));
+      (MethodDescriptor)(methodTable.get(node.getName(), SymbolType.METHOD));
 
     if (methodDesc.getParams().size() != node.getArgs().size()) {
       ErrorReporting.reportError(new SemanticException(node.getSourceLoc(),
@@ -56,7 +57,7 @@ public class CheckMethodCalls extends ASTNodeVisitor<Boolean> {
       for (int i = 0; i < methodDesc.getParams().size(); i++) {
         DecafType expected =
           ((ParamDescriptor)methodDesc.getSymbolTable().get(
-            methodDesc.getParams().get(i), true)).getType();
+            methodDesc.getParams().get(i), SymbolType.VARIABLE)).getType();
         DecafType got = node.getArgs().get(i).getType();
         if (expected != got) {
           ErrorReporting.reportError(
