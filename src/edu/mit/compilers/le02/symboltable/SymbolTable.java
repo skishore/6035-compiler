@@ -75,6 +75,60 @@ public class SymbolTable {
     return null;
   }
 
+
+
+  /**
+   * Convenience method to get a FieldDescriptor
+   * @param id The id of the descriptor
+   * @return Returns the requested descriptor, or null if not found
+   * @see SymbolTable.get
+   */
+  public FieldDescriptor getField(String id) {
+    return (FieldDescriptor) get(id, SymbolType.VARIABLE);
+  }
+
+
+  /**
+   * Convenience method to get a ParamDescriptor
+   * @param id The id of the descriptor
+   * @return Returns the requested descriptor, or null if not found
+   * @see SymbolTable.get
+   */
+  public ParamDescriptor getParam(String id) {
+    return (ParamDescriptor) get(id, SymbolType.VARIABLE);
+  }
+
+
+  /**
+   * Convenience method to get a MethodDescriptor
+   * @param id The id of the descriptor
+   * @return Returns the requested descriptor, or null if not found
+   * @see SymbolTable.get
+   */
+  public LocalDescriptor getLocal(String id) {
+    return (LocalDescriptor) get(id, SymbolType.VARIABLE);
+  }
+
+  /**
+   * Convenience method to get a TypedDescriptor for a variable
+   * @param id The id of the descriptor
+   * @return Returns the requested descriptor, or null if not found
+   * @see SymbolTable.get
+   */
+  public TypedDescriptor getTypedVar(String id) {
+    return (TypedDescriptor) get(id, SymbolType.VARIABLE);
+  }
+
+  /**
+   * Convenience method to get a MethodDescriptor
+   * @param id The id of the descriptor
+   * @return Returns the requested descriptor, or null if not found
+   * @see SymbolTable.get
+   */
+  public MethodDescriptor getMethod(String id) {
+    return (MethodDescriptor) get(id, SymbolType.METHOD);
+  }
+
   /**
    * Checks if this symbol table or any ancestor contains the query id
    *

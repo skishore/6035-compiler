@@ -27,61 +27,59 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
    * Retrieves the CheckDeclarations singleton, creating if necessary.
    */
   public static CheckDeclarations getInstance() {
-      if (instance == null) {
-        instance = new CheckDeclarations();
-      }
-      return instance;
+    if (instance == null) {
+      instance = new CheckDeclarations();
+    }
+    return instance;
   }
 
   /**
    * Checks that every identifier is declared before it is used.
    */
   public static void check(ASTNode root) {
-      assert(root instanceof ClassNode);
-      root.accept(getInstance());
+    assert(root instanceof ClassNode);
+    root.accept(getInstance());
   }
 
   @Override
   public Boolean visit(ClassNode node) {
-      symbolTable = node.getDesc().getSymbolTable();
+    symbolTable = node.getDesc().getSymbolTable();
 
-      defaultBehavior(node);
-      return true;
+    defaultBehavior(node);
+    return true;
   }
 
   @Override
   public Boolean visit(MethodDeclNode node) {
-      SymbolTable parent = symbolTable;
-      symbolTable = ((MethodDescriptor)
-          symbolTable.get(node.getName(), SymbolType.METHOD)).getSymbolTable();
+    SymbolTable parent = symbolTable;
+    symbolTable = symbolTable.getMethod(node.getName()).getSymbolTable();
 
-      defaultBehavior(node);
+    defaultBehavior(node);
 
-      symbolTable = parent;
-      return true;
+    symbolTable = parent;
+    return true;
   }
 
   @Override
   public Boolean visit(ForNode node) {
-      node.getBody().accept(this);
-      return true;
+    node.getBody().accept(this);
+    return true;
   }
 
   @Override
   public Boolean visit(BlockNode node) {
-      SymbolTable parent = symbolTable;
-      symbolTable = node.getLocalSymbolTable();
+    SymbolTable parent = symbolTable;
+    symbolTable = node.getLocalSymbolTable();
 
-      defaultBehavior(node);
+    defaultBehavior(node);
 
-      symbolTable = parent;
-      return true;
+    symbolTable = parent;
+    return true;
   }
 
   @Override
   public Boolean visit(ArrayLocationNode node) {
-    TypedDescriptor desc =
-      (TypedDescriptor)(symbolTable.get(node.getName(), SymbolType.VARIABLE));
+    TypedDescriptor desc = symbolTable.getTypedVar(node.getName());
     if (desc == null) {
       ErrorReporting.reportError(
         new SymbolTableException(node.getSourceLoc(),
@@ -107,14 +105,13 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
 
   @Override
   public Boolean visit(ScalarLocationNode node) {
-    TypedDescriptor desc =
-      (TypedDescriptor)(symbolTable.get(node.getName(), SymbolType.VARIABLE));
+    TypedDescriptor desc = symbolTable.getTypedVar(node.getName());
     if (desc == null) {
       ErrorReporting.reportError(
         new SymbolTableException(node.getSourceLoc(),
-          "Undeclared variable " + node.getName()));
+              "Undeclared variable " + node.getName()));
     } else if ((desc.getType() == DecafType.INT_ARRAY) ||
-               (desc.getType() == DecafType.BOOLEAN_ARRAY)) {
+        (desc.getType() == DecafType.BOOLEAN_ARRAY)) {
       ErrorReporting.reportError(
         new SemanticException(node.getSourceLoc(),
           "Array " + node.getName() + " used without index as scalar"));
