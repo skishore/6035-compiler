@@ -72,7 +72,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
   public Descriptor visit(ClassNode node) {
     SymbolTable parent = currParent;
 
-    // Create and fill fieldSymbolTable
+    // Create and fill globalSymbolTable with fields
     SymbolTable globalSymbolTable = new SymbolTable(parent);
     currParent = globalSymbolTable;
     isField = true;
@@ -81,7 +81,7 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
     }
     isField = false;
 
-    // Create and fill methodSymbolTable
+    // Create and fill globalSymbolTable with methods
     for (MethodDeclNode m : node.getMethods()) {
       globalSymbolTable.put(m.getName(), m.accept(this), m.getSourceLoc());
     }
