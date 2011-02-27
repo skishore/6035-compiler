@@ -83,7 +83,7 @@ public class IrGenerator {
     if (node == null) {
       ErrorReporting.reportError(
         new IrException(SourceLocation.getSourceLocationWithoutDetails(),
-          "Attempted to visit null node. Check if parse tree is malformed."));
+          "Attempted to visit null node. Check if parse tree is malformed"));
       return new BooleanNode(
         SourceLocation.getSourceLocationWithoutDetails(), false);
     }
