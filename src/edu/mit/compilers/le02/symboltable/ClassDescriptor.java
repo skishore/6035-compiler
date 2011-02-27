@@ -2,29 +2,21 @@ package edu.mit.compilers.le02.symboltable;
 
 
 public class ClassDescriptor extends Descriptor {
-  private SymbolTable methodSymbolTable;
-  private SymbolTable fieldSymbolTable;
+  private SymbolTable symbolTable;
 
-  public ClassDescriptor(SymbolTable parent, String id, SymbolTable fields,
-                         SymbolTable methods) {
+  public ClassDescriptor(SymbolTable parent, String id, SymbolTable st) {
     super(parent, id);
 
-    this.fieldSymbolTable = fields;
-    this.methodSymbolTable = methods;
+    this.symbolTable = st;
   }
 
-  public SymbolTable getMethodSymbolTable() {
-    return methodSymbolTable;
-  }
-
-  public SymbolTable getFieldSymbolTable() {
-    return fieldSymbolTable;
+  public SymbolTable getSymbolTable() {
+    return symbolTable;
   }
 
   @Override
   public String toString() {
-    return "[" + fieldSymbolTable.toString() +
-      "],[" +methodSymbolTable.toString() + "]";
+    return "[" + symbolTable.toString() + "]";
   }
 
 

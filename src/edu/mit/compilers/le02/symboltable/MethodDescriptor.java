@@ -6,22 +6,22 @@ import java.util.List;
 
 public class MethodDescriptor extends TypedDescriptor {
   BlockNode code;
-  SymbolTable paramSymbolTable;
+  SymbolTable symbolTable;
   List<String> params;
 
   public MethodDescriptor(SymbolTable parent, String id, DecafType type,
-                          SymbolTable paramSymbolTable, List<String> params,
+                          SymbolTable symbolTable, List<String> params,
                           BlockNode node) {
     super(parent, id, type);
 
     this.code = node;
-    this.paramSymbolTable = paramSymbolTable;
+    this.symbolTable = symbolTable;
         this.params = params;
   }
 
   @Override
   public String toString() {
-    return "[" + this.paramSymbolTable.toString() +
+    return "[" + this.symbolTable.toString() +
       "],[" + this.code.getLocalSymbolTable().toString() + "]";
 
   }
@@ -34,7 +34,7 @@ public class MethodDescriptor extends TypedDescriptor {
     return params;
   }
 
-  public SymbolTable getParamSymbolTable() {
-    return paramSymbolTable;
+  public SymbolTable getSymbolTable() {
+    return symbolTable;
   }
 }

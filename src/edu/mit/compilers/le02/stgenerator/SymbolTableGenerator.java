@@ -72,25 +72,22 @@ public class SymbolTableGenerator extends ASTNodeVisitor<Descriptor> {
   public Descriptor visit(ClassNode node) {
     SymbolTable parent = currParent;
 
-    // Create and fill fieldSymbolTable
-    SymbolTable fieldSymbolTable = new SymbolTable(parent);
-    currParent = fieldSymbolTable;
+    // Create and fill globalSymbolTable with fields
+    SymbolTable globalSymbolTable = new SymbolTable(parent);
+    currParent = globalSymbolTable;
     isField = true;
     for (FieldDeclNode n : node.getFields()) {
-      fieldSymbolTable.put(n.getName(), n.accept(this), n.getSourceLoc());
+      globalSymbolTable.put(n.getName(), n.accept(this), n.getSourceLoc());
     }
     isField = false;
 
-    // Create and fill methodSymbolTable
-    SymbolTable methodSymbolTable = new SymbolTable(fieldSymbolTable);
-    currParent = methodSymbolTable;
+    // Create and fill globalSymbolTable with methods
     for (MethodDeclNode m : node.getMethods()) {
-      methodSymbolTable.put(m.getName(), m.accept(this), m.getSourceLoc());
+      globalSymbolTable.put(m.getName(), m.accept(this), m.getSourceLoc());
     }
 
     currParent = parent;
-    return new ClassDescriptor(parent, node.getName(), fieldSymbolTable,
-                               methodSymbolTable);
+    return new ClassDescriptor(parent, node.getName(), globalSymbolTable);
   }
 
   @Override
