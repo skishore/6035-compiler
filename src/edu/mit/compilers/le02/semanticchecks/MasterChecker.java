@@ -26,5 +26,6 @@ public class MasterChecker {
         CheckMethodCalls.check(root);
         CheckReturnValues.check(root);
         CheckExprTypes.check(root);
+        CheckBreakContinue.check(root);
     }
 }
