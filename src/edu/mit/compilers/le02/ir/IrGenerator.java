@@ -231,8 +231,8 @@ public class IrGenerator {
         node.getFirstChild().getType() == DecafParserTokenTypes.TK_true);
 
      case DecafParserTokenTypes.CHAR_LITERAL:
-      // Chars come as 'a', 'b', 'c', [...] or '\t', '\n', '\"', '\'', '\\'
-      // We currently do not deal with this case.
+      // Chars come as 'a', 'b', 'c', [...] or '\t', '\n', '\"', '\'', '\\'.
+      // We need to remove the leading and trailing quotes, and unescape.
       return new CharNode(sl,
         Util.unescape(node.getFirstChild().getText()).charAt(1));
 
@@ -241,7 +241,7 @@ public class IrGenerator {
 
      case DecafParserTokenTypes.STRING_LITERAL:
       String str_text = node.getFirstChild().getText();
-      // We need to handle escape sequences here too.
+      // Remove the leading and trailing quotes, and unescape.
       return new StringNode(sl,
         Util.unescape(str_text.substring(1, str_text.length() - 1)));
 
