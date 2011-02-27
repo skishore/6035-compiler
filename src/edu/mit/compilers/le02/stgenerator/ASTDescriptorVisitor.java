@@ -41,7 +41,7 @@ public final class ASTDescriptorVisitor extends ASTNodeVisitor<Object> {
 
   @Override
   public Object visit(MethodCallNode node) {
-    node.setDesc((MethodDescriptor) currST.get(node.getName(), 
+    node.setDesc((MethodDescriptor) currST.get(node.getName(),
                                                SymbolType.METHOD));
 
     defaultBehavior(node);
@@ -64,7 +64,6 @@ public final class ASTDescriptorVisitor extends ASTNodeVisitor<Object> {
   public Object visit(ScalarLocationNode node) {
     node.setDesc((TypedDescriptor) currST.get(node.getName(),
                                               SymbolType.VARIABLE));
-    
 
     defaultBehavior(node);
     return null;
@@ -72,7 +71,7 @@ public final class ASTDescriptorVisitor extends ASTNodeVisitor<Object> {
 
   @Override
   public Object visit(ArrayLocationNode node) {
-    node.setDesc((TypedDescriptor) currST.get(node.getName(), 
+    node.setDesc((TypedDescriptor) currST.get(node.getName(),
                                               SymbolType.VARIABLE));
 
     defaultBehavior(node);

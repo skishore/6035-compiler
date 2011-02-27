@@ -10,7 +10,7 @@ import edu.mit.compilers.le02.stgenerator.SymbolTableException;
 public class SymbolTable {
   private SymbolTable parent;
   private Map<String, Descriptor> table;
-  
+
   public enum SymbolType {
     METHOD,
     VARIABLE,
@@ -58,10 +58,10 @@ public class SymbolTable {
         d = st.getMap().get(id);
         if (type == SymbolType.EITHER) {
           return d;
-        } else if ((type == SymbolType.VARIABLE 
+        } else if ((type == SymbolType.VARIABLE
                     && d instanceof TypedDescriptor
                     && !(d instanceof MethodDescriptor)) ||
-                   (type == SymbolType.METHOD 
+                   (type == SymbolType.METHOD
                     && d instanceof MethodDescriptor)) {
           return d;
         } else {
@@ -96,12 +96,12 @@ public class SymbolTable {
   private Map<String, Descriptor> getMap() {
     return table;
   }
-  
+
   public int size() {
     if (parent == null) {
       return table.size();
     }
-    
+
     return table.size() + parent.size();
   }
 

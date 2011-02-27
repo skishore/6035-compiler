@@ -52,7 +52,7 @@ public class CheckDeclarations extends ASTNodeVisitor<Boolean> {
   @Override
   public Boolean visit(MethodDeclNode node) {
       SymbolTable parent = symbolTable;
-      symbolTable = ((MethodDescriptor) 
+      symbolTable = ((MethodDescriptor)
           symbolTable.get(node.getName(), SymbolType.METHOD)).getSymbolTable();
 
       defaultBehavior(node);

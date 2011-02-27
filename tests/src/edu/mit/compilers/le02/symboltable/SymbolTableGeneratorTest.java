@@ -37,13 +37,13 @@ public class SymbolTableGeneratorTest extends TestCase {
     assertTrue(ErrorReporting.noErrors());
 
     assertNotNull(st);
-    ClassDescriptor cd = (ClassDescriptor) st.get("Program", 
+    ClassDescriptor cd = (ClassDescriptor) st.get("Program",
                                                   SymbolType.EITHER);
     assertNotNull(cd);
     SymbolTable fst = cd.getSymbolTable();
     assertNotNull(fst);
 
-    FieldDescriptor fd = (FieldDescriptor) fst.get("array1", 
+    FieldDescriptor fd = (FieldDescriptor) fst.get("array1",
                                                    SymbolType.EITHER);
     checkTypedDesc(fd, "array1", DecafType.INT_ARRAY);
     fd = (FieldDescriptor) fst.get("array2", SymbolType.EITHER);
@@ -79,13 +79,13 @@ public class SymbolTableGeneratorTest extends TestCase {
     assertTrue(ErrorReporting.noErrors());
 
     assertNotNull(st);
-    ClassDescriptor cd = (ClassDescriptor) st.get("Program", 
+    ClassDescriptor cd = (ClassDescriptor) st.get("Program",
                                                   SymbolType.EITHER);
     assertNotNull(cd);
     SymbolTable mst = cd.getSymbolTable();
     assertNotNull(mst);
 
-    MethodDescriptor md = (MethodDescriptor) mst.get("method1", 
+    MethodDescriptor md = (MethodDescriptor) mst.get("method1",
                                                      SymbolType.EITHER);
     checkTypedDesc(md, "method1", DecafType.INT);
     SymbolTable pst = md.getSymbolTable();
@@ -94,14 +94,14 @@ public class SymbolTableGeneratorTest extends TestCase {
     assertNotNull(lst);
 
 
-    ParamDescriptor pd = (ParamDescriptor) pst.get("param1", 
+    ParamDescriptor pd = (ParamDescriptor) pst.get("param1",
                                                    SymbolType.EITHER);
     checkTypedDesc(pd, "param1", DecafType.INT);
 
     pd = (ParamDescriptor) pst.get("param2", SymbolType.EITHER);
     checkTypedDesc(pd, "param2", DecafType.BOOLEAN);
 
-    LocalDescriptor ld = (LocalDescriptor) lst.get("local1", 
+    LocalDescriptor ld = (LocalDescriptor) lst.get("local1",
                                                    SymbolType.EITHER);
     checkTypedDesc(ld, "local1", DecafType.BOOLEAN);
     ld = (LocalDescriptor) lst.get("local2", SymbolType.EITHER);
@@ -150,20 +150,20 @@ public class SymbolTableGeneratorTest extends TestCase {
     assertTrue(ErrorReporting.noErrors());
 
     assertNotNull(st);
-    ClassDescriptor cd = (ClassDescriptor) st.get("Program", 
+    ClassDescriptor cd = (ClassDescriptor) st.get("Program",
                                                   SymbolType.EITHER);
     assertNotNull(cd);
     SymbolTable mst = cd.getSymbolTable();
     assertNotNull(mst);
 
-    MethodDescriptor md = (MethodDescriptor) mst.get("method1", 
+    MethodDescriptor md = (MethodDescriptor) mst.get("method1",
                                                      SymbolType.EITHER);
     checkTypedDesc(md, "method1", DecafType.INT);
     BlockNode node = (BlockNode) md.getCode().getStatements().get(1);
     SymbolTable lst = node.getLocalSymbolTable();
     assertNotNull(lst);
 
-    LocalDescriptor ld = (LocalDescriptor) lst.get("local1", 
+    LocalDescriptor ld = (LocalDescriptor) lst.get("local1",
                                                    SymbolType.EITHER);
     checkTypedDesc(ld, "local1", DecafType.BOOLEAN);
     ld = (LocalDescriptor) lst.get("local2", SymbolType.EITHER);
