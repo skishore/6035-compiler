@@ -1,15 +1,99 @@
 =Semantics=
 
 ==Division of work==
+We used GitHub to organize our work and required a code review for each commit
+before it was merged; thus, at least two members of the group understand each
+line of code in detail and the entire group understands the overall design. Liz
+worked on the building of a well-organized concrete parse tree within ANTLR and
+converting the concrete parse tree into the defined abstract syntax tree
+format. David defined the structure of the abstract syntax tree and wrote
+classes for each node and a visitor class. Maria worked on symbol table design
+and population, with collaboration from Shaunak and David.  Liz worked on the
+error handling and pretty-printing framework and the testing/verification
+framework. Shaunak implemented the semantic checks and fixed many bugs in
+underlying layers of the stack. Shaunak and Liz drafted the writeup.  All
+members of the team worked on debugging, testing, and polishing the final
+product.
+
 
 ==Clarification/addition/assumptions==
+Please see the ‘Implementation Issues’ section for a discussion of for loops -
+in particular, we do not allow shadowing of the for loop index variable within
+the loop block since we treat it as part of the block.  We implemented an
+additional check to verify that all variable locations and variable expressions
+without indexes correspond to scalar variables. The inverse check is specified
+by the spec for verifying that indexed references are to array variables.  **
+what if you’re setting a = b where a and b are both arrays?] We assume that
+main can either be void or return a value since this was not specified in the
+spec one way or another.
+
 
 ==Overview of design, analysis of alternatives, and design decisions==
+We split the lexical analysis phase of the project into four parts: creation of
+concrete parse tree, conversion of concrete parse tree into abstract syntax
+tree, population of the symbol tables, and finally semantic checks using the
+AST and the symbol tables. The symbol tables are then used to link individual
+method call and variable references to appropriate descriptors.
+
+We created generic visitor classes for walking through the tree and then built
+the IR and did semantic checks in multiple passes. On these passes, we built
+populated symbol tables, added references to descriptors to each node, and then
+enforced semantic checks.
+
+We check for duplicate declarations during symbol table population. All other
+semantic checks are handled by a number of specialized visitors. One important
+constraint during the semantic checking phase is that the CheckDeclarations
+visitor is run before the CheckExprTypes type check. Among other checks, the
+first visitor ensures that every array has an index and that no scalar variable
+does. During the type checking phase, we are then able to simplify the
+INT_ARRAY and BOOLEAN_ARRAY types to INT and BOOLEAN, respectively.
+
+Where possible, we structured the code to be easily testable so that we could
+verify that functionality we had written was working correctly without needing
+to perform end to end testing. This allowed us to have higher confidence in the
+unit tested code and eliminate it as a possible source of bugs when tracking
+down issues.
+
 
 ==Implementation issues==
+Implementing bug-free tree traversal was more difficult than we initially
+expected. Our first attempts did not actually correctly traverse the tree,
+leading to bugs in symbol table population and to many nodes with null
+descriptors. We attempted to use method overloading to write code that was
+minimally repetitive, but this approach did not work since Java resolves method
+calls at compile time rather than at runtime. In the end, we addressed these
+problems by adding an accept() method to each ASTNode class.
+
+For loops were another area that tripped us up. Because we parsed loop
+initialization as an assignment instead of a declaration, we had to create a
+special case for ForNodes. We correctly added the for loop’s counter variable
+to symbol table of the loop’s body, but we did not attach the counter’s
+descriptor to the loop initializer until later.
+
+We incorrectly inserted SyscallArgNodes (used to wrap either an ExpressionNode
+or a StringNode) into the list of arguments for non-syscall function calls,
+leading to casting errors due to incorrect assumptions about whether
+non-syscall function calls needed their arguments wrapped.
+
+At the last minute we caught errors in the way we handled char and string
+escaping - we did not realize that the ANTLR AST.getValue() method returned the
+entire unaltered token from the lexer, including escaped sequences that needed
+to be unescaped and the quotes surrounding the string/char.
+
+Another issue we ran into was how to represent the code in the symbol tables.
+After exploring several options, we decided to augment our abstract syntax tree
+to contain references to the appropriate descriptors in symbol tables.  These
+references were populated during the creation of the symbol tables by a
+visitor.  This was particularly useful as it allowed us to traverse the
+abstract syntax tree to check for errors, while still using the type
+information from the symbol tables.
+
 
 ==Commented source code==
+See the README file for an index of what components are located in which
+packages, and the individual source files for commented code.
 
 
 ==Known problems==
-
+Please see https://github.com/lizthegrey/6035-compiler/issues for an
+up-to-date list of known issues.
